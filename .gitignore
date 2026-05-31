@@ -1,0 +1,14 @@
+# Source book (copyrighted, large binary) — kept locally, not versioned
+*.pdf
+
+# Obsidian workspace cache / per-machine config
+.obsidian/workspace*
+.obsidian/cache
+.obsidian/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
