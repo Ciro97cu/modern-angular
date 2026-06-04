@@ -1,11 +1,11 @@
 ---
 capitolo: 13
 titolo: "Agentic UI & AI Assistants with Hashbrown"
-pagine: "346-372"
+pagine: "357-383"
 tags: [tipo/capitolo, ai]
 ---
 # 13 · Agentic UI & AI Assistants with Hashbrown
-> 📖 cap.13 · pp.346-372 — *Modern Angular* v1.0.4
+> 📖 cap.13 · pp.357-383 — *Modern Angular* v2.0.0
 
 Gli assistenti AI migliorano la UX e abbattono i costi di supporto, ma implementarli implica tanto lavoro ripetitivo (connessione ai vari LLM, tool calling, ecc.). **Hashbrown** (`@hashbrownai/*`, open-source, due esperti noti della community Angular) toglie di mezzo questa fatica: supporta i principali provider — Gemini (Google), GPT (OpenAI), Azure (Microsoft), Llama (Meta).
 
@@ -15,7 +15,7 @@ Il capitolo estende un'app esistente di flight-booking con tre scenari crescenti
 3. **Natural language queries con code generation**: l'LLM genera JS che gira in sandbox per produrre un chart.
 
 ## Setting up Hashbrown
-> 📖 pp.346-349
+> 📖 pp.357-360
 
 Servono pochi pacchetti npm: il core framework-agnostic, il binding Angular e l'adapter del provider.
 
@@ -99,7 +99,7 @@ bootstrapApplication(AppComponent, {
 > La API key sta **solo nel backend**. Il frontend parla con un proxy che fa da intermediario verso l'LLM e che applica guardrail server-side (scelta del modello, system instruction): è lì che si controllano i costi e l'ambito.
 
 ## Using the chatResource
-> 📖 pp.350-351
+> 📖 pp.361-362
 
 Hashbrown offre varie implementazioni dell'**Resource API** di Angular (vedi [[resource]]) per chattare con gli LLM. Per la chat testuale si usa `chatResource`.
 
@@ -159,7 +159,7 @@ export class AssistantChatComponent {
 > Mostrare "Tool Call: findFlights" va bene per gli sviluppatori, ma confonde l'utente finale. Conviene **tradurre la traccia tecnica** in qualcosa come "Loading flights from Graz to Hamburg".
 
 ## Providing Tools
-> 📖 pp.352
+> 📖 pp.363
 
 I tool sono oggetti creati con `createTool`. Definiscono `name`, `description`, `schema` degli argomenti e un `handler`.
 
@@ -208,7 +208,7 @@ export const getLoadedFlights = createTool({
 > Skillet **non** descrive formalmente il valore di ritorno dei tool: il modello accetta qualsiasi forma di risposta. Se vuoi informarlo sulla struttura del risultato, descrivilo **come testo libero** nella `description`.
 
 ## Under the Hood (tool calling)
-> 📖 pp.353-354
+> 📖 pp.364-365
 
 Guardando i messaggi inviati all'LLM si vede il meccanismo: la conversazione passa attraverso ruoli (`user`, `assistant`, `tool`), e l'elenco dei tool con i relativi metadata viene appeso in fondo alla richiesta.
 
@@ -266,7 +266,7 @@ sequenceDiagram
 ```
 
 ## UI chat con uiChatResource
-> 📖 pp.355-358
+> 📖 pp.366-369
 
 `uiChatResource` va oltre: oltre al tool calling, l'LLM può **rispondere con componenti** renderizzati direttamente nella chat (non più solo testo). È un rimpiazzo drop-in di `chatResource`.
 
@@ -328,7 +328,7 @@ messageModels = computed(() =>
 ```
 
 ## Dumb components con smart wrapper
-> 📖 pp.359-360
+> 📖 pp.370-371
 
 I componenti offerti all'LLM sono **dumb component** oppure, come `flightWidget`, uno **smart wrapper** intorno a un dumb component (cfr. componenti e input/output del [[02-signal-based-components]]).
 
@@ -371,7 +371,7 @@ export class FlightWidgetComponent {
 Il wrapper inoltra i suoi [[signal-input|input]] al dumb component e gestisce gli eventi scatenando azioni negli store o cambi rotta. Punto chiave: l'input `status` (`'booked' | 'other'`) — l'LLM deve **derivarlo dalla conversazione**; in base al valore il widget mostra il pulsante "Check in" (volo prenotato) o "Select"/"Remove" (volo trovato in ricerca).
 
 ## Describing Components
-> 📖 pp.360-361
+> 📖 pp.371-372
 
 I componenti si descrivono con `exposeComponent`: `name`, `description` (quando usarlo) e schema Skillet di ogni `input`.
 
@@ -410,7 +410,7 @@ export const FlightSchema = s.object('Flight to be displayed', {
 ```
 
 ## Under the Hood: Structured Output
-> 📖 pp.361
+> 📖 pp.372
 
 Per decidere quali componenti mostrare, Hashbrown istruisce l'LLM a rispondere **solo con documenti JSON** (structured output). Il JSON arriva come stringa in `content` e contiene i componenti da mostrare con i valori degli input.
 
@@ -426,7 +426,7 @@ Per decidere quali componenti mostrare, Hashbrown istruisce l'LLM a rispondere *
 I componenti possibili (con input e descrizioni) vengono passati in una sezione separata della richiesta come **JSON Schema derivato da Skillet**.
 
 ## Supporting Different Models
-> 📖 pp.362
+> 📖 pp.373
 
 Alcuni modelli (es. Google Gemini) **non supportano (ancora) la combinazione structured output + tool calling**. Si risolve al bootstrap con `emulateStructuredOutput`:
 
@@ -445,7 +445,7 @@ bootstrapApplication(AppComponent, {
 Con `true`, Hashbrown definisce uno **pseudo-tool** che permette all'LLM di selezionare i componenti, e istruisce il modello a rispondere chiamando quel tool.
 
 ## Applying Few-Shot Prompting
-> 📖 pp.362-364
+> 📖 pp.373-375
 
 Per far rispondere sempre con testo + eventuali componenti, e per aiutare i modelli più deboli/economici (es. Gemini Flash), si arricchisce il system prompt della resource con esempi.
 
@@ -505,7 +505,7 @@ uiChatResource({
 > Il tag `prompt` (con validazione XML vs componenti) funziona **solo per il system prompt nella resource**. Se sovrascrivi il system prompt lato server (per sicurezza) e/o ti servono esempi dentro le descrizioni dei componenti, resti vincolato agli **esempi in prosa** non validati.
 
 ## Natural Language Queries — Approach
-> 📖 pp.365-366
+> 📖 pp.376-377
 
 Si va ancora oltre la selezione da un catalogo di componenti: l'app **genera codice** per parti dinamiche. Scenario: l'utente descrive a parole un report ("% di voli in ritardo per giorno, ordinati per data"), l'app trasforma i dati e mostra un chart.
 
@@ -544,7 +544,7 @@ generateChart({ data });   // sink fornito dall'app
 Il codice delega a due funzioni fornite dall'app: `loadFlights` (recupera i dati) e `generateChart` (sink che mostra il chart). L'LLM **non genera solo codice**, decide anche quali funzioni dell'app il codice deve invocare.
 
 ## Implementation with Hashbrown
-> 📖 pp.367-368
+> 📖 pp.378-379
 
 Due building block: `structuredCompletionResource` + una **runtime JavaScript**.
 
@@ -597,7 +597,7 @@ export class ReportingComponent {
 - Lo `schema` impone la struttura della risposta: esito (`success`/`error`), `message` per l'utente e `code` generato.
 
 ## Runtime Functions
-> 📖 pp.369-370
+> 📖 pp.380-381
 
 `createRuntimeFunction` crea una funzione che il codice generato può chiamare nella runtime. Definisce `name`, `description`, `args` (schema input), `result` (schema output) e `handler`.
 
@@ -649,7 +649,7 @@ Dettaglio importante: a differenza di `loadFlights` (data source), `generateChar
 > Nelle runtime function il `result` **è** descritto via Skillet (es. `s.array(..., FlightSchema)`), così il modello sa cosa aspettarsi come ritorno — diversamente dai tool del chatResource, dove il valore di ritorno non era schematizzato.
 
 ## System Prompt con One-Shot Prompting
-> 📖 pp.371-372
+> 📖 pp.382-383
 
 Il system prompt di `structuredCompletionResource` definisce i guardrail per la generazione del codice: passi chiave, un esempio, regole generali.
 

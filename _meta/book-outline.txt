@@ -1,396 +1,405 @@
+# Outline di modern-angular_v2_0_0.pdf (2a ed., Angular 22) — pagine = numero pagina PDF
+
 - [p.13] Preface
+  - [p.13] Changes in this 2nd Edition
   - [p.13] Who This Book Is For
   - [p.14] How to Read This Book
   - [p.14] Structure of This Book
   - [p.14] Source Code
   - [p.15] Acknowledgements
   - [p.15] About the Author
-  - [p.16-17] Trainings and Consultancy
-  - [p.16-17] Feedback
+  - [p.16] Trainings and Consultancy
+  - [p.17] Feedback
 - [p.18] Getting Started with Angular
   - [p.18] Tooling
     - [p.18] Development Environment
     - [p.19] Node.js
     - [p.19] Angular CLI
     - [p.19] Example Project Repository
-  - [p.20-21] Getting Started with the Angular CLI
-    - [p.20-21] Generating a New Project
-    - [p.20-21] Starting an Angular Application
+  - [p.20] Getting Started with the Angular CLI
+    - [p.20] Generating a New Project
+    - [p.20] Starting an Angular Application
     - [p.22] Project Structure of CLI Projects
-    - [p.23-24] Inspecting the Generated Source Code
-      - [p.23-24] App Component with Signals and Data Bindings
+    - [p.23] Inspecting the Generated Source Code
+      - [p.23] App Component with Signals and Data Bindings
       - [p.25] Bootstrapping the App Component
       - [p.26] Connecting the Root Component to the Start Page
     - [p.27] Installing Additional Packages
-    - [p.28-29] Adding Components and Styles
-    - [p.28-29] Configuring the Angular CLI
+    - [p.28] Adding Components and Styles
+    - [p.28] Configuring the Angular CLI
     - [p.30] Initializing the Linter
     - [p.30] Building the Application
-  - [p.30] Summary
-- [p.31] Signal-Based Components
-  - [p.31] Creating a Signal-based Component
-    - [p.32] Scaffolding Components with the Angular CLI
-    - [p.33] Suffixes and the Updated Angular Style Guide
-    - [p.33] Data Model
-    - [p.34-37] Component Logic
-    - [p.38] Importing Dependencies for the Template
-    - [p.39-40] Template and Data Binding
-      - [p.41] Event Bindings
-      - [p.41] Property Bindings
-      - [p.41] Built-in Control Flow
-      - [p.42] Interpolation and Pipes
-      - [p.43] Conditional Styling
-    - [p.44] Calling the Component
-    - [p.45] Running and Debugging the Application
-      - [p.45] Starting the Application
-      - [p.45] Discovering Errors in the Developer Console
-      - [p.46] Debugging the Application in the Browser
-      - [p.47-51] Debugging with Visual Studio Code
-  - [p.47-51] Data Access
-    - [p.47-51] Data Access Using the HttpClient
-    - [p.52-55] Data Access Using the httpResource
-  - [p.56] Sub Components with Properties and Events
-    - [p.57] Preparations
-    - [p.58] Planning Properties and Events
-    - [p.59] Components with InputSignals and OutputEmitterRefs
-    - [p.60] Component Template
-    - [p.61-62] Binding to a Sub-Component
-    - [p.63-64] Content Projection
-    - [p.65-66] Writable Inputs with ModelSignals
-    - [p.67-69] Two-way Bindings
-  - [p.70] Summary
-- [p.71-72] Reactive Design with Signals
-  - [p.71-72] Building Blocks of Reactive Design
-    - [p.71-72] Computed Signals
-    - [p.73-74] Resources
-      - [p.73-74] httpResource
-      - [p.75-76] rxResource
-      - [p.77-78] resource (Promise-based)
-    - [p.79-81] Effects
-  - [p.82] Signal Semantics in Angular
-    - [p.82] Signals in the Component Lifecycle
-    - [p.83-84] Auto-Tracking and the Reactive Context
-    - [p.85] Discussing Explicit Effects
-    - [p.86] Untracking
-    - [p.86] Glitch-Free Property
-    - [p.87-88] Equality and Immutability
-  - [p.89] Establishing a Reactive Flow
-    - [p.89] Thinking in Terms of the Signal Graph
-    - [p.90-92] Implementing the Reactive Flow
-  - [p.93] Summary
-- [p.94] Navigation & Lazy Loading with the Router
-  - [p.94] Overview
-  - [p.95] Getting Started with the Router
-    - [p.96-97] Setting up Routing Configuration
-    - [p.98] Adding a Placeholder in the App
-    - [p.99-100] Setting up Hyperlinks to Activate Routes
-    - [p.101] Trying out Your Setup
-    - [p.101] Programmatically Changing Routes
-  - [p.102] Parameterized Routes
-    - [p.102] Types of Routing Parameters
-    - [p.102] Reading Parameters with ActivatedRoute
-    - [p.103-104] Using withComponentInputBinding() for Reading Parameters
-    - [p.105] Configuring Parameterized Routes
-    - [p.106-107] Linking to Parameterized Routes
-  - [p.108] Hierarchical Routing with Child Routes
-    - [p.108] Overview of Child Routes
-    - [p.109-111] Implementing Child Components
-    - [p.112] Configuring Child Routes
-    - [p.113] Hyperlinks to Child Routes
-  - [p.114-117] Lazy Loading of Routes
-    - [p.114-117] Setting up Routes for Lazy Loading
-    - [p.118] Lazy Loading Individual Components with the Router
-    - [p.118] Verify Lazy Loading in the Browser
-    - [p.119] Preloading
-  - [p.120-121] Working with Query Strings and Hash Fragments
-  - [p.122] Path Routing vs. Hash Routing
-    - [p.122] PathLocationStrategy
-    - [p.123-124] HashLocationStrategy
-  - [p.125] Summary
-- [p.126] State Management with Services & Signals
-  - [p.126] Services
-    - [p.126] Generating a Service
-    - [p.127] Implementing a Service
-    - [p.128] Injecting a Service
-    - [p.129-130] Injection Context
-    - [p.131] Services with Dependencies
-    - [p.132-133] Exchanging Services with Providers
-    - [p.134] Short-Hand Syntax for Providers
-    - [p.135] Provider Functions
-    - [p.136-138] Component-local Services
-    - [p.139] Route-local Services and Auto Cleanup
-  - [p.140] State Management
-    - [p.141-142] Implementing a Store with Signals
-    - [p.143-144] Consuming the Store
-    - [p.145-146] Delegated Signals
-    - [p.147] Lifetime and Scopes
-    - [p.148] Outlook: NgRx Signal Store
-  - [p.148] Summary
-- [p.149-150] Signal Forms
-  - [p.149-150] A First Signal Form
-    - [p.149-150] Setting up the Component
-    - [p.151] Understanding the FieldTree Type
-    - [p.152-154] Binding to the Template
-  - [p.155] Working with Schemas
-    - [p.155] Using Separate Schemas
-    - [p.156] Controlling Behavior
-    - [p.157-158] Debouncing
-    - [p.159] Validating Against Zod and Standard Schema
-  - [p.160-161] Submitting Forms
-    - [p.160-161] Logic for Submitting Forms
-    - [p.162] Template for Submitting
-    - [p.163] Further Submit Actions
-  - [p.163] Custom Validators
-    - [p.163] Implementing a First Custom Validators
-    - [p.164] Refactoring Validators into Functions
-    - [p.165-166] Showing Validation Errors
-    - [p.167] Conditional Validation
-    - [p.168-169] Multi-Field Validators
-    - [p.170] Accessing Sibling Fields
-    - [p.171] Tree Validators
-    - [p.172-173] Asynchronous Validators
-    - [p.174] HTTP Validators
-  - [p.175-176] Large and Nested Forms
-    - [p.175-176] Form Groups
-    - [p.177-178] Form Arrays
-    - [p.179] Validating Form Arrays
-    - [p.180-181] Subforms
-  - [p.182] Working with Form Metadata
-    - [p.183] Reading Metadata
-    - [p.184] Displaying Metadata
-    - [p.185] Defining Custom Metadata
-    - [p.186] Reading Custom Metadata
-  - [p.187-189] Null and Undefined Values
-  - [p.190-191] Custom Fields
-  - [p.192] Summary
-- [p.193-194] Modern Testing with Vitest
-  - [p.193-194] Vitest
-    - [p.193-194] Structure of a Vitest Test
-    - [p.195] Skipping Tests
-    - [p.195] Turning on Browser Mode
-    - [p.196] Running Tests
-  - [p.197-198] Angular and Vitest
-    - [p.197-198] Preparing the TestBed
-    - [p.199] A First Component Test
-    - [p.200-201] Working with Locators
-    - [p.202] Locating Elements via DebugElement
-    - [p.202] Defining Default Timeouts
-  - [p.203-204] Mocking and Spies
-    - [p.203-204] Mocking Services
-    - [p.205] Mocking Services on the Component Level
-    - [p.205] Mocking Child Components and Shallow Testing
-    - [p.206-209] Mocking HTTP Calls
-    - [p.210-211] Gray-Box Testing with Spies
-    - [p.212] Testing Routed Components
-  - [p.212] Testing Timers and Debouncing
-    - [p.213] Mocking Asynchronicity and Delays
-    - [p.214-215] Fake Timers
-  - [p.216] Testing Services
-  - [p.217-218] Determining Test Coverage
-  - [p.219] Summary
-- [p.220] Sustainable Architectures for Modern Angular
-  - [p.220] Vertical Slicing
-    - [p.220] Reasons for Vertical Slicing
-    - [p.221-222] Finding Boundaries
-    - [p.223-224] Event Storming
-    - [p.225-226] Different Models
-    - [p.225-226] Different Slicing in the Frontend
-  - [p.227] Structuring Verticals
-    - [p.227] The Architecture Matrix
-    - [p.228-229] Feature-Local Source Code
-    - [p.230] Implementation Options
-  - [p.231] Implementing a Modulith
-    - [p.231] Project Structure for a Modulith
-    - [p.232] Information Hiding
-    - [p.233-234] Enforcing your Architecture with Sheriff
-    - [p.235-236] Visualizing Dependencies with Detective
-    - [p.237] Lightweight Path Mappings
-  - [p.238] Lightweight Stores and Your Architecture
-    - [p.238] Unidirectional Data Flow
-    - [p.239] Where to Put a Lightweight Store?
-    - [p.240] Granularity of a Store
-    - [p.241] Communication Between Stores
-    - [p.242] Preventing Cycles, Redundancies, and Inconsistencies
-  - [p.242] Summary
-- [p.243-244] State Management with NgRx Signal Store
-  - [p.243-244] A First SignalStore
-    - [p.243-244] Creating a Signal Store
-    - [p.245-246] Defining State
-    - [p.247] Providing Resources
-    - [p.248] Providing Computed Signals
-    - [p.249] Providing Methods
-    - [p.250-251] Setting up Hooks
-    - [p.250-251] Consuming the Store
-  - [p.252-254] Inspecting the Store with the Redux DevTools
-    - [p.252-254] Connecting to the Redux DevTools
-    - [p.252-254] Disabling DevTools in Production
-  - [p.255-257] Mutations
-    - [p.255-257] Creating Mutations
-    - [p.258-259] Consuming Mutations
-    - [p.260] Using rxMutation
-  - [p.261-265] Reactive Methods
-    - [p.261-265] rxMethod
-    - [p.266] signalMethod
-  - [p.267-269] Entity Management and Normalization
-    - [p.267-269] Entities
-    - [p.270] Entity Maps
-    - [p.271] Identifying Entities with IDs
-    - [p.272] Managing Several Entities in a Store
-    - [p.273-275] Normalization
-  - [p.276] Event API: Flux and Redux
-    - [p.277] Mental Model
-    - [p.278] Events
-    - [p.279] Reducer
-    - [p.280] Event Handlers
-    - [p.281] Dispatching Events
-  - [p.282-283] Custom Features
-    - [p.282-283] Defining Custom Features
-    - [p.284-285] Using Custom Features
-  - [p.286] Summary
-- [p.287-288] Signal Queries & Component Communication
-  - [p.287-288] Content Projection
-  - [p.289-290] Referencing Parent Components
-  - [p.291] View and Content
-    - [p.292-293] Interacting with Content
-    - [p.294-295] Interacting with the View
-    - [p.296] Questioning the Use of viewChild and viewChildren
-    - [p.296] Static Child Components
-  - [p.297-299] Communication via Template Variables
-  - [p.297-299] Communication via Services
-  - [p.300] Summary
-- [p.301-303] Directives, Templates, and Containers
-  - [p.301-303] Attribute Directives
-    - [p.301-303] Defining Directives
-    - [p.304] Communicating with the Environment
-    - [p.304] Directives and Template Variables
-    - [p.305-307] Controlled DOM-Manipulations
-  - [p.308-310] Code-based Content Projection
-    - [p.308-310] Templates and Containers
-    - [p.311-312] Passing Parameters to Templates
-  - [p.313] Structural Directives
-    - [p.314] Desugaring Structural Directives
-    - [p.315-318] Implementing a Simple DataTable
-    - [p.319-320] Using ViewContainerRef Directly to Display Templates
-    - [p.321-327] Accessing the ViewContainerRef via Signal Queries
-  - [p.321-327] Dynamic Components
-    - [p.321-327] Modal Dialogs
-    - [p.328-329] Instantiating Component via Code
-  - [p.330] Summary
-- [p.331-332] Initialization & Route Changes
-  - [p.331-332] Initializers
-    - [p.331-332] Application Initializers
-    - [p.333] Environment Initializers
-    - [p.334] Platform Initializers
-  - [p.334] Guards
-    - [p.335] Preventing Route Activation
-    - [p.336-338] Preventing Route Deactivation
-  - [p.339-340] Router Events
-  - [p.341-342] Resolver
-  - [p.343-344] HttpInterceptors
-  - [p.345] Summary
-- [p.346-349] Agentic UI & AI Assistants with Hashbrown
-  - [p.346-349] Implementing an Assistant with Tool Calling
-    - [p.346-349] Setting up Hashbrown
-    - [p.350-351] Using the chatResource
-    - [p.352] Providing Tools
-    - [p.353-354] Under the Hood
-  - [p.355] Generative UI and Component Control
-    - [p.356-358] UI chat with uiChatResource
-    - [p.359] Components for chat: Dumb Components with Smart Wrappers
-    - [p.360] Describing Components
-    - [p.361] Under the Hood: Structured Output
-    - [p.362-364] Supporting Different Models
-    - [p.362-364] Applying Few-Shot Prompting
-  - [p.365-366] Natural Language Queries with Code Generation
-    - [p.365-366] Approach
-    - [p.367-368] Implementation with Hashbrown
-    - [p.369-370] Runtime Functions
-    - [p.371] System Prompt with One-Shot Prompting
-  - [p.372] Summary
-- [p.373] Monorepos & Reusable Libraries
-  - [p.373] Angular CLI-based Repos
-    - [p.374] Creating a Monorepo
-    - [p.375-377] Structure of Libraries
-    - [p.378] Trying Out the Library in the Monorepo
-    - [p.379-380] Building and Publishing the npm Package
-    - [p.381] Consuming the npm Package
-  - [p.382-383] Faster Builds and More Convenience with Nx
-    - [p.382-383] Creating an Nx Workspace
-    - [p.384-385] Module Boundaries
-    - [p.386] Nx with Sheriff and Detective
-    - [p.386] Incremental Builds with Nx
-    - [p.386] Distributed Cache with Nx Cloud
-    - [p.387-388] Even Faster: Parallelization with Nx Cloud
-  - [p.387-388] Summary
-- [p.389] Internationalization
-  - [p.389] Overview
-  - [p.390] Installing @angular/localize
-  - [p.390] Marking Texts
-  - [p.391] Marking Strings in the Component Class
-  - [p.392-393] Extracting Texts
-  - [p.394] Integrating Translated Texts into Builds
-  - [p.395-396] Setting the Language for Development
-  - [p.397-398] Specifying Translation Texts at Runtime
-  - [p.397-398] Taking Grammatical Forms into Account
-  - [p.399] Supporting Different Formats
-  - [p.400] Outlook: Community Solutions
-  - [p.400] Summary
-- [p.401] Modern Patterns for Authentication & Authorization
-  - [p.401] Cookie-based Authentication
-    - [p.401] Security-Attributes for Cookies
-    - [p.402] Cookies and XSRF
-  - [p.403] Token-based Security
-    - [p.404] OAuth 2
-    - [p.405-406] Authenticating Users with OpenID Connect
-    - [p.405-406] JSON Web Token
-    - [p.407] OAuth 2 and OIDC Flows
-    - [p.408-409] Client-side OAuth 2
-    - [p.408-409] Current Recommendation: Server-side OAuth 2
-  - [p.410] Summary
-- [p.411] Defer, SSR & Hydration
-  - [p.411] Deferrable Views
-    - [p.411] Using Defer Blocks
-    - [p.412] Triggers
-  - [p.413] SSR & Hydration
-    - [p.413] Adding Server-Side Rendering
-    - [p.414-415] Incremental Hydration
-    - [p.416-417] Event Replay
-    - [p.416-417] Different Implementations for Server and Client
-      - [p.416-417] Different Implementations via DI
-      - [p.418-419] Checking the Platform at Runtime
-  - [p.418-419] Hybrid Routing
-    - [p.420] Prerendering Routes With Parameters
-    - [p.421] Working with the HTTP request and response
-  - [p.422] Summary
-- [p.423] Micro Frontends: Scaling Across Multiple Teams
-  - [p.423] What are Micro Frontends?
-    - [p.423] Motivation Behind Micro Frontends
-    - [p.424] Challenges to Keep in Mind
-    - [p.425] Micro Frontends and Self-Contained Systems
-  - [p.426-428] Native Federation
-  - [p.429] Using Native Federation
-    - [p.429] Native Federation: Setting up a Micro Frontend
-    - [p.430-432] Native Federation: Setting up a Shell
-    - [p.433-434] Exposing a Router Config
-    - [p.435] Communication between Micro Frontends
-  - [p.436] Multi-Version and Multi-Framework Solutions
-    - [p.437] Abstracting Micro Frontends with Web Components
-    - [p.438-440] Loading Web Components in a Shell
-    - [p.441] Sharing Zone.js
-    - [p.442] Web Components with own Routes
-    - [p.442] Workaround for Routers in Web Component
-  - [p.443] The Cost of Micro Frontends
-  - [p.443] Summary
-- [p.444] Analyzing Your Architecture with Forensic Techniques
-  - [p.444] The Example Application Examined
-  - [p.445-446] Analyzing Layering
-  - [p.447] Forensic Analysis for Architects: A Brief Overview
-  - [p.447] Using Detective
-  - [p.448] Change Coupling
-  - [p.449] Hotspots as an Indicator of Architectural Problems
-  - [p.450-451] Team Alignment and Conway’s Law
-  - [p.452] From Detective to Code Scene
-  - [p.452] Critical Review
-  - [p.453] Summary
-- [p.454] Trainings and Consulting
-- [p.455] Imprint & Legal Notice
+  - [p.31] Summary
+- [p.32] Signal-Based Components
+  - [p.32] Creating a Signal-based Component
+    - [p.33] Scaffolding Components with the Angular CLI
+    - [p.34] Suffixes and the Updated Angular Style Guide
+    - [p.34] Data Model
+    - [p.35] Component Logic
+    - [p.39] Importing Dependencies for the Template
+    - [p.40] Template and Data Binding
+      - [p.42] Event Bindings
+      - [p.42] Property Bindings
+      - [p.42] Built-in Control Flow
+      - [p.43] Exhaustive @switch with @default never
+      - [p.45] Interpolation and Pipes
+      - [p.46] Conditional Styling
+    - [p.46] Calling the Component
+    - [p.47] Running and Debugging the Application
+      - [p.47] Starting the Application
+      - [p.47] Discovering Errors in the Developer Console
+      - [p.48] Debugging the Application in the Browser
+      - [p.49] Debugging with Visual Studio Code
+  - [p.50] Data Access
+    - [p.50] Data Access Using the HttpClient
+    - [p.54] Data Access Using the httpResource
+  - [p.59] Sub Components with Properties and Events
+    - [p.59] Preparations
+    - [p.60] Planning Properties and Events
+    - [p.61] Components with InputSignals and OutputEmitterRefs
+    - [p.62] Component Template
+    - [p.63] Binding to a Sub-Component
+    - [p.65] Content Projection
+    - [p.67] Writable Inputs with ModelSignals
+    - [p.69] Two-way Bindings
+  - [p.72] Summary
+- [p.73] Reactive Design with Signals
+  - [p.73] Building Blocks of Reactive Design
+    - [p.73] Computed Signals
+    - [p.75] Resources
+      - [p.75] httpResource
+      - [p.77] rxResource
+      - [p.79] resource (Promise-based)
+      - [p.81] Composing Resources via Snapshots
+    - [p.84] Effects
+  - [p.87] Signal Semantics in Angular
+    - [p.87] Signals in the Component Lifecycle
+    - [p.88] Debouncing Signals via debounced
+    - [p.88] Auto-Tracking and the Reactive Context
+    - [p.90] Discussing Explicit Effects
+    - [p.91] Untracking
+    - [p.91] Glitch-Free Property
+    - [p.92] Equality and Immutability
+  - [p.94] Establishing a Reactive Flow
+    - [p.94] Thinking in Terms of the Signal Graph
+    - [p.95] Implementing the Reactive Flow
+  - [p.98] Summary
+- [p.99] Navigation & Lazy Loading with the Router
+  - [p.99] Overview
+  - [p.100] Getting Started with the Router
+    - [p.101] Setting up Routing Configuration
+    - [p.103] Adding a Placeholder in the App
+    - [p.104] Setting up Hyperlinks to Activate Routes
+      - [p.106] Alternative: Determining the Active Route with isActive
+    - [p.107] Trying out Your Setup
+    - [p.107] Programmatically Changing Routes
+  - [p.108] Parameterized Routes
+    - [p.108] Types of Routing Parameters
+    - [p.109] Reading Parameters with ActivatedRoute
+    - [p.110] Using withComponentInputBinding() for Reading Parameters
+    - [p.111] Configuring Parameterized Routes
+    - [p.112] Linking to Parameterized Routes
+  - [p.114] Hierarchical Routing with Child Routes
+    - [p.114] Overview of Child Routes
+    - [p.115] Implementing Child Components
+    - [p.118] Configuring Child Routes
+    - [p.119] Hyperlinks to Child Routes
+  - [p.120] Lazy Loading of Routes
+    - [p.120] Setting up Routes for Lazy Loading
+    - [p.124] Lazy Loading Individual Components with the Router
+    - [p.124] Verify Lazy Loading in the Browser
+    - [p.125] Preloading
+  - [p.126] Working with Query Strings and Hash Fragments
+  - [p.128] Path Routing vs. Hash Routing
+    - [p.128] PathLocationStrategy
+    - [p.129] HashLocationStrategy
+  - [p.131] Summary
+- [p.132] State Management with Services & Signals
+  - [p.132] Services
+    - [p.132] Generating a Service
+    - [p.133] Implementing a Service
+    - [p.134] Injecting a Service
+    - [p.135] Injection Context
+    - [p.137] Services with Dependencies
+    - [p.138] Exchanging Services with Providers
+    - [p.141] Short-Hand Syntax for Providers
+    - [p.141] Provider Functions
+    - [p.142] Component-local Services
+    - [p.145] Route-local Services and Auto Cleanup
+    - [p.146] Lazy Service Injection with injectAsync
+  - [p.148] State Management
+    - [p.149] Implementing a Store with Signals
+    - [p.151] Consuming the Store
+    - [p.153] Delegated Signals
+    - [p.155] Lifetime and Scopes
+    - [p.156] Outlook: NgRx Signal Store
+  - [p.156] Summary
+- [p.157] Signal Forms
+  - [p.157] A First Signal Form
+    - [p.157] Setting up the Component
+    - [p.159] Understanding the FieldTree Type
+    - [p.160] Binding to the Template
+  - [p.163] Working with Schemas
+    - [p.163] Using Separate Schemas
+    - [p.164] Controlling Behavior
+    - [p.166] Debouncing
+    - [p.167] Validating Against Zod and Standard Schema
+  - [p.169] Visualizing Validation State with CSS Classes
+  - [p.170] Submitting Forms
+    - [p.170] Logic for Submitting Forms
+    - [p.172] Template for Submitting
+    - [p.173] Further Submit Actions
+  - [p.174] Custom Validators
+    - [p.174] Implementing a First Custom Validators
+    - [p.175] Refactoring Validators into Functions
+    - [p.176] Showing Validation Errors
+    - [p.178] Conditional Validation
+    - [p.179] Multi-Field Validators
+    - [p.181] Accessing Sibling Fields
+    - [p.182] Tree Validators
+    - [p.183] Asynchronous Validators
+    - [p.185] HTTP Validators
+  - [p.186] Large and Nested Forms
+    - [p.186] Form Groups
+    - [p.188] Form Arrays
+    - [p.190] Validating Form Arrays
+    - [p.191] Subforms
+  - [p.193] Working with Form Metadata
+    - [p.194] Reading Metadata
+    - [p.195] Displaying Metadata
+    - [p.196] Defining Custom Metadata
+    - [p.197] Reading Custom Metadata
+  - [p.198] Null and Undefined Values
+  - [p.201] Custom Fields
+  - [p.203] Summary
+- [p.204] Modern Testing with Vitest
+  - [p.204] Vitest
+    - [p.204] Structure of a Vitest Test
+    - [p.206] Skipping Tests
+    - [p.206] Turning on Browser Mode
+    - [p.207] Running Tests
+  - [p.208] Angular and Vitest
+    - [p.208] Preparing the TestBed
+    - [p.210] A First Component Test
+    - [p.211] Working with Locators
+    - [p.213] Locating Elements via DebugElement
+    - [p.213] Defining Default Timeouts
+  - [p.214] Mocking and Spies
+    - [p.214] Mocking Services
+    - [p.216] Mocking Services on the Component Level
+    - [p.216] Mocking Child Components and Shallow Testing
+    - [p.217] Mocking HTTP Calls
+    - [p.221] Gray-Box Testing with Spies
+    - [p.223] Testing Routed Components
+  - [p.223] Testing Timers and Debouncing
+    - [p.224] Mocking Asynchronicity and Delays
+    - [p.225] Fake Timers
+  - [p.227] Testing Services
+  - [p.228] Determining Test Coverage
+  - [p.230] Summary
+- [p.231] Sustainable Architectures for Modern Angular
+  - [p.231] Vertical Slicing
+    - [p.231] Reasons for Vertical Slicing
+    - [p.232] Finding Boundaries
+    - [p.234] Event Storming
+    - [p.236] Different Models
+    - [p.236] Different Slicing in the Frontend
+  - [p.238] Structuring Verticals
+    - [p.238] The Architecture Matrix
+    - [p.239] Feature-Local Source Code
+    - [p.241] Implementation Options
+  - [p.242] Implementing a Modulith
+    - [p.242] Project Structure for a Modulith
+    - [p.243] Information Hiding
+    - [p.244] Enforcing your Architecture with Sheriff
+    - [p.246] Visualizing Dependencies with Detective
+    - [p.248] Lightweight Path Mappings
+  - [p.249] Lightweight Stores and Your Architecture
+    - [p.249] Unidirectional Data Flow
+    - [p.250] Where to Put a Lightweight Store?
+    - [p.251] Granularity of a Store
+    - [p.252] Communication Between Stores
+    - [p.253] Preventing Cycles, Redundancies, and Inconsistencies
+  - [p.253] Summary
+- [p.254] State Management with NgRx Signal Store
+  - [p.254] A First SignalStore
+    - [p.254] Creating a Signal Store
+    - [p.256] Defining State
+    - [p.258] Providing Resources
+    - [p.259] Providing Computed Signals
+    - [p.260] Providing Methods
+    - [p.261] Setting up Hooks
+    - [p.261] Consuming the Store
+  - [p.263] Inspecting the Store with the Redux DevTools
+    - [p.263] Connecting to the Redux DevTools
+    - [p.263] Disabling DevTools in Production
+  - [p.266] Mutations
+    - [p.266] Creating Mutations
+    - [p.269] Consuming Mutations
+    - [p.271] Using rxMutation
+  - [p.272] Reactive Methods
+    - [p.272] rxMethod
+    - [p.277] signalMethod
+  - [p.278] Entity Management and Normalization
+    - [p.278] Entities
+    - [p.281] Entity Maps
+    - [p.282] Identifying Entities with IDs
+    - [p.283] Managing Several Entities in a Store
+    - [p.284] Normalization
+  - [p.287] Event API: Flux and Redux
+    - [p.288] Mental Model
+    - [p.289] Events
+    - [p.290] Reducer
+    - [p.291] Event Handlers
+    - [p.292] Dispatching Events
+  - [p.293] Custom Features
+    - [p.293] Defining Custom Features
+    - [p.295] Using Custom Features
+  - [p.297] Summary
+- [p.298] Signal Queries & Component Communication
+  - [p.298] Content Projection
+  - [p.300] Referencing Parent Components
+  - [p.302] View and Content
+    - [p.303] Interacting with Content
+    - [p.305] Interacting with the View
+    - [p.307] Questioning the Use of viewChild and viewChildren
+    - [p.307] Static Child Components
+  - [p.308] Communication via Template Variables
+  - [p.308] Communication via Services
+  - [p.311] Summary
+- [p.312] Directives, Templates, and Containers
+  - [p.312] Attribute Directives
+    - [p.312] Defining Directives
+    - [p.315] Communicating with the Environment
+    - [p.315] Directives and Template Variables
+    - [p.316] Controlled DOM-Manipulations
+  - [p.319] Code-based Content Projection
+    - [p.319] Templates and Containers
+    - [p.322] Passing Parameters to Templates
+  - [p.324] Structural Directives
+    - [p.325] Desugaring Structural Directives
+    - [p.326] Implementing a Simple DataTable
+    - [p.330] Using ViewContainerRef Directly to Display Templates
+    - [p.332] Accessing the ViewContainerRef via Signal Queries
+  - [p.332] Dynamic Components
+    - [p.332] Modal Dialogs
+    - [p.339] Instantiating Component via Code
+  - [p.341] Summary
+- [p.342] Initialization & Route Changes
+  - [p.342] Initializers
+    - [p.342] Application Initializers
+    - [p.344] Environment Initializers
+    - [p.345] Platform Initializers
+  - [p.345] Guards
+    - [p.345] Preventing Route Activation
+    - [p.347] Preventing Route Deactivation
+  - [p.350] Router Events
+  - [p.352] Resolver
+  - [p.354] HttpInterceptors
+  - [p.356] Summary
+- [p.357] Agentic UI & AI Assistants with Hashbrown
+  - [p.357] Implementing an Assistant with Tool Calling
+    - [p.357] Setting up Hashbrown
+    - [p.361] Using the chatResource
+    - [p.363] Providing Tools
+    - [p.364] Under the Hood
+  - [p.366] Generative UI and Component Control
+    - [p.367] UI chat with uiChatResource
+    - [p.370] Components for chat: Dumb Components with Smart Wrappers
+    - [p.371] Describing Components
+    - [p.372] Under the Hood: Structured Output
+    - [p.373] Supporting Different Models
+    - [p.373] Applying Few-Shot Prompting
+  - [p.376] Natural Language Queries with Code Generation
+    - [p.376] Approach
+    - [p.378] Implementation with Hashbrown
+    - [p.380] Runtime Functions
+    - [p.382] System Prompt with One-Shot Prompting
+  - [p.383] Summary
+- [p.384] Monorepos & Reusable Libraries
+  - [p.384] Angular CLI-based Repos
+    - [p.385] Creating a Monorepo
+    - [p.386] Structure of Libraries
+    - [p.389] Trying Out the Library in the Monorepo
+    - [p.390] Building and Publishing the npm Package
+    - [p.392] Consuming the npm Package
+  - [p.393] Faster Builds and More Convenience with Nx
+    - [p.393] Creating an Nx Workspace
+    - [p.395] Module Boundaries
+    - [p.397] Nx with Sheriff and Detective
+    - [p.397] Incremental Builds with Nx
+    - [p.397] Distributed Cache with Nx Cloud
+    - [p.398] Even Faster: Parallelization with Nx Cloud
+  - [p.398] Summary
+- [p.400] Internationalization
+  - [p.400] Overview
+  - [p.401] Installing @angular/localize
+  - [p.401] Marking Texts
+  - [p.402] Marking Strings in the Component Class
+  - [p.403] Extracting Texts
+  - [p.405] Integrating Translated Texts into Builds
+  - [p.406] Setting the Language for Development
+  - [p.408] Specifying Translation Texts at Runtime
+  - [p.408] Taking Grammatical Forms into Account
+  - [p.410] Supporting Different Formats
+  - [p.411] Outlook: Community Solutions
+  - [p.411] Summary
+- [p.412] Modern Patterns for Authentication & Authorization
+  - [p.412] Cookie-based Authentication
+    - [p.412] Security-Attributes for Cookies
+    - [p.413] Cookies and XSRF
+  - [p.414] Token-based Security
+    - [p.415] OAuth 2
+    - [p.416] Authenticating Users with OpenID Connect
+    - [p.416] JSON Web Token
+    - [p.418] OAuth 2 and OIDC Flows
+    - [p.419] Client-side OAuth 2
+    - [p.419] Current Recommendation: Server-side OAuth 2
+  - [p.421] Summary
+- [p.422] Defer, SSR & Hydration
+  - [p.422] Deferrable Views
+    - [p.422] Using Defer Blocks
+    - [p.423] Triggers
+  - [p.424] SSR & Hydration
+    - [p.424] Adding Server-Side Rendering
+    - [p.425] Incremental Hydration
+    - [p.427] Event Replay
+    - [p.428] Different Implementations for Server and Client
+      - [p.428] Different Implementations via DI
+      - [p.429] Checking the Platform at Runtime
+  - [p.430] Hybrid Routing
+    - [p.432] Prerendering Routes With Parameters
+    - [p.432] Working with the HTTP request and response
+  - [p.433] Summary
+- [p.435] Micro Frontends: Scaling Across Multiple Teams
+  - [p.435] What are Micro Frontends?
+    - [p.435] Motivation Behind Micro Frontends
+    - [p.436] Challenges to Keep in Mind
+    - [p.437] Micro Frontends and Self-Contained Systems
+  - [p.438] Native Federation
+  - [p.441] Using Native Federation
+    - [p.441] Native Federation: Setting up a Micro Frontend
+    - [p.442] Native Federation: Setting up a Shell
+    - [p.445] Exposing a Router Config
+    - [p.447] Communication between Micro Frontends
+  - [p.448] Multi-Version and Multi-Framework Solutions
+    - [p.449] Abstracting Micro Frontends with Web Components
+    - [p.450] Loading Web Components in a Shell
+    - [p.453] Sharing Zone.js
+    - [p.454] Web Components with own Routes
+    - [p.454] Workaround for Routers in Web Component
+  - [p.455] The Cost of Micro Frontends
+  - [p.455] Summary
+- [p.456] Analyzing Your Architecture with Forensic Techniques
+  - [p.456] The Example Application Examined
+  - [p.457] Analyzing Layering
+  - [p.459] Forensic Analysis for Architects: A Brief Overview
+  - [p.459] Using Detective
+  - [p.460] Change Coupling
+  - [p.461] Hotspots as an Indicator of Architectural Problems
+  - [p.462] Team Alignment and Conway’s Law
+  - [p.464] From Detective to Code Scene
+  - [p.464] Critical Review
+  - [p.465] Summary
+- [p.466] Trainings and Consulting
+- [p.467] Imprint & Legal Notice

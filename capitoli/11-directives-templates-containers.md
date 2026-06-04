@@ -1,18 +1,18 @@
 ---
 capitolo: 11
 titolo: "Directives, Templates, and Containers"
-pagine: "301-330"
-tags: [tipo/capitolo, directives, templates]
+pagine: "312-341"
+tags: [tipo/capitolo, directives, templates, angular-22]
 ---
 # 11 · Directives, Templates, and Containers
-> 📖 cap.11 · pp.301-330 — *Modern Angular* v1.0.4
+> 📖 cap.11 · pp.312-341 — *Modern Angular* v2.0.0
 
 Le librerie di componenti (Angular Material & co.) non spediscono solo UI pronte: poggiano su una manciata di mattoni che rendono i componenti flessibili e riusabili. Questo capitolo li attraversa partendo da un insieme minimo di costrutti: una **attribute directive** (in due versioni: tooltip), una **DataTable** (structural directive) e un **DialogService** (dynamic components).
 
 Idea cardine: un **componente è solo una directive con un template**. La `@Directive` ha quasi tutte le proprietà di `@Component`, mancano solo quelle legate al template (`template`/`templateUrl`, `styles`/`styleUrls`, `viewProviders`).
 
 ## Attribute Directives — definire una directive
-> 📖 pp.301-304
+> 📖 pp.312-315
 
 Le **attribute directive** aggiungono comportamento a elementi esistenti senza portare una propria view. Il nome riflette la convenzione: il selector punta a elementi con un certo **attributo**. L'esempio sostituisce il classico `(click)` per azioni critiche con un click che prima mostra un dialog di conferma.
 
@@ -63,7 +63,7 @@ I selector seguono le possibilità CSS, quindi si può restringere: `button[appC
 > L'opzione `host` del decorator lega proprietà ed eventi all'elemento host: `class:`/`style.`/binding di proprietà e **host listener** tipo `'(click)': '...'`. È il modo signal-era di fare ciò che un tempo si faceva con `@HostBinding`/`@HostListener`.
 
 ## Comunicare con l'ambiente & template variables
-> 📖 pp.304-305
+> 📖 pp.315-316
 
 Come i componenti, le directive comunicano col chiamante via `input()`/`output()`. Dare allo `output` **lo stesso nome del selector** permette di applicare la directive e impostare il binding in un colpo solo:
 
@@ -81,7 +81,7 @@ Una directive si referenzia anche con una **template variable**: dietro un eleme
 `#cww="clickWithWarning"` dà accesso all'istanza `ClickWithWarning` del bottone, di cui si possono chiamare i metodi pubblici. `exportAs` funziona anche con i componenti, ma di solito è superfluo: Angular assegna già l'istanza del componente alla template variable senza valore esplicito.
 
 ## Controlled DOM-Manipulations
-> 📖 pp.305-307
+> 📖 pp.316-318
 
 A volte una directive deve creare/gestire elementi DOM **fuori dal template** (overlay, tooltip, popover che devono sfuggire a `overflow`/posizionamento dei genitori). È una manipolazione di basso livello: usarla solo se non c'è un'astrazione migliore, e **ripulire sempre** gli elementi creati alla distruzione, pena memory leak e nodi orfani.
 
@@ -170,7 +170,7 @@ Uso:
 Collegamenti: [[inject]] · [[injection-context]] · [[signal-input]].
 
 ## Code-based Content Projection — templates & containers
-> 📖 pp.308-310
+> 📖 pp.319-321
 
 Oltre alla [[content-projection]] dichiarativa (`<ng-content>`), si può renderizzare il contenuto di un **template via codice**: più flessibilità, e si può proiettare lo stesso template più volte con parametri diversi.
 
@@ -263,7 +263,7 @@ Uso (il template si passa come `TemplateRef`, ottenuto con la variabile `#tmpl`)
 - `viewRef.destroy()` + `DestroyRef` garantiscono che i nodi muoiano con l'host.
 
 ## Passare parametri ai template (context object)
-> 📖 pp.311-313
+> 📖 pp.322-324
 
 Quando si renderizza un template si può passare un **context object** con parametri usabili come variabili nel template.
 
@@ -311,7 +311,7 @@ Leggilo come una funzione che riceve valori: `let-title` prende `$implicit`, `le
 Collegamenti: [[content-projection]].
 
 ## Structural Directives — desugaring
-> 📖 pp.313-315
+> 📖 pp.324-326
 
 Una **structural directive** assume che l'host sia un **template** renderizzabile su richiesta (una o più volte) e offre una **microsyntax** compatta per parametri e binding. È il chiamante (non la directive) a decidere l'uso strutturale, prefissando l'attributo con `*`.
 
@@ -359,7 +359,7 @@ Internamente una structural directive di solito **prende il container corrente e
 > `let data` cattura `$implicit`; `let link=details` cattura il parametro `details`. Sono cose diverse: il primo è il valore implicito, il secondo è nominato. Per Angular moderno il control flow (`@if`/`@for`) sostituisce le vecchie `*ngIf`/`*ngFor` — le structural directive custom restano utili per costrutti riusabili tipo questa DataTable.
 
 ## Implementare una DataTable
-> 📖 pp.315-319
+> 📖 pp.326-330
 
 DataTable generica: riceve un array di oggetti, e per ogni colonna si passa un template via `*appTableField`.
 
@@ -435,7 +435,7 @@ export class DataTable<T extends object> {
 Collegamenti: [[signal-queries]] (la query `contentChildren`) · [[10-signal-queries-component-communication]].
 
 ## Usare ViewContainerRef direttamente
-> 📖 pp.319-321
+> 📖 pp.330-332
 
 `ngTemplateOutlet` usa internamente un `ViewContainerRef`. Per scenari più complessi lo si usa **direttamente**. Ecco una reimplementazione di `ngTemplateOutlet`:
 
@@ -493,7 +493,7 @@ readonly container = viewChild('anchor', { read: ViewContainerRef });
 Collegamenti: [[signal-queries]].
 
 ## Dynamic Components — Modal Dialogs
-> 📖 pp.321-327
+> 📖 pp.332-338
 
 Aggiungere dinamicamente un componente via codice serve quando il componente da mostrare è noto solo a runtime e può cambiare — caso tipico: un **modal dialog** con contenuto contestuale. Angular offre `ngComponentOutlet`:
 
@@ -530,6 +530,9 @@ export const DIALOG_DATA = new InjectionToken<unknown>('DIALOG_DATA');
 ```
 
 Il servizio pubblica gli eventi su un `Subject` RxJS (uno stream a cui l'outlet si sottoscrive):
+
+> [!info] Angular 22+
+> Negli snippet `@Injectable({ providedIn: 'root' })` ≡ `@Service()` (Angular 22). Dettagli in [[service]].
 
 ```ts
 // dialog.service.ts (prima versione)
@@ -634,7 +637,7 @@ Perché funzioni serve un `<app-dialog-outlet />` in un template attivo (es. `Ap
 Collegamenti: [[inject]] · [[providers]].
 
 ## Instantiating Component via Code
-> 📖 pp.328-330
+> 📖 pp.339-341
 
 Le librerie (es. Angular Material) mostrano i dialog **senza** che noi aggiungiamo l'outlet a un template: lo aggiungono **via codice**. Lo fa il `DialogOutletService` con la funzione `createComponent`, attaccando la view all'`ApplicationRef` e inserendone l'elemento nel `<body>`:
 

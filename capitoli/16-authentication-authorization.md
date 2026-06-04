@@ -1,11 +1,11 @@
 ---
 capitolo: 16
 titolo: "Modern Patterns for Authentication & Authorization"
-pagine: "401-410"
+pagine: "412-421"
 tags: [tipo/capitolo, security]
 ---
 # 16 · Modern Patterns for Authentication & Authorization
-> 📖 cap.16 · pp.401-410 — *Modern Angular* v1.0.4
+> 📖 cap.16 · pp.412-421 — *Modern Angular* v2.0.0
 
 Poche applicazioni gestionali fanno a meno dell'autenticazione. Il capitolo presenta due varianti: la classica **cookie-based authentication** e la **token-based security** con OAuth 2 e OpenID Connect (OIDC). La buona notizia: l'autenticazione moderna si implementa **soprattutto sul server**. Sul frontend non scrivi quasi codice, ma devi capire i concetti per discuterli con i colleghi backend. Per questo il capitolo è più **concettuale** degli altri.
 
@@ -13,7 +13,7 @@ Poche applicazioni gestionali fanno a meno dell'autenticazione. Il capitolo pres
 > Nelle SPA la **sicurezza va sempre imposta sul backend**. Guard e interceptor lato client (vedi [[12-initialization-route-changes]]) sono questioni di *usability*, non di sicurezza: il vero controllo lo fa il server.
 
 ## Cookie-based Authentication
-> 📖 pp.401-402
+> 📖 pp.412-413
 
 I cookie sembrano antiquati, ma grazie ai **security attribute** introdotti negli ultimi anni sono oggi l'approccio preferito per l'autenticazione in molti scenari. Il client non può influenzare questi attributi: li imposta il **server** quando emette il cookie.
 
@@ -32,7 +32,7 @@ Dal punto di vista del client il flusso è semplice:
 Nel passo 2 l'autenticazione può avvenire via username/password, oppure il backend può delegare a una identity solution esistente (es. Active Directory) e ricevere un **security token firmato** con le informazioni utente.
 
 ### Cookies and XSRF
-> 📖 p.402
+> 📖 p.413
 
 **Cross-Site Request Forgery (CSRF/XSRF)** è un attacco in cui un aggressore fa scatenare a un utente autenticato un'azione a sua insaputa:
 
@@ -68,7 +68,7 @@ Una seconda linea di difesa è validare gli header `Origin`/`Referer` inviati da
 > `Origin`/`Referer` possono **mancare per motivi legittimi**: privacy tool, estensioni, proxy aziendali li possono rimuovere, e client vecchi/bloccati non li inviano affatto. Il server deve trattare l'assenza come **inconcludente**, non rifiutare la richiesta, altrimenti taglia fuori utenti validi.
 
 ## Token-based Security
-> 📖 pp.403-406
+> 📖 pp.414-417
 
 Spesso bisogna integrare identity solution esistenti (Active Directory, LDAP) per il **single sign-on**, e il client deve ottenere il diritto di accedere ai servizi **per conto** dell'utente loggato. I **security token** risolvono questi requisiti con eleganza.
 
@@ -76,7 +76,7 @@ Spesso bisogna integrare identity solution esistenti (Active Directory, LDAP) pe
 > Sia OAuth 2 sia OpenID Connect devono girare **su HTTPS** per essere sicuri. (Le demo del libro lo omettono solo per semplicità.)
 
 ### OAuth 2
-> 📖 pp.404-405
+> 📖 pp.415-416
 
 OAuth (2006, Twitter e Ma.gnolia) e il suo successore **OAuth 2** nascono per permettere a un utente di **delegare parte dei propri diritti a un client senza condividere la password**. Oggi sono usati da Google, Facebook, Microsoft, Salesforce, ecc., sempre più non solo per la delega di diritti (**authorization**) ma anche per il single sign-on (**authentication**).
 
@@ -93,7 +93,7 @@ Vantaggi:
 Il **formato** dell'access token e la sua validazione sono dettagli implementativi che OAuth 2 non specifica. Spesso si usano **firme digitali** (così il resource server verifica facilmente che il token venga da un authorization server fidato); in alternativa il token può essere un semplice **ID imprevedibile**, col resource server che ricontatta l'authorization server.
 
 ### Authenticating Users with OpenID Connect
-> 📖 pp.405-406
+> 📖 pp.416-417
 
 **OpenID Connect (OIDC)** estende OAuth 2 definendo come i client ottengono informazioni sugli utenti — aspetto che OAuth 2 non copre (l'access token può persino non essere leggibile dal client). OIDC introduce un **ID token** che il client riceve **in aggiunta** all'access token:
 
@@ -103,7 +103,7 @@ Il **formato** dell'access token e la sua validazione sono dettagli implementati
 A differenza degli access token, la struttura degli **ID token è prescritta**: sono **sempre JSON Web Token (JWT)**, firmabili e/o cifrabili. OIDC definisce inoltre uno **Userinfo endpoint**: un servizio HTTP che, presentando l'access token, restituisce ulteriori dati sull'utente (indirizzo, foto profilo, …). Quali claim stiano già nell'ID token e quali vadano richiesti via Userinfo è una scelta di configurazione dell'identity solution.
 
 ### JSON Web Token
-> 📖 pp.405-407
+> 📖 pp.416-418
 
 Un **JWT** contiene un oggetto JSON di **claim**: coppie nome/valore che descrivono un soggetto (es. un utente) o il token stesso (validità, audience, …). L'issuer può firmare e/o cifrare l'insieme di claim. Un JWT firmato è composto da **tre sezioni BASE64 separate da un punto**:
 
@@ -146,7 +146,7 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9 . eyJuYmYiOjEz[...]BlbmlkIn0 . Nt5pBRqGvDFn
 > Issuer e consumer possono concordare i nomi dei claim, ma conviene prima verificare se esistono **nomi ufficiali** (es. nella spec OpenID Connect) per evitare collisioni; si possono usare anche identificatori pubblici (URL) come nomi di claim.
 
 ### OAuth 2 and OIDC Flows
-> 📖 pp.407-408
+> 📖 pp.418-419
 
 I **flow** specificano i messaggi da scambiare perché il client ottenga l'access o l'ID token. Per le SPA era stato definito l'**Implicit Flow**, ma oggi si raccomanda l'**Authorization Code Flow** combinato con **PKCE** (*Proof Key for Code Exchange*); l'Implicit Flow è addirittura **deprecato** in OAuth 2.1.
 
@@ -173,7 +173,7 @@ Cosa ti serve sapere:
 - **App esistenti** sviluppate con l'Implicit Flow restano sicure finché si seguono le best practice correnti.
 
 ### Client-side OAuth 2
-> 📖 p.408
+> 📖 p.419
 
 Agli albori delle SPA si usava OAuth 2 **direttamente sul client**. Librerie come `angular-oauth2-oidc` gestiscono il protocollo e restituiscono un access token, che il client inoltra all'API (es. via un **HttpInterceptor** che aggiunge l'header `Authorization: Bearer ...`, vedi [[12-initialization-route-changes]]).
 
@@ -187,7 +187,7 @@ Ma ci sono problemi seri:
 > Non esiste storage sicuro nel browser per i token: né `localStorage` né `sessionStorage` né i cookie leggibili da JS proteggono da un'iniezione XSS. Il refresh token nel browser è esplicitamente **sconsigliato**.
 
 ### Current Recommendation: Server-side OAuth 2 (BFF)
-> 📖 pp.408-409
+> 📖 pp.419-420
 
 Per i rischi visti, l'OAuth 2 Working Group (best practice *OAuth 2.0 for Browser-Based Applications*) raccomanda alle app browser-based di **limitare OAuth 2 al lato server**: il flow OAuth 2 gira **sul server** e access/refresh token sono conservati in una **session server-side**. La SPA **non vede mai l'access token**, quindi codice malevolo non può rubarlo.
 

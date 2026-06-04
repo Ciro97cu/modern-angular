@@ -1,11 +1,11 @@
 ---
 capitolo: 14
 titolo: "Monorepos & Reusable Libraries"
-pagine: "373-388"
-tags: [tipo/capitolo, monorepo, architecture]
+pagine: "384-399"
+tags: [tipo/capitolo, monorepo, architecture, angular-22]
 ---
 # 14 · Monorepos & Reusable Libraries
-> 📖 cap.14 · pp.373-388 — *Modern Angular* v1.0.4
+> 📖 cap.14 · pp.384-399 — *Modern Angular* v2.0.0
 
 Con un singolo progetto Angular i team raggiungono presto i propri limiti quando il codice cresce. La risposta sono i **monorepo**: un'unica repo che raggruppa più applicazioni e **librerie riutilizzabili**. Le librerie servono a sotto-strutturare un sistema grande (vedi i moduliths del [[08-sustainable-architectures|cap.8]]) e, quando servono altrove, si **pubblicano via npm**.
 
@@ -15,7 +15,7 @@ Il capitolo parte dalla **Angular CLI** (monorepo manuale, build/publish) e poi 
 > I monorepo non servono solo per creare librerie da pubblicare. In progetti molto grandi suddividono la soluzione complessiva in app/librerie più piccole, più facili da governare. In questo scenario le librerie **non vanno pubblicate su npm**: sono consumate localmente dalle app del monorepo. Termine alternativo a monorepo: **workspace**.
 
 ## Angular CLI-based Repos — Creating a Monorepo
-> 📖 pp.373-374
+> 📖 pp.384-385
 
 Dal punto di vista della CLI un monorepo è un normale progetto Angular. La differenza è che **non vogliamo il `src` centrale**: si genera con `--create-application false`, poi si aggiungono app e librerie dentro `projects/`.
 
@@ -51,13 +51,16 @@ graph TD
 > ```
 
 ## Structure of Libraries
-> 📖 pp.375-377
+> 📖 pp.386-388
 
 Come le app, le librerie sono file TypeScript (componenti, servizi, ...) sotto `src/lib`. Una lib contiene anche `ng-package.json`, `package.json` e i `tsconfig.lib*.json` (Listing 14-3). Generiamo un servizio `Logger`:
 
 ```bash
 ng g service logger --project util-logger
 ```
+
+> [!info] Angular 22+
+> `@Injectable({ providedIn: 'root' })` ≡ `@Service()` (Angular 22). Dettagli in [[service]].
 
 ```ts
 // projects/util-logger/src/lib/logger.ts
@@ -124,7 +127,7 @@ Prima di pubblicare si cura il `package.json` della libreria (Listing 14-7):
 > ```
 
 ## Trying Out the Library in the Monorepo
-> 📖 pp.378-379
+> 📖 pp.389-390
 
 I building block delle librerie si testano come gli altri (vedi [[07-testing-with-vitest|cap.7]]), indicando il nome della lib:
 
@@ -175,7 +178,7 @@ export class AppComponent {
 Lanciando `ng serve playground-app -o` il messaggio compare nella console JavaScript.
 
 ## Building and Publishing the npm Package
-> 📖 pp.379-381
+> 📖 pp.390-392
 
 Prima di pubblicare, assicurati che il `package.json` della lib (es. `projects/util-logger/package.json`) abbia un **numero di versione univoco**, altrimenti la pubblicazione fallisce. Poi build e publish:
 
@@ -210,7 +213,7 @@ npm publish dist/util-logger --registry http://localhost:4873
 > ```
 
 ## Consuming the npm Package
-> 📖 p.381
+> 📖 p.392
 
 Il consumer installa il pacchetto con `npm install` nella propria app Angular e lo usa come visto sopra:
 
@@ -223,7 +226,7 @@ npm install @my/util-logger --registry http://localhost:4873
 > Se si richiede un pacchetto che Verdaccio non conosce, di default delega al **registry npm pubblico** e lo recupera da lì.
 
 ## Faster Builds with Nx — Creating an Nx Workspace
-> 📖 pp.382-383
+> 📖 pp.393-394
 
 Il limite della soluzione CLI: gli sviluppatori devono **sapere quali app sono cambiate** e lanciare a mano la build giusta; il build server, per sicurezza, ricostruisce e testa tutto. Meglio lasciare che sia il **tooling** a capire cosa è cambiato — p.es. calcolando un **hash** dei file sorgente che confluiscono in ogni app: se l'hash cambia, quell'app va ricostruita/ritestata.
 
@@ -266,7 +269,7 @@ graph TD
 Il comando `nx graph` mostra il **grafo delle dipendenze** tra app e librerie.
 
 ## Module Boundaries
-> 📖 pp.384-385
+> 📖 pp.395-396
 
 Come Sheriff (vedi [[08-sustainable-architectures]]), anche Nx permette regole su **chi può dipendere da cosa** — i cosiddetti **module boundaries**, definiti però **a livello di libreria/applicazione** (non per cartella). Si configura la regola ESLint `@nx/enforce-module-boundaries` in `eslint.config.js`, dichiarando i `depConstraints` per `sourceTag`:
 
@@ -330,14 +333,14 @@ nx run-many -t lint --all
 ```
 
 ## Nx with Sheriff and Detective
-> 📖 p.386
+> 📖 p.397
 
 I module boundaries di Nx lavorano **per libreria/applicazione**. Se servono regole **più granulari, per-cartella**, si combina **Sheriff** con Nx; **Detective** funziona con Nx per **visualizzare** setup folder-based. Entrambi sono trattati nel [[08-sustainable-architectures|cap.8]] e nel [[19-forensic-architecture-analysis|cap.19]].
 
 Collegamenti: [[08-sustainable-architectures]] (Sheriff, Detective, moduliths) · [[19-forensic-architecture-analysis]].
 
 ## Incremental Builds with Nx
-> 📖 p.386
+> 📖 p.397
 
 Lo stesso grafo delle dipendenze alimenta le **build incrementali** offerte out of the box. Con `nx build`, se i sorgenti che confluiscono nell'app non sono cambiati, il risultato arriva **subito dalla cache locale** (cartella `.nx`, ignorata dal `.gitignore`):
 
@@ -355,7 +358,7 @@ Anche unit test, E2E e linting sono incrementali; Nx li **cacha a livello di lib
 > Lo stesso sarebbe possibile per `nx build` rendendo le lib **buildable** (`nx g lib myLib --buildable`), ma in pratica **raramente conviene**: i rebuild incrementali a livello di applicazione sono preferibili.
 
 ## Distributed Cache with Nx Cloud
-> 📖 p.386
+> 📖 p.397
 
 Di default la cache è **locale**. Per andare oltre, una **cache distribuita** condivisa da tutto il team e dal build server permette di beneficiare anche delle build già fatte da altri. La offre **Nx Cloud** (add-on commerciale del Nx gratuito; self-hostabile se non si possono usare provider cloud). Per connettere il workspace basta un comando:
 
@@ -364,7 +367,7 @@ npx nx connect-to-nx-cloud
 ```
 
 ## Even Faster: Parallelization with Nx Cloud
-> 📖 pp.387-388
+> 📖 pp.398-399
 
 Per accelerare ulteriormente, Nx Cloud **parallelizza** i task di build. Il grafo delle dipendenze stabilisce l'ordine dei task e quali si possono eseguire in parallelo. Si usano nodi distinti: un **main node** coordina, più **worker node** eseguono i singoli task in parallelo. Nx può perfino generare gli **script CI** che avviano i nodi:
 

@@ -1,11 +1,11 @@
 ---
 capitolo: 6
 titolo: "Signal Forms"
-pagine: "149-192"
-tags: [tipo/capitolo, forms, signals]
+pagine: "157-203"
+tags: [tipo/capitolo, forms, signals, angular-22]
 ---
 # 06 · Signal Forms
-> 📖 cap.6 · pp.149-192 — *Modern Angular* v1.0.4
+> 📖 cap.6 · pp.157-203 — *Modern Angular* v2.0.0
 
 I **Signal Forms** colmano il divario fra la reattività basata su [[signal]] e l'interazione utente: stato della form, validazione e logica di submit diventano tutti signal, quindi reattivi e componibili. Si estende il componente `FlightEdit`, partendo da una form semplice fino a custom validators, subform e custom controls.
 
@@ -13,7 +13,7 @@ I **Signal Forms** colmano il divario fra la reattività basata su [[signal]] e 
 > Signal Forms è l'**API moderna ma ancora sperimentale** di Angular (package `@angular/forms/signals`). È raccomandata per i nuovi progetti, ma l'API può cambiare. La `form()` è stata introdotta brevemente nel [[02-signal-based-components|cap.2]] (`filterForm`).
 
 ## A First Signal Form
-> 📖 pp.149-152
+> 📖 pp.157-160
 
 Lo store (`FlightDetailStore`, sullo stile del [[05-state-management-services-signals|cap.5]]) pubblica dati **read-only** per garantire la consistenza. La form deve invece modificarli con un two-way binding, quindi serve una **copia di lavoro locale** rappresentata da un [[linked-signal|linkedSignal]].
 
@@ -46,7 +46,7 @@ export class FlightEdit {
 `normalizeFlight` converte la data nel formato di `<input type="datetime-local">` (ISO senza timezone, es. `2030-12-24T17:30:00.000`).
 
 ### Understanding the FieldTree
-> 📖 pp.151-152
+> 📖 pp.159-160
 
 Un **FieldTree** è come un signal profondamente annidato: ogni proprietà del dato è un signal con lo stato della form.
 
@@ -74,7 +74,7 @@ const firstPriceAmt  = this.flightForm.prices[0].amount().value();
 ```
 
 ### Binding to the Template
-> 📖 pp.152-154
+> 📖 pp.160-162
 
 Si importa la direttiva **FormField** (e `JsonPipe` per mostrare gli errori nei primi passi). `[formField]` lega un campo del FieldTree a `input` / `select` / `textarea`.
 
@@ -100,7 +100,7 @@ Si importa la direttiva **FormField** (e `JsonPipe` per mostrare gli errori nei 
 > Legando un numero usa `<input type="number">`: Signal Forms rispetta la semantica HTML per garantire la type safety. Inoltre `minLength` **non scatta sui campi vuoti** (supporto ai campi opzionali): per imporre il valore serve `required`.
 
 ## Working with Schemas
-> 📖 pp.155-159
+> 📖 pp.163-167
 
 Lo schema non definisce solo le regole di validazione, ma anche altri comportamenti (debouncing, campi read-only/disabled/hidden, validazione contro schemi esterni).
 
@@ -176,8 +176,32 @@ export const flightSchema = schema<Flight>((path) => {
 });
 ```
 
+> [!info] Angular 22+ · Schema dinamico (lambda)
+> Da **Angular 21.1** il 2° argomento di `validateStandardSchema` può essere una **lambda che ritorna uno schema**: Angular la avvolge in un `computed`, così lo schema attivo può dipendere da altri signal (validazione context-dependent, es. switch tra regole lenient/strict).
+> ```ts
+> validateStandardSchema(
+>   path,
+>   () => (strict() ? StrictFlightZodSchema : FlightZodSchema),
+> );
+> // al cambio di strict(), la form ri-valida contro lo schema aggiornato
+> ```
+
+### Visualizzare lo stato di validazione con classi CSS
+> [!info] Angular 22+
+> Reactive/Template-driven Forms aggiungono da sole classi come `ng-valid`/`ng-invalid`/`ng-pending`. Signal Forms è più **esplicito**: mappi i nomi delle classi a predicati sullo stato del campo via **`provideSignalFormsConfig`**. La costante `NG_STATUS_CLASSES` (namespace `compat`) replica le classi delle form classiche → i CSS esistenti continuano a funzionare.
+> ```ts
+> // app.config.ts
+> import { provideSignalFormsConfig } from '@angular/forms/signals';
+> import { NG_STATUS_CLASSES } from '@angular/forms/signals/compat';
+>
+> providers: [
+>   provideSignalFormsConfig({ classes: NG_STATUS_CLASSES }),
+>   // ng-valid, ng-invalid, ng-dirty, ng-pristine, ng-pending
+> ]
+> ```
+
 ## Submitting Forms
-> 📖 pp.160-163
+> 📖 pp.170-174
 
 Il submit è forse il miglioramento più grande: la logica si definisce nel nodo `submission` delle opzioni di `form()`, e al template basta un normale bottone di submit.
 
@@ -246,7 +270,7 @@ protected async requestApproval(): Promise<void> {
 > L'interazione fra errori di validazione **client-side** e quelli ricevuti **durante il submit** dal backend (l'`action` ritorna un `ValidationError`) è una novità chiave: con le form precedenti era difficile da realizzare.
 
 ## Custom Validators
-> 📖 pp.163-174
+> 📖 pp.174-185
 
 Logica di validazione oltre i built-in. Si usa `validate(path, lambda)`: la lambda riceve un `ctx` e ritorna `null` (nessun errore), un `ValidationError`, o un array di `ValidationError`. Ogni errore è identificato da una stringa `kind` e può avere proprietà libere.
 
@@ -374,7 +398,7 @@ export function validateCityHttp(path: SchemaPathTree<string>) {
 Collegamenti: [[resource|rxResource]] (la factory degli async validator).
 
 ## Large and Nested Forms
-> 📖 pp.175-182
+> 📖 pp.186-193
 
 Signal Forms supporta modelli annidati: oggetti (**form groups**), array ripetuti (**form arrays**) e scomposizione in **subform**.
 
@@ -473,7 +497,7 @@ export class PricesForm {
 ```
 
 ## Working with Form Metadata
-> 📖 pp.182-187
+> 📖 pp.193-198
 
 I metadata informano l'utente **prima** su cosa ci si aspetta (es. campo richiesto, lunghezza). Molti validatori definiscono metadata sui campi validati.
 
@@ -520,7 +544,7 @@ export function validateCityHttp(path: SchemaPathTree<string>) {
 ```
 
 ## Null and Undefined Values
-> 📖 pp.187-190
+> 📖 pp.198-201
 
 > [!warning] Gotcha
 > Signal Forms **non ammette valori `undefined`**: semanticamente `undefined` significa "il campo non esiste", quindi `form()` non saprebbe che dovrebbe esistere. `null` è invece accettato (semantica "valore vuoto"), ma è ancora meglio un **default sensato** (es. `delay: 0`).
@@ -553,7 +577,7 @@ protected save(): void {
 Per convertire subito dopo la digitazione si può usare un *delegated signal* (vedi [[05-state-management-services-signals|cap.5]]). La stessa strategia vale per i campi condizionali: dal punto di vista della form esistono sempre, anche se nascosti nell'UI.
 
 ## Custom Fields
-> 📖 pp.190-192
+> 📖 pp.201-203
 
 Per usare `[formField]` con widget propri, il componente implementa l'interfaccia **`FormValueControl<T>`**, che richiede solo un [[model-signal|ModelSignal]] chiamato `value` (+ proprietà opzionali come `disabled`, `errors`). Sostituisce il vecchio, scomodo *Control Value Accessor*.
 

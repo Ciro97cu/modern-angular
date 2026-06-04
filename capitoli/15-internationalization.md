@@ -1,18 +1,18 @@
 ---
 capitolo: 15
 titolo: "Internationalization"
-pagine: "389-400"
+pagine: "400-411"
 tags: [tipo/capitolo, i18n]
 ---
 # 15 · Internationalization
-> 📖 cap.15 · pp.389-400 — *Modern Angular* v1.0.4
+> 📖 cap.15 · pp.400-411 — *Modern Angular* v2.0.0
 
 Adattare un'app a regioni e lingue diverse va previsto **in fase di implementazione**: testi intercambiabili, ma anche formati di data e numero. Questo è l'obiettivo dell'**internationalization** (abbreviata **I18N**). L'adattamento alle singole lingue/regioni che ne consegue si chiama **localization** (**L10N**). La combinazione di regione + lingua è il **locale**: `de-DE` (tedesco standard, Germania), `de-AT` (tedesco austriaco); i **locale generici** ignorano la regione (es. `de`).
 
 La soluzione I18N integrata in Angular è **compile-time**: il compiler estrae i testi, li sostituisce con le traduzioni e produce **un set di bundle per ogni lingua**. Vantaggio: nessun costo a runtime per caricare/mostrare i testi (sono parte del bundle). Prezzo: devi distribuire più versioni e cambiare lingua significa **caricare una nuova app** via hyperlink, perdendo lo stato di quella precedente.
 
 ## Overview
-> 📖 pp.389-390
+> 📖 pp.400-401
 
 Il compiler genera file in formati standard usati dagli studi di traduzione: **XLIFF** (XML Localization Interchange File Format) v1 e v2, **XMB** (XML Message Bundles) e i formati JSON come **ARB** (Application Resource Bundle). Dopo la traduzione, il compiler integra i testi nei bundle generati.
 
@@ -20,7 +20,7 @@ Il compiler genera file in formati standard usati dagli studi di traduzione: **X
 > Dalla v9 la CLI è "smart": fa **un solo build** con dei placeholder per tutti i testi, poi **copia il set di bundle per ogni lingua** e sostituisce i placeholder con le traduzioni. Prima rieseguiva l'intero build per ogni lingua → build lentissimi.
 
 ## Installing @angular/localize
-> 📖 p.390
+> 📖 p.401
 
 Anche se la I18N del compiler è parte integrante del compiler stesso, servono tool per CLI e runtime, forniti dal pacchetto `@angular/localize`:
 
@@ -29,7 +29,7 @@ ng add @angular/localize
 ```
 
 ## Marking Texts (i18n attribute)
-> 📖 pp.390-391
+> 📖 pp.401-402
 
 Per far sapere al compiler quali testi estrarre, si marcano nei template con l'attributo `i18n`:
 
@@ -66,7 +66,7 @@ Si possono includere **data binding** nei testi marcati:
 > ```
 
 ## Marking Strings in the Component Class ($localize)
-> 📖 pp.391-392
+> 📖 pp.402-403
 
 A volte i messaggi (info/errore) nascono nella **component class**. Dalla v9 si possono adattare con `$localize`, con una sintassi insolita:
 
@@ -85,7 +85,7 @@ export class FlightSearchComponent {
 È una **tagged string**: backtick + funzione tag (`$localize`). Il contenuto inizia con i metadati (tra **due `:`**), poi il valore di default. La sintassi è così perché il compiler sostituisce i testi direttamente nei bundle per performance → non si possono caricare a runtime quando servono.
 
 ## Extracting Texts (extract-i18n)
-> 📖 pp.392-394
+> 📖 pp.403-405
 
 Marcati i testi, li estrai col compiler:
 
@@ -124,7 +124,7 @@ I file finiscono nella **root del progetto**. Per ordine si crea una sottocartel
 Oltre ai metadati (ID/description/meaning) c'è il testo originale nel nodo `<source>`: basta aggiungere un `<target>` con la traduzione. Qui lo facciamo a mano; in pratica lo fanno gli studi di traduzione coi loro tool.
 
 ## Integrating Translated Texts into Builds (angular.json)
-> 📖 pp.394-395
+> 📖 pp.405-406
 
 I file di traduzione si registrano in `angular.json`, con un nodo `i18n` sotto `projects/<nome>`:
 
@@ -161,7 +161,7 @@ Nella `dist` compare **una sottocartella per locale** (es. `de`, `en-US`), ognun
 Collegamenti: build e packaging approfonditi in [[14-monorepos-libraries]].
 
 ## Setting the Language for Development (ng serve)
-> 📖 pp.395-396
+> 📖 pp.406-407
 
 `ng serve` **non ha uno switch per la lingua**. Si aggira con due configurazioni in `angular.json`: una per `ng build` che imposta la lingua...
 
@@ -211,7 +211,7 @@ ng serve --configuration de
 > Per ogni lingua extra serve una **coppia di configurazioni** (build + serve). Gli stessi autori ammettono che l'approccio è un po' macchinoso.
 
 ## Specifying Translation Texts at Runtime (loadTranslations)
-> 📖 p.397
+> 📖 p.408
 
 Anche se la I18N del compiler integra i testi a compile-time, si possono impostare via codice con `loadTranslations` — ma **prima del primo uso** di ciascun testo (non essendoci data binding, dopo il primo uso non cambiano più senza un reload):
 
@@ -236,7 +236,7 @@ ng extract-i18n --format json   # genera messages.json con le espressioni
 > Puoi caricare i testi di `loadTranslations` anche via HTTP (es. `HttpClient`), ma **devono essere disponibili prima del primo uso**. Essendo le richieste HTTP asincrone, non è garantito: usa un **resolver** che ritarda il routing (cfr. cap. sui resolver).
 
 ## Taking Grammatical Forms into Account (ICU: plural / select)
-> 📖 pp.397-399
+> 📖 pp.408-410
 
 Oltre ai testi, vanno gestite le **forme grammaticali**: genere, singolare/plurale (lingue diverse hanno numeri diversi di generi e forme plurali). Il compiler I18N offre una grammatica dedicata nel template (sintassi ICU).
 
@@ -274,7 +274,7 @@ export class PassengerSearchComponent {
 ```
 
 ## Supporting Different Formats (locale-aware pipes)
-> 📖 pp.399-400
+> 📖 pp.410-411
 
 Vanno rispettate anche le convenzioni locali per **numeri e date**. Angular include i metadati di tutti i locale dal **Unicode CLDR** (Common Locale Data Repository): durante il build la CLI li aggiunge alle versioni di lingua. Le pipe `date` e `number` li leggono a runtime.
 
@@ -292,7 +292,7 @@ La pipe `number` non richiede aggiustamenti: usa automaticamente separatori dell
 Collegamenti: pipe `date`/`number` locale-aware viste in [[02-signal-based-components]].
 
 ## Outlook: Community Solutions (ngx-translate, Transloco)
-> 📖 p.400
+> 📖 p.411
 
 La I18N del compiler eccelle in **performance** (testi intessuti nei bundle, zero costo runtime per load/data binding), ma paga in **flessibilità**: niente data binding → **niente cambio lingua a runtime**, solo hyperlink ad altre versioni di lingua.
 

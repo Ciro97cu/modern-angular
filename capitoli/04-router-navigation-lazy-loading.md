@@ -1,11 +1,11 @@
 ---
 capitolo: 4
 titolo: "Navigation & Lazy Loading with the Router"
-pagine: "94-125"
-tags: [tipo/capitolo, routing, di, performance]
+pagine: "99-131"
+tags: [tipo/capitolo, routing, di, performance, angular-22]
 ---
 # 04 · Navigation & Lazy Loading with the Router
-> 📖 cap.4 · pp.94-125 — *Modern Angular* v1.0.4
+> 📖 cap.4 · pp.99-131 — *Modern Angular* v2.0.0
 
 In una SPA le "pagine" si simulano mostrando/nascondendo componenti. Il **Router** di Angular automatizza questo: mappa **path** → **componenti** e li attiva in un **placeholder** (`<router-outlet>`), tenendo l'URL sincronizzato con lo stato (così back button, bookmark e history funzionano). Il capitolo copre: routing config, navigazione (link e programmatica), route parametrizzate, child routes, lazy loading + preloading, query string/hash fragment, e le due strategie di location (path vs hash).
 
@@ -13,7 +13,7 @@ In una SPA le "pagine" si simulano mostrando/nascondendo componenti. Il **Router
 > Più config di routing coesistono: `app.routes.ts` ha le route necessarie all'avvio; altre config vengono caricate **on demand** per feature/dominio (vedi lazy loading).
 
 ## Setting up Routing Configuration
-> 📖 pp.96-98
+> 📖 pp.101-103
 
 Le route sono un array `Routes`. Ogni voce mappa un `path` a un `component` (o a una redirect / lazy import).
 
@@ -62,7 +62,7 @@ export const appConfig: ApplicationConfig = {
 Collegamenti: [[providers]] · [[12-initialization-route-changes]] (guards/resolver lungo le route changes).
 
 ## RouterOutlet: il placeholder
-> 📖 pp.98-99
+> 📖 pp.103-104
 
 Invece di referenziare un componente concreto, `App` espone un **placeholder** `<router-outlet>` dove il Router monta il componente attivato. Va importato `RouterOutlet`.
 
@@ -86,7 +86,7 @@ export class App {}
 ```
 
 ## routerLink & routerLinkActive
-> 📖 pp.99-101
+> 📖 pp.104-107
 
 I link dichiarativi usano la directive `routerLink` (riferita al `path` della route). `routerLinkActive` applica una classe CSS quando quel link (o un figlio) è attivo, per evidenziare la voce di menu corrente. Entrambe vanno importate nel componente.
 
@@ -113,10 +113,22 @@ export class Sidebar {}
 </li>
 ```
 
+> [!info] Angular 22+ · `isActive`
+> `routerLinkActive` resta la scelta naturale per l'**highlighting dichiarativo**. Ma quando ti serve lo stato di attivazione **come valore** (per un computed, un effect, logica reattiva oltre la classe CSS), da **Angular 21.1** la funzione `isActive(path, router)` ritorna un **`Signal<boolean>`** ri-valutato a ogni cambio di route.
+> ```ts
+> import { isActive, Router } from '@angular/router';
+>
+> export class Sidebar {
+>   private readonly router = inject(Router);
+>   protected readonly homeActive = isActive('/home', this.router);
+>   // un signal per voce di menu → [class.active]="homeActive()"
+> }
+> ```
+
 Collegamenti: [[02-signal-based-components]] (struttura componenti e `imports`).
 
 ## Navigazione programmatica con Router
-> 📖 p.101
+> 📖 p.107
 
 Per cambiare route via codice si fa [[inject]] del `Router` e si chiama `navigate`.
 
@@ -141,7 +153,7 @@ this.router.navigate(['/a', 'b', id]); // con id=17 → attiva /a/b/17
 Collegamenti: [[inject]].
 
 ## Parameterized Routes
-> 📖 pp.102-107
+> 📖 pp.109-113
 
 Per passare info alle route (es. ID del volo da editare) si usano i **routing parameters**. Tre notazioni:
 
@@ -235,7 +247,7 @@ Nella config solo i parametri di **segmento** vanno dichiarati, prefissati con `
 Collegamenti: [[signal-input]] · [[content-projection]] · [[02-signal-based-components]].
 
 ## Hierarchical Routing with Child Routes
-> 📖 pp.108-114
+> 📖 pp.114-120
 
 Un componente attivato dal Router può avere a sua volta un `<router-outlet>` → **child routes** (viste annidate). Esempio: un `BookingNavigation` con menu in alto e un placeholder interno per `flight-search`/`passenger-search`.
 
@@ -294,7 +306,7 @@ Le child route vanno nell'array `children` del nodo padre, con una default route
 > Path relativi in `routerLink`: `./x` appende alla route corrente (è il default, omettibile). `../x` punta a un **sibling** — es. da `./booking/flight-search` a `./booking/passenger-search` con `../passenger-search`.
 
 ## Lazy Loading of Routes
-> 📖 pp.114-118
+> 📖 pp.120-124
 
 Di default all'avvio Angular carica **tutto** → startup lento nelle app grandi. Il lazy loading carica parti su richiesta. Se la parte ha più route, si dà una sua config (qui per dominio: `ticketing.routes.ts`).
 
@@ -342,7 +354,7 @@ Verifica nel browser: nell'output di `ng serve` compare un **bundle separato**; 
 > `loadChildren` → config di route lazy; `loadComponent` → singolo componente lazy. Entrambi via dynamic `import()`; con un `default export` ometti il `.then`.
 
 ## Preloading
-> 📖 p.119
+> 📖 p.125
 
 Il preloading carica i bundle lazy **in background** durante i tempi morti dopo l'avvio, così sono già pronti al bisogno. Si attiva con la feature `withPreloading` + una strategia.
 
@@ -363,7 +375,7 @@ provideRouter(
 > Strategie out-of-the-box: `NoPreloading` (default) e `PreloadAllModules`. Per logiche custom implementa un service che fa l'interfaccia `PreloadingStrategy` — ma prima verifica se le due built-in (o soluzioni come `ngx-quicklink` / `guess.js`) bastano.
 
 ## Query Strings & Hash Fragments
-> 📖 pp.120-121
+> 📖 pp.126-127
 
 Oltre a segmenti/matrix, il Router supporta la classica **query string** (`url?p1=v1&p2=v2`) e il **hash fragment** (`url#frammento`) — utili per impostazioni applicative globali.
 
@@ -400,7 +412,7 @@ this.activatedRoute.fragment.subscribe((f) => console.log('fragment', f));
 > Con `withComponentInputBinding` anche i **query parameter** vengono legati a input omonimi, ma **non il hash fragment**: Angular lo tratta come stringa singola, non come coppie chiave-valore.
 
 ## Path Routing vs. Hash Routing
-> 📖 pp.122-124
+> 📖 pp.128-130
 
 Il Router delega la gestione dell'URL a una **strategia** intercambiabile.
 

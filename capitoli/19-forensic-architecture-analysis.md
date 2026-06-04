@@ -1,18 +1,18 @@
 ---
 capitolo: 19
 titolo: "Analyzing Your Architecture with Forensic Techniques"
-pagine: "444-453"
+pagine: "456-465"
 tags: [tipo/capitolo, architecture]
 ---
 # 19 · Analyzing Your Architecture with Forensic Techniques
-> 📖 cap.19 · pp.444-453 — *Modern Angular* v1.0.4
+> 📖 cap.19 · pp.456-465 — *Modern Angular* v2.0.0
 
 Buoni **domain boundaries** rendono un sistema manutenibile nel lungo periodo (vedi [[08-sustainable-architectures]]), ma come capire se la struttura iniziale è ancora valida e dove serve migliorare? Un approccio ovvio è analizzare le **dipendenze** fra le parti dell'app. La **forensic analysis** va oltre: usando i dati storici del version control scopre pattern nascosti che le sole dipendenze non rivelano.
 
 Il capitolo applica queste tecniche a un'app Angular con lo strumento open-source **Detective** (di Angular Architects), ispirato al libro *Your Code as a Crime Scene* di Adam Tornhill.
 
 ## L'app di esempio esaminata
-> 📖 p.444
+> 📖 p.456
 
 L'applicazione demo è divisa in **due domini** più un'area `shared` con componenti tecnici riusabili (logging, authentication). Detective deriva il diagramma della struttura direttamente dal codice sorgente.
 
@@ -32,7 +32,7 @@ Aprendo i tre blocchi (drill-down) si vede che **dentro** ogni dominio ci sono m
 > **High cohesion** dentro i domini e **low coupling** fra i domini sono due facce della stessa medaglia: entrambi servono a far evolvere i domini in modo indipendente, riducendo il carico cognitivo (più focus, meno errori, lead time più brevi). Idealmente il taglio dei domini correla anche con la struttura dei team → team self-sufficient (vedi [[#Team alignment e legge di Conway]]).
 
 ## Analyzing layering
-> 📖 pp.445-446
+> 📖 pp.457-458
 
 La prima analisi strutturale rivela un potenziale problema: la feature `feature-next-flight` dipende da `feature-my-tickets`. Non è per forza un male, ma può portare a catene di dipendenze e persino a **cicli**. Per prevenirlo, i domini si suddividono in **layer**, dove ogni layer può comunicare solo con i layer inferiori.
 
@@ -56,7 +56,7 @@ Per condividere funzionalità da `feature-my-tickets` verso `feature-next-flight
 Collegamenti: [[08-sustainable-architectures]] (architecture matrix, layer, Sheriff/Detective).
 
 ## Forensic analysis per architetti: panoramica
-> 📖 p.447
+> 📖 p.459
 
 Le idee di forensic code analysis (libro *Your Code as a Crime Scene* di Adam Tornhill) applicano concetti della criminalistica al codice sorgente. Usando i **dati storici** del source control si identificano gli **hotspot**: aree complesse e cambiate di frequente, che possono segnalare debolezze architetturali rendendo il sistema instabile e difficile da mantenere.
 
@@ -65,7 +65,7 @@ Tenendo conto della **dimensione temporale** emergono altre informazioni nascost
 - **team alignment**: allineamento fra struttura dei team e struttura dei moduli → team più autonomi, miglior qualità del codice, meno rischio di errori.
 
 ## Usare Detective
-> 📖 p.447
+> 📖 p.459
 
 Per analizzare un progetto, dalla root si esegue:
 
@@ -80,7 +80,7 @@ npx detective
 Collegamenti: Detective compare già in [[08-sustainable-architectures]] (visualizzazione dipendenze) e in [[14-monorepos-libraries]] (uso con Nx, insieme a Sheriff).
 
 ## Change coupling
-> 📖 p.448
+> 📖 p.460
 
 Il coupling visto finora deriva direttamente dalle dipendenze fra moduli ECMAScript (deducibile da `import`/`export`). Il **change coupling** è un coupling meno ovvio: identifica i **file cambiati frequentemente insieme**. Sono logicamente accoppiati e possono evidenziare problemi nei domain boundary — minano l'obiettivo per cui la maggior parte dei cambiamenti dovrebbe restare in un solo dominio.
 
@@ -101,7 +101,7 @@ Nella demo emerge che il coupling fra i domini `check-in` e `ticketing` **non è
 > Se la discussione conclude che le alternative hanno svantaggi maggiori, si **mantiene** l'implementazione attuale: comunque l'analisi è servita a rendere consapevoli del trade-off.
 
 ## Hotspot come indicatore di problemi architetturali
-> 📖 pp.449-450
+> 📖 pp.461-462
 
 Se lo **stesso file** viene modificato molto spesso può esserci un problema di architettura/modularizzazione: magari un componente centrale da cui troppi domini dipendono, o che ha troppe responsabilità. Inoltre è noto che un alto **code churn** (molte modifiche agli stessi file) correla con un tasso di errore più alto.
 
@@ -122,7 +122,7 @@ Detective, per il suo taglio architetturale, **aggrega gli hotspot a livello di 
 Nella demo gli hotspot non preoccupano: due-tre cambiamenti totali e cyclomatic complexity ≤ 6 a livello di file non giustificano allarmi.
 
 ## Team alignment e legge di Conway
-> 📖 pp.450-451
+> 📖 pp.462-463
 
 Già nel 1968 **Melvin Conway** osservò che la struttura delle applicazioni riflette le strutture di comunicazione degli sviluppatori (**Conway's Law**): se tre team costruiscono insieme un compilatore, finisci con un compilatore a tre fasi.
 
@@ -140,7 +140,7 @@ Poiché `shared` è una collezione eterogenea di moduli riusabili (non un'unità
 Assegnando gli **ex membri** a un team artificiale a parte si può scoprire una **perdita di conoscenza** dovuta alla loro uscita; l'approccio si estende a ragionamenti **what-if** per capire se la conoscenza va distribuita meglio nei team.
 
 ## Da Detective a CodeScene
-> 📖 p.452
+> 📖 p.464
 
 La forensic analysis descritta può essere migliorata ulteriormente:
 - **raggruppare i commit** dello stesso feature branch o con lo stesso ticket ID, per non perdere il change coupling quando un dominio viene cambiato in commit separati;
@@ -150,7 +150,7 @@ La forensic analysis descritta può essere migliorata ulteriormente:
 Il prodotto commerciale **CodeScene** (di Adam Tornhill) implementa queste opzioni e offre molte altre analisi.
 
 ## Review critica
-> 📖 p.452
+> 📖 p.464
 
 > [!warning] Gotcha
 > La forensic analysis è **solo un pezzo del puzzle**, non un sostituto della valutazione qualitativa dell'architettura. Serve comunque valutare: se l'architettura supporta gli obiettivi (performance, security, usability), se sono state prese decisioni deliberate sui temi chiave (state management, authentication), se i pattern definiti sono implementati bene e hanno ancora senso, se le assunzioni sui trade-off si sono rivelate corrette.

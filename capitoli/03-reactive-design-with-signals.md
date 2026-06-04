@@ -1,18 +1,18 @@
 ---
 capitolo: 3
 titolo: "Reactive Design with Signals"
-pagine: "71-93"
-tags: [tipo/capitolo, signals, reactivity, http]
+pagine: "73-98"
+tags: [tipo/capitolo, signals, reactivity, http, angular-22]
 ---
 # 03 · Reactive Design with Signals
-> 📖 cap.3 · pp.71-93 — *Modern Angular* v1.0.4
+> 📖 cap.3 · pp.73-98 — *Modern Angular* v2.0.0
 
 Finora i [[signal]] servivano solo a dire ad Angular *quando* aggiornare i binding del template. Qui si fa il salto: si usano i signal per un design **reattivo e dichiarativo**. Invece di descrivere *come* aggiornare i valori dipendenti, si descrive *da cosa* sono derivati; il framework tiene tutto in sync. L'analogia è il foglio di calcolo: definisci formule che derivano valori da altre celle, e quando cambia la sorgente le dipendenti si aggiornano da sole.
 
 I mattoni sono tre — **computed signals**, **resources**, **effects** — più la semantica sottostante (auto-tracking, untracking, glitch-free). Si chiude assemblando il tutto in un **reactive flow** sulla `flight-search` del [[02-signal-based-components|cap.2]].
 
 ## Computed Signals
-> 📖 pp.71-72
+> 📖 pp.73-74
 
 Un [[computed]] definisce un signal di sola lettura che **deriva** il proprio valore da altri signal; quando le dipendenze cambiano, ricalcola.
 
@@ -55,7 +55,7 @@ Qui `flightRoute` si aggiorna solo quando cambia `from`, non `to`: controllo fin
 Collegamenti: [[computed]] · [[untracked]] · [[signal]]
 
 ## Resources: dati asincroni
-> 📖 pp.73-78
+> 📖 pp.75-80
 
 I computed derivano valori **sincroni**; per i dati **asincroni** (es. fetch dal backend) servono le [[resource]]. Tutte proiettano signal di input in signal di output in modo asincrono. Angular ne offre tre implementazioni: `httpResource`, `rxResource` e `resource` (Promise-based).
 
@@ -144,10 +144,36 @@ findPromise(
 > [!warning] Gotcha
 > In un'app reale `findPromise` non lo scriveresti: terresti l'Observable che già hai e useresti `rxResource`. Esiste solo a scopo dimostrativo.
 
+### Comporre resource: Snapshots
+> [!info] Angular 22+
+> Derivare un valore da un altro è banale coi computed; per le **resource** prima si poteva proiettare solo singole proprietà (`value`/`error`/`isLoading`), non lo stato nel suo insieme. Da **Angular 21.2** ogni resource espone un signal **`snapshot()`** che impacchetta `status` + `value`. Lo trasformi con un [[linked-signal]] e lo ri-converti in resource con **`resourceFromSnapshots`**: la resource originale tiene la sua logica di load, quella derivata applica solo una trasformazione sopra.
+
+```ts
+// filtra i risultati di una resource per un criterio extra
+export function withMinWeight(
+  input: Resource<Luggage[]>,
+  minWeight: Signal<number>,
+): Resource<Luggage[]> {
+  const derived = linkedSignal<
+    { snap: ResourceSnapshot<Luggage[]>; min: number },
+    ResourceSnapshot<Luggage[]>
+  >({
+    source: () => ({ snap: input.snapshot(), min: minWeight() }),
+    computation: ({ snap, min }) =>
+      snap.status === 'resolved'
+        ? { ...snap, value: snap.value.filter((i) => i.weight >= min) }
+        : snap,
+  });
+  return resourceFromSnapshots(derived);
+}
+```
+
+Caso d'uso tipico (`withPreviousValue`, helper di esempio del team Angular): **tenere visibile l'ultimo valore caricato durante un reload**, invece di mostrare `undefined` in mezzo — leggendo `previous` nella `computation`.
+
 Collegamenti: [[resource]] · [[02-signal-based-components]] (intro a `httpResource`)
 
 ## Effects
-> 📖 pp.79-81
+> 📖 pp.84-86
 
 Come un computed, un [[effect]] ri-esegue quando cambia un signal che legge; ma **non ritorna un valore**: esegue un side effect (logging, DOM, canvas, librerie terze).
 
@@ -193,7 +219,7 @@ afterEveryRender(()  => { /* dopo OGNI ciclo, indipendente dai signal */ });
 Collegamenti: [[effect]] · [[injection-context]]
 
 ## Signal Semantics
-> 📖 pp.82-88
+> 📖 pp.87-93
 
 ### Signal e lifecycle del componente
 Un effect creato nel costruttore non parte subito: Angular **ne rinvia l'esecuzione** finché il componente non è inizializzato. Quindi quando gira può leggere in sicurezza gli input.
@@ -211,6 +237,16 @@ export class FlightCard {
   );
 }
 ```
+
+### Debouncing dei signal: `debounced`
+> [!info] Angular 22+
+> I signal non hanno nozione di tempo (niente `debounceTime`/`throttle`). **`debounced(sig, 300)`** prende un signal e ritorna una **resource** che insegue il signal con ritardo configurabile; `status()` è `'loading'` mentre il valore si assesta (utile per un indicatore).
+> ```ts
+> const filter = signal('');
+> const debouncedFilter = debounced(filter, 300); // 300ms
+> effect(() => console.log(debouncedFilter.value()));
+> ```
+> Per il caso più comune — debounce dell'input di un form prima di una search/validazione — Signal Forms offre l'helper dedicato `debounce()` (per-campo, sullo schema): vedi [[06-signal-forms]].
 
 ### Auto-tracking e reactive context
 Angular traccia automaticamente tutti i signal letti dentro un [[reactive-context]]. Dal punto di vista dello sviluppatore i contesti reattivi sono **due**: **template** ed **effect**. I signal letti dentro un computed sono tracciati quando il computed è letto in un template o in un effect (si usa il contesto di questi ultimi). Il tracking è **transitivo**: vale anche per i signal letti in un metodo/funzione chiamato dentro il contesto.
@@ -329,7 +365,7 @@ Puoi passare una **equality function** custom (secondo parametro di `signal`), m
 Collegamenti: [[reactive-context]] · [[untracked]] · [[equality-immutability]] · [[linked-signal]] (per stato che dipende da una sorgente ma resta scrivibile)
 
 ## Establishing a Reactive Flow
-> 📖 pp.89-93
+> 📖 pp.94-98
 
 ### Pensare per signal graph
 Angular mantiene in background un **signal graph**: la struttura che dice come signal, computed e consumer (effect, template) dipendono tra loro — cioè come i dati fluiscono nell'app. Ragionare per grafo rende naturale costruire il flusso. Esempio: oltre ai `flights` c'è un `delayInMin`; il flow parte da `filter`, è proiettato asincronamente in `flights` via `flightsResource`, poi `flights` si combina con `delayInMin` in un computed `flightsWithDelays`, che è ciò che il template mostra.

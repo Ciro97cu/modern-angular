@@ -1,18 +1,18 @@
 ---
 capitolo: 2
 titolo: "Signal-Based Components"
-pagine: "31-70"
-tags: [tipo/capitolo, components, signals, templates, http]
+pagine: "32-72"
+tags: [tipo/capitolo, components, signals, templates, http, angular-22]
 ---
 # 02 · Signal-Based Components
-> 📖 cap.2 · pp.31-70 — *Modern Angular* v1.0.4
+> 📖 cap.2 · pp.32-72 — *Modern Angular* v2.0.0
 
 Si costruisce una feature di **ricerca voli** (`flight-search`) e si introducono i mattoni dei componenti signal-based: data model, logica con [[signal]], template syntax, accesso ai dati (HttpClient vs [[resource|httpResource]]) e sotto-componenti con input/output.
 
 Struttura cartelle a **subdomain** (approfondita nel [[08-sustainable-architectures|cap.8]]): `src/app/domains/ticketing/feature-booking/flight-search`.
 
 ## Scaffolding & Style Guide
-> 📖 pp.31-33
+> 📖 pp.32-34
 
 ```bash
 ng g c domains/ticketing/feature-booking/flight-search
@@ -24,7 +24,7 @@ Genera `flight-search.ts` + `flight-search.html` (niente stylesheet/test per via
 > Lo Style Guide aggiornato **non usa più i suffissi** `Component`/`.component.ts`: la classe è `FlightSearch`, il file `flight-search.ts`. Si possono usare suffissi semantici propri (`search`, `edit`).
 
 ## Data model
-> 📖 pp.33-34
+> 📖 pp.34-35
 
 Interfacce in `domains/ticketing/data/`. Le date sono **stringhe ISO**. Le costanti `initial*` evitano `null`/`undefined`.
 
@@ -38,7 +38,7 @@ export const initialFlight: Flight = { id: 0, from: '', to: '', date: '', delaye
 ```
 
 ## Component logic con i signal
-> 📖 pp.34-37
+> 📖 pp.35-38
 
 ```ts
 @Component({
@@ -71,7 +71,7 @@ const ro = counter.asReadonly();
 Collegamenti: [[signal]] · [[06-signal-forms]] (la `form()`).
 
 ## Template & data binding
-> 📖 pp.39-43
+> 📖 pp.40-46
 
 ```html
 <input [formField]="filterForm.from" id="from" />
@@ -109,6 +109,18 @@ Tipi di binding:
 }
 ```
 
+> [!info] Angular 22+ · Exhaustive `@switch`
+> Quando l'espressione è una **literal union**, il ramo `@default never;` chiede al compilatore un **exhaustiveness check**: se in futuro aggiungi un valore alla union senza il relativo `@case`, il template **non compila**. (Forma base da **Angular 21.2**.)
+> ```html
+> @switch (passenger().passengerStatus) {  <!-- 'A' | 'B' | 'C' -->
+>   @case ('A') { <p>Senator</p> }
+>   @case ('B') { <p>Frequent Traveller</p> }
+>   @case ('C') { <p>Regular</p> }
+>   @default never;
+> }
+> ```
+> Se invece fai switch su una **proprietà** di una discriminated union (non sulla union intera), usa `never(<expression>)` (**Angular 22**) per dichiarare l'esaustività.
+
 > [!warning] Gotcha
 > Nel `@for` il **`track` è obbligatorio** (es. `track flight.id`; in mancanza, `track $index` o `track item`): permette ad Angular di spostare i nodi DOM invece di ri-renderizzare tutto.
 
@@ -116,19 +128,19 @@ Tipi di binding:
 > Usa `<button type="button">`: il default è `submit` e farebbe il reload della pagina. Il `formRoot` del [[06-signal-forms|cap.6]] disabilita questo comportamento.
 
 ## Chiamare il componente
-> 📖 pp.44-45
+> 📖 pp.46-47
 
 Importa `FlightSearch` nell'array `imports` di `App` e usalo in `app.html` con `<app-flight-search />`. Il prefisso del selector (`app-`) si cambia in `angular.json` (chiave `prefix`, idem `eslint.config.js`).
 
 ## Debugging
-> 📖 pp.45-47
+> 📖 pp.47-50
 
 - Errori in **console** del browser: Angular stampa link cliccabili al file HTML/TS.
 - **Source Maps** generate da `ng serve` → debugger del browser (Chrome → Sources, `Cmd+Shift+P` per aprire file).
 - **VS Code**: breakpoint nel `.ts` + F5; config già in `.vscode/launch.json` generata dalla CLI.
 
 ## Data access: HttpClient
-> 📖 pp.47-52
+> 📖 pp.50-54
 
 ```ts
 private readonly http = inject(HttpClient);
@@ -150,7 +162,7 @@ protected search(): void {
 Collegamenti: [[inject]].
 
 ## Data access: httpResource (signal-based)
-> 📖 pp.52-56
+> 📖 pp.54-59
 
 ```ts
 protected readonly flightsResource = httpResource<Flight[]>(
@@ -181,7 +193,7 @@ protected search(): void { this.flightsResource.reload(); }
 Collegamenti: [[resource]] · approfondimento in [[03-reactive-design-with-signals]].
 
 ## Sotto-componenti: input, output, model
-> 📖 pp.56-69
+> 📖 pp.59-71
 
 Si estrae un `FlightCard`. Interfaccia pubblica vista dal padre:
 

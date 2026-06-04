@@ -1,6 +1,9 @@
 # Convenzioni del vault — Modern Angular (appunti IT)
 
-Vault Obsidian. Scopo: **studio personale / ripasso**. Fonte: `modern-angular_v1_0_4.pdf` (libro "Modern Angular", ed. v1.0.4).
+Vault Obsidian. Scopo: **studio personale / ripasso**. Fonte: `modern-angular_v2_0_0.pdf` (libro "Modern Angular", **2ª edizione** v2.0.0, aggiornata ad **Angular 22**). I numeri di pagina dei riferimenti `📖` puntano a questo PDF.
+
+> [!info] Versioning del vault
+> Gli appunti seguono la **v2.0.0** (Angular 22). Le feature introdotte con Angular 21.1/21.2/22 sono marcate con un callout `> [!info] Angular 22+` e il tag `angular-22` nel frontmatter → filtrabili in search/graph. Dove un vecchio snippet mostra ancora `@Injectable({ providedIn: 'root' })`, leggilo come [[service|@Service()]].
 
 ## Lingua
 - **Prosa in italiano**, diretta, senza fronzoli.
@@ -40,7 +43,7 @@ Modello **ibrido**: la nota-capitolo è l'hub e contiene il grosso; le note atom
 - 19-forensic-architecture-analysis
 
 ## Concetti atomici disponibili (in `concetti/`) — linkare con `[[nome]]`
-signal · computed · effect · linked-signal · resource · untracked · reactive-context · equality-immutability · signal-input · signal-output · model-signal · two-way-binding · content-projection · signal-queries · inject · injection-context · providers · lightweight-store
+signal · computed · effect · linked-signal · resource · untracked · reactive-context · equality-immutability · signal-input · signal-output · model-signal · two-way-binding · content-projection · signal-queries · inject · injection-context · providers · lightweight-store · service
 
 ## Template nota-capitolo
 ```markdown
@@ -51,7 +54,7 @@ pagine: "<start>-<end>"
 tags: [tipo/capitolo, <tematici>]
 ---
 # NN · <Titolo inglese>
-> 📖 cap.N · pp.<start>-<end> — *Modern Angular* v1.0.4
+> 📖 cap.N · pp.<start>-<end> — *Modern Angular* v2.0.0
 
 <Intro/contesto breve: cosa copre il capitolo e perché conta.>
 
@@ -105,6 +108,7 @@ aliases: [<sinonimi/varianti>]
 ## Tag controllati
 - tipo: `tipo/capitolo`, `tipo/concetto`
 - tematici: `signals`, `components`, `reactivity`, `routing`, `di`, `services`, `state-management`, `forms`, `testing`, `architecture`, `ngrx`, `directives`, `templates`, `lifecycle`, `ai`, `monorepo`, `i18n`, `security`, `ssr`, `micro-frontends`, `http`, `performance`
+- versione: `angular-22` (note che trattano feature gated ad Angular 21.1/21.2/22)
 
 ## Diagrammi
 Mermaid dove rende davvero: reactive flow / signal graph, gerarchia DI, child routes, flussi OAuth/OIDC, architecture matrix, unidirectional data flow. Non ovunque.

@@ -1,6 +1,6 @@
 ---
 titolo: "resource / httpResource / rxResource"
-tags: [tipo/concetto, signals, reactivity, http]
+tags: [tipo/concetto, signals, reactivity, http, angular-22]
 aliases: [resource, httpResource, rxResource]
 ---
 # resource()
@@ -19,5 +19,25 @@ const flight = httpResource<Flight>(() => `/api/flight/${id()}`);
 
 > [!warning] Gotcha
 > La richiesta riparte ad ogni cambio delle dipendenze lette nella funzione sorgente. `httpResource` è pensata per **GET/read**; per le mutazioni usa `HttpClient` o le mutations dello store.
+
+> [!info] Angular 22+ · Snapshots
+> Ogni resource espone un signal **`snapshot()`** che impacchetta `status` + `value` in un unico oggetto. Lo si può trasformare con un [[linked-signal]] e ri-convertire in resource con **`resourceFromSnapshots`** → resource derivate da altre resource (prima era possibile solo per singola proprietà).
+> ```ts
+> // mantieni l'ultimo valore valido durante un reload
+> const derived = linkedSignal<ResourceSnapshot<T>, ResourceSnapshot<T>>({
+>   source: input.snapshot,
+>   computation: (snap, previous) =>
+>     snap.status === 'loading' && previous?.value?.status === 'resolved'
+>       ? { ...snap, value: previous.value.value }
+>       : snap,
+> });
+> return resourceFromSnapshots(derived);
+> ```
+
+> [!info] Angular 22+ · debounced
+> I signal non hanno nozione di tempo. **`debounced(sig, ms)`** prende un signal e ritorna una *resource* che insegue il signal con ritardo configurabile (`status() === 'loading'` mentre il valore si assesta). Per i form esiste l'helper dedicato `debounce()` di `@angular/forms/signals` (vedi [[06-signal-forms]]).
+> ```ts
+> const debouncedFilter = debounced(filter, 300); // 300ms
+> ```
 
 **Usato in:** [[02-signal-based-components]], [[03-reactive-design-with-signals]], [[09-ngrx-signal-store]]

@@ -1,16 +1,16 @@
 ---
 capitolo: 5
 titolo: "State Management with Services & Signals"
-pagine: "126-148"
-tags: [tipo/capitolo, services, state-management, di, signals]
+pagine: "132-156"
+tags: [tipo/capitolo, services, state-management, di, signals, angular-22]
 ---
 # 05 · State Management with Services & Signals
-> 📖 cap.5 · pp.126-148 — *Modern Angular* v1.0.4
+> 📖 cap.5 · pp.132-156 — *Modern Angular* v2.0.0
 
 Finora tutta la logica viveva nei componenti. Crescendo l'app conviene separare le responsabilità in **service**: classi riusabili, scambiabili e iniettabili. Il capitolo costruisce un `FlightClient` per l'accesso ai dati, esplora la **Dependency Injection** (inject, injection context, dipendenze tra service, providers/scope) e poi implementa uno **store** signal-based per la gestione dello stato della feature `flight-search`.
 
 ## Generating a Service
-> 📖 p.126-127
+> 📖 p.132-133
 
 Come per i componenti, lo si genera con la CLI:
 
@@ -20,23 +20,25 @@ ng generate service domains/ticketing/data/flight-client
 ng g s domains/ticketing/data/flight-client
 ```
 
-Lo Style Guide aggiornato **non aggiunge più il suffisso** `Service`. Conviene un suffisso semantico proprio per categoria: qui i service di data access usano `Client` (come `HttpClient`). Il risultato è una classe decorata con `@Injectable`:
+Lo Style Guide aggiornato **non aggiunge più il suffisso** `Service`. Conviene un suffisso semantico proprio per categoria: qui i service di data access usano `Client` (come `HttpClient`). Il risultato è una classe decorata con [[service|@Service()]]:
 
 ```ts
 // flight-client.ts
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()              // singleton in root (default)
 export class FlightClient {}
 ```
 
 > [!tip] Take-away
-> `{ providedIn: 'root' }` crea **una sola istanza** (singleton) per tutta l'app, accessibile da chiunque conosca il tipo `FlightClient`. È il default adatto alla maggior parte dei casi.
+> `@Service()` crea di default **una sola istanza** (singleton) per tutta l'app, accessibile da chiunque conosca il tipo `FlightClient`. È il default adatto alla maggior parte dei casi.
+
+> [!info] Angular 22+ · `@Service` vs `@Injectable`
+> Il decoratore **`@Service()`** (Angular 22) è la forma usata in tutto il libro dalla 2ª ed.: `@Service()` ≡ `@Injectable({ providedIn: 'root' })`. **Semantica identica**, solo più conciso — `ng update` riscrive i decoratori al bump. Più avanti vedrai `@Service({ autoProvided: false })` per i servizi scambiabili (≡ `@Injectable()` senza `providedIn`). Dettagli in [[service]].
+> *(Nota: i restanti snippet di questo vault possono ancora mostrare `@Injectable({ providedIn: 'root' })`: leggilo come `@Service()`.)*
 
 ## Implementing a Service
-> 📖 p.127-128
+> 📖 p.133-134
 
 Il service espone un metodo che restituisce l'`httpResource` di cui ha bisogno il componente. Riceve i criteri come **signal** e li legge dentro la lambda reattiva:
 
@@ -71,7 +73,7 @@ export class FlightClient {
 Se `from` o `to` sono vuoti la lambda ritorna `undefined` → la [[resource|httpResource]] non parte.
 
 ## Injecting a Service
-> 📖 p.128-129
+> 📖 p.134-135
 
 Il componente richiede l'istanza con [[inject]] (niente `new`: è Angular a fornirla in base alla config). Da notare che la Signal Form rappresenta `from`/`to` come signal annidati, con un `value` signal per il valore corrente:
 
@@ -100,7 +102,7 @@ export class FlightSearch {
 Collegamenti: [[inject]].
 
 ## Injection Context
-> 📖 p.129-130
+> 📖 p.135-136
 
 `inject` va chiamato in un **injection context** valido: field initializer (come sopra) e constructor. Angular e le librerie definiscono altre aree eseguite in injection context, e se ne può crearne una con `runInInjectionContext` passando un `Injector`:
 
@@ -136,7 +138,7 @@ export class FlightSearch {
 Collegamenti: [[injection-context]] · [[inject]].
 
 ## Services with Dependencies
-> 📖 p.131-132
+> 📖 p.137-138
 
 Un service può dipendere da altri service. Il `FlightClient` può iniettare un `ConfigService` per la base URL:
 
@@ -166,7 +168,7 @@ export class FlightClient {
 ```
 
 ## Exchanging Services with Providers
-> 📖 p.132-134
+> 📖 p.138-141
 
 La DI permette di **scambiare** un'implementazione via configurazione (utile per test con mock, o per adattarsi a clienti/configurazioni diverse). Esempio: un `LanguageService` con due strategie. Si usa una **classe astratta** come contratto:
 
@@ -176,16 +178,19 @@ export abstract class LanguageService {
   abstract getUserLang(): string;
 }
 
-@Injectable()
+@Service({ autoProvided: false })   // Angular 22; pre-22: @Injectable() senza providedIn
 export class DefaultLanguageService implements LanguageService {
   getUserLang(): string { return 'en (default)'; }
 }
 
-@Injectable()
+@Service({ autoProvided: false })
 export class BrowserLanguageService implements LanguageService {
   getUserLang(): string { return navigator.language + ' (browser)'; }
 }
 ```
+
+> [!info] Angular 22+
+> `@Service({ autoProvided: false })` rende la classe iniettabile **ma non la registra in root**: la fornisci tu via [[providers]]. È l'equivalente del vecchio `@Injectable()` (senza `providedIn`). Perfetto per le implementazioni scambiabili dietro un base type.
 
 Si configura un **provider** (di solito in `app.config.ts`): `provide` è il **token** (cosa chiedi), `useClass` l'implementazione (cosa ottieni):
 
@@ -234,7 +239,7 @@ export class FlightSearch {
 Collegamenti: [[providers]] · [[inject]].
 
 ## Short-Hand Syntax for Providers
-> 📖 p.134-135
+> 📖 p.141-141
 
 Per fornire un service **senza tipo base**, la classe fa da token e da implementazione:
 
@@ -255,7 +260,7 @@ providers: [
 Un provider così in `app.config.ts` equivale a mettere `@Injectable({ providedIn: 'root' })` sulla classe stessa.
 
 ## Provider Functions
-> 📖 p.135-136
+> 📖 p.141-142
 
 Configurare il provider a mano costringe il consumer a **conoscere l'implementazione**. Le librerie (Angular incluso) offrono **provider function** col prefisso `provide`, che incapsulano i dettagli e accettano parametri di configurazione; ritornano un provider o un array di provider:
 
@@ -287,7 +292,7 @@ export const appConfig: ApplicationConfig = {
 > Una provider function può restituire un **array** di provider; Angular **appiattisce** automaticamente gli array annidati nella property `providers`, quindi il nesting non è un problema.
 
 ## Component-local Services
-> 📖 p.136-138
+> 📖 p.142-144
 
 I service sono singleton **per scope**. Lo scope finora era quello root; ma anche ogni **componente ha il suo injector**. Fornendo un service nello scope del componente, **ogni istanza** del componente ottiene la propria istanza del service. Si configura nella property `providers` del decorator `@Component`:
 
@@ -325,7 +330,7 @@ La config vale per il componente **e per tutti i suoi figli**, che ricevono la s
 Collegamenti: [[providers]] · [[injection-context]].
 
 ## Route-local Services & Auto Cleanup
-> 📖 p.139-140
+> 📖 p.145-148
 
 Gli **Environment Provider** definiscono un altro scope DI per intere parti dell'app; il router li usa per fornire service ai componenti di una rotta. Si aggiunge `providers` alla config della route:
 
@@ -370,8 +375,33 @@ export const appConfig: ApplicationConfig = {
 
 Collegamenti: [[04-router-navigation-lazy-loading]] · [[providers]].
 
+## Lazy Service Injection con `injectAsync`
+> [!info] Angular 22+
+> Per servizi che tirano dentro bundle pesanti (o usati da pochi utenti) conviene caricarli **on demand**. **`injectAsync`** (Angular 22) riceve una lambda che ritorna una `Promise` del servizio e restituisce una funzione: la **prima** chiamata fa l'import dinamico e crea l'istanza, le successive ritornano la stessa.
+
+```ts
+// checkin-page.ts
+import { injectAsync, onIdle } from '@angular/core';
+
+export class CheckinPage {
+  private readonly upgradeService = injectAsync(
+    () => import('./upgrade-service').then((m) => m.UpgradeService),
+    { prefetch: () => onIdle() },   // pre-carica a browser idle
+  );
+
+  protected async upgrade(): Promise<void> {
+    const svc = await this.upgradeService();   // import al primo uso
+    svc.upgrade(/* ... */);
+  }
+}
+```
+
+L'`import(...)` dinamico mette `UpgradeService` in un bundle separato, caricato solo quando serve. L'opzione `prefetch` elimina il ritardo del primo uso pre-caricando in background (`onIdle()` → `requestIdleCallback`, con fallback `setTimeout`; opzionale `onIdle({ timeout: 100 })`). Il servizio target **deve** essere auto-provided ([[service|@Service()]]). Vedi [[inject]].
+
+Collegamenti: [[inject]] · [[service]].
+
 ## State Management — perché serve uno store
-> 📖 p.140-141
+> 📖 p.148-149
 
 Le SPA mantengono stato lato client (voli selezionati, criteri di filtro, dati già caricati). Ma navigando via da una rotta Angular **distrugge il componente** (idem un `@if` che diventa `false`): lo stato nei componenti **va perso** e al ritorno se ne crea uno nuovo.
 
@@ -380,7 +410,7 @@ Per farlo **sopravvivere** lo si mette in un service nello scope **root** (non d
 Collegamenti: [[lightweight-store]] · [[08-sustainable-architectures]].
 
 ## Implementing a Store with Signals
-> 📖 p.141-143
+> 📖 p.149-151
 
 Lo store incapsula i [[signal]] e le resource. I signal **scrivibili sono privati** (`_from`), si espone la **read-only view** via `asReadonly`, più [[computed]] derivati e metodi di update:
 
@@ -461,7 +491,7 @@ flowchart LR
 Collegamenti: [[signal]] · [[computed]] · [[lightweight-store]].
 
 ## Consuming the Store
-> 📖 p.143-145
+> 📖 p.151-153
 
 Il componente inietta `FlightStore` e delega a signal/metodi: niente più gestione di signal e resource al suo interno. Problema: i filter signal dello store sono **read-only**, non bindabili agli input. Soluzione: un [[linked-signal|linkedSignal]] con copia di lavoro locale, su cui si crea la Signal Form:
 
@@ -528,7 +558,7 @@ export class FlightSearch {
 Collegamenti: [[linked-signal]] · [[effect]] · [[signal-input|Signal Forms (cap.6)]].
 
 ## Delegated Signals
-> 📖 p.145-147
+> 📖 p.153-155
 
 Per una UX reattiva serve chiamare `updateFilter` **a ogni** modifica di `from`/`to`. Un **delegated signal** delega lettura e scrittura ad altre parti del sistema: qui delega l'intero `filter` allo store. Non è (ancora) parte di Angular: nell'example project sta in `delegated-signal.ts` (cartella `shared/util-common`), implementato come `linkedSignal` che fa override di `set`/`update`.
 
@@ -566,7 +596,7 @@ protected readonly filterForm = form(this.filter, (path) => {
 Collegamenti: [[linked-signal]] · [[06-signal-forms]].
 
 ## Lifetime & Scopes
-> 📖 p.147-148
+> 📖 p.155-156
 
 Il **lifetime** dello store dipende dallo scope in cui lo registri:
 
@@ -577,7 +607,7 @@ Il **lifetime** dello store dipende dallo scope in cui lo registri:
 Collegamenti: [[lightweight-store]] · [[providers]].
 
 ## Outlook: NgRx Signal Store
-> 📖 p.148
+> 📖 p.156
 
 Implementare store con service + signal è semplice (incapsulare signal/resource, fornire routine di update controllato, delegare al data access). Ma genera **boilerplate ripetitivo**. La libreria signal-based più popolare per ridurlo è il **NgRx Signal Store**: snellisce l'implementazione e offre helper utili — dettagli nel [[09-ngrx-signal-store|cap.9]].
 

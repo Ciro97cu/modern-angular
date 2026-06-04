@@ -1,11 +1,11 @@
 ---
 capitolo: 1
 titolo: "Getting Started with Angular"
-pagine: "18-30"
-tags: [tipo/capitolo, tooling, signals]
+pagine: "18-31"
+tags: [tipo/capitolo, tooling, signals, angular-22]
 ---
 # 01 · Getting Started with Angular
-> 📖 cap.1 · pp.18-30 — *Modern Angular* v1.0.4
+> 📖 cap.1 · pp.18-31 — *Modern Angular* v2.0.0
 
 Setup dell'ambiente, generazione del progetto con la **Angular CLI** e prima lettura del codice generato. Il progetto di esempio del libro è **flights42** (`angular-architects/flights42` su GitHub).
 
@@ -145,7 +145,7 @@ export const appConfig: ApplicationConfig = {
 - **Build di produzione**: `ng build` → output in `dist/<app>/browser` (minify + tree-shaking).
 
 > [!tip] Take-away
-> **OnPush** è la strategia di change detection raccomandata e i signal la rendono naturale: Angular aggiorna un componente solo quando i suoi dati cambiano. **Da Angular 22 sarà il default.**
+> **OnPush** è la strategia di change detection raccomandata e i signal la rendono naturale: Angular aggiorna un componente solo quando i suoi dati cambiano. **Da Angular 22 è il default.** Il libro continua comunque a scrivere `changeDetection: ChangeDetectionStrategy.OnPush` esplicitamente in ogni `@Component`: rende la scelta visibile e resta retrocompatibile con versioni < 22.
 
 ## 🔁 Ripasso lampo
 1. Differenza tra `npm i <pkg>` e `ng add <pkg>`?

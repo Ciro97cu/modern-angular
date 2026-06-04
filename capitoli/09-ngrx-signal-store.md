@@ -1,18 +1,18 @@
 ---
 capitolo: 9
 titolo: "State Management with NgRx Signal Store"
-pagine: "243-286"
+pagine: "254-297"
 tags: [tipo/capitolo, ngrx, state-management, signals]
 ---
 # 09 · State Management with NgRx Signal Store
-> 📖 cap.9 · pp.243-286 — *Modern Angular* v1.0.4
+> 📖 cap.9 · pp.254-297 — *Modern Angular* v2.0.0
 
 Una SPA mantiene lo stato mentre l'utente cambia rotta: dati caricati via HTTP, ma anche interazioni UI (filtri, selezioni). Implementare lo store a mano (vedi [[05-state-management-services-signals|cap.5]]) funziona ma produce **molto boilerplate ripetitivo**: esporre signal read-only ma scrivibili dall'interno, integrare resource per il loading, gestire stati di errore/caricamento. Il **NgRx SignalStore** (`@ngrx/signals`) rimuove gran parte di questo boilerplate ed è oggi la soluzione di state management più diffusa per Angular moderno, integrandosi nativamente con i [[signal]].
 
 In tutto il capitolo lo store è un **service** che incapsula lo stato di una feature, composto da una pila di **features** (`withState`, `withComputed`, ...) passate a `signalStore()`. Molte features usate qui vengono dalla community via NgRx Toolkit (`@angular-architects/ngrx-toolkit`): `withResource`, `withDevtools`, `withMutations`.
 
 ## A First SignalStore
-> 📖 pp.243-251
+> 📖 pp.254-262
 
 Lo store si crea con `signalStore()`. Il primo argomento (opzionale) configura il `providedIn`; tutti gli altri sono **features** che aggiungono funzionalità. Di solito la prima è `withState`, che definisce le proprietà di stato: ognuna diventa un signal **read-only per i consumer** ma aggiornabile dall'interno dello store.
 
@@ -123,7 +123,7 @@ export class FlightSearch {
 Collegamenti: [[signal]] · [[computed]] · [[resource]] · [[inject]] · [[lightweight-store]] · [[05-state-management-services-signals]] · [[08-sustainable-architectures]].
 
 ## Inspecting the Store with the Redux DevTools
-> 📖 pp.252-254
+> 📖 pp.263-265
 
 I **Redux DevTools** (estensione Chrome/Firefox) ispezionano lo stato e le sue transizioni nel tempo (incluso il **time-travel debugging**). Anche se SignalStore non implementa il pattern Redux, ci si collega con la feature `withDevtools` del NgRx Toolkit: la stringa passata è il nome del *branch* nell'albero DevTools (per distinguere più store).
 
@@ -147,7 +147,7 @@ isDevMode() ? withDevtools('flight') : withDevToolsStub('flight'),
 > Il check `isDevMode()` è **a runtime**: i DevTools restano nel bundle di produzione. Per escluderli serve un check a **compile-time** con un valore costante: usare i file `environment.ts` / `environment.development.ts` (generati da `ng generate environments`) che espongono `withDevtools`/`withDevToolsStub`, e un helper `withDevToolsForDebugMode(name)` che chiama `environment.withDevtools(name)`.
 
 ## Mutations
-> 📖 pp.255-260
+> 📖 pp.266-271
 
 Le resource caricano dati, ma Angular non offre una controparte per **modificarli**. Farlo a mano (HttpClient nei metodi) genera boilerplate per stati loading/error e chiamate sovrapposte. Il NgRx Toolkit fornisce la **Mutation API** (ispirata a React Query), che ricalca la Resource API. Esistono `httpMutation` (cambi rappresentabili come richiesta HTTP) e `rxMutation` (cambi arbitrari che ritornano Observable). Si aggiungono con `withMutations`.
 
@@ -210,7 +210,7 @@ createSaveRxMutation(options: Partial<RxMutationOptions<Flight, Flight>>) {
 ```
 
 ## Reactive Methods
-> 📖 pp.261-266
+> 📖 pp.272-277
 
 Lo SignalStore offre due **reactive methods**, ri-eseguiti automaticamente quando i valori passati cambiano. Sono come un [[effect]] esplicito che reagisce **solo** ai valori in ingresso, non agli altri signal usati al loro interno.
 
@@ -264,7 +264,7 @@ connectFlightId: signalMethod<number>((id) => {
 > A differenza di RxJS (operatori di flattening) e della Resource API (semantica `switchMap`), `signalMethod` **non ha alcun meccanismo per le chiamate sovrapposte**. Va bene quando si limita a un `patchState` che triggera a sua volta una resource.
 
 ## Entity Management and Normalization
-> 📖 pp.267-275
+> 📖 pp.278-286
 
 Lo stato è spesso fatto di **entità** (voli, passeggeri). La feature `withEntities` (da `@ngrx/signals/entities`) riduce il boilerplate e incoraggia best practice come la normalizzazione.
 
@@ -340,7 +340,7 @@ withComputed((store) => ({
 I dati si normalizzano dal backend (se controllabile, o con un BFF) oppure lato client dopo il load (con `map`/`reduce`). Si può **saltare** la normalizzazione se l'app legge soltanto o aggiorna sempre l'intera struttura annidata.
 
 ## Event API: Flux and Redux
-> 📖 pp.276-281
+> 📖 pp.287-292
 
 L'**Event API** porta il pattern **Flux** / Redux (dello store NgRx "Global") nel mondo dei Signal Store, per **disaccoppiare** gli store dai loro consumer via eventi.
 
@@ -436,7 +436,7 @@ constructor() { this.dispatch.loadLuggageTriggered({ passengerId: 4711 }); }
 ```
 
 ## Custom Features
-> 📖 pp.282-285
+> 📖 pp.293-296
 
 Le **custom features** sono i blocchi riusabili condivisibili tra store. Anche `withResource`, `withDevtools`, `withEntities` e l'Event API sono custom features. Si definiscono con una **factory** che delega a `signalStoreFeature` — null'altro che una combinazione di altre features.
 
