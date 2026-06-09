@@ -109,8 +109,8 @@ Tipi di binding:
 }
 ```
 
-> [!info] Angular 22+ · Exhaustive `@switch`
-> Quando l'espressione è una **literal union**, il ramo `@default never;` chiede al compilatore un **exhaustiveness check**: se in futuro aggiungi un valore alla union senza il relativo `@case`, il template **non compila**. (Forma base da **Angular 21.2**.)
+> [!info] Angular 21.2+ · Exhaustive `@switch`
+> Quando l'espressione è una **literal union**, il ramo `@default never;` chiede al compilatore un **exhaustiveness check**: se in futuro aggiungi un valore alla union senza il relativo `@case`, il template **non compila** (da **Angular 21.2**).
 > ```html
 > @switch (passenger().passengerStatus) {  <!-- 'A' | 'B' | 'C' -->
 >   @case ('A') { <p>Senator</p> }

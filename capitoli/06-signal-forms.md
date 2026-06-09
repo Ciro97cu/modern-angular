@@ -176,8 +176,8 @@ export const flightSchema = schema<Flight>((path) => {
 });
 ```
 
-> [!info] Angular 22+ · Schema dinamico (lambda)
-> Da **Angular 21.1** il 2° argomento di `validateStandardSchema` può essere una **lambda che ritorna uno schema**: Angular la avvolge in un `computed`, così lo schema attivo può dipendere da altri signal (validazione context-dependent, es. switch tra regole lenient/strict).
+> [!info] Angular 21.1+ · Schema dinamico (lambda)
+> Da **Angular 21.1** il 2° argomento di `validateStandardSchema` può essere una **lambda che ritorna uno schema**. Angular la avvolge in un `computed`, quindi lo schema attivo può dipendere da altri signal: utile per validare in modo diverso secondo il contesto (es. regole morbide o severe).
 > ```ts
 > validateStandardSchema(
 >   path,
@@ -187,8 +187,8 @@ export const flightSchema = schema<Flight>((path) => {
 > ```
 
 ### Visualizzare lo stato di validazione con classi CSS
-> [!info] Angular 22+
-> Reactive/Template-driven Forms aggiungono da sole classi come `ng-valid`/`ng-invalid`/`ng-pending`. Signal Forms è più **esplicito**: mappi i nomi delle classi a predicati sullo stato del campo via **`provideSignalFormsConfig`**. La costante `NG_STATUS_CLASSES` (namespace `compat`) replica le classi delle form classiche → i CSS esistenti continuano a funzionare.
+> [!info] Angular 22+ · classi CSS di stato
+> Reactive e Template-driven Forms aggiungono da sole classi come `ng-valid`/`ng-invalid`/`ng-pending`. Signal Forms è più **esplicito**: mappi i nomi delle classi a predicati sullo stato del campo con **`provideSignalFormsConfig`**. La costante `NG_STATUS_CLASSES` (namespace `compat`) replica le classi delle form classiche, così i CSS che già hai continuano a funzionare.
 > ```ts
 > // app.config.ts
 > import { provideSignalFormsConfig } from '@angular/forms/signals';

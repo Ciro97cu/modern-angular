@@ -113,8 +113,8 @@ export class Sidebar {}
 </li>
 ```
 
-> [!info] Angular 22+ · `isActive`
-> `routerLinkActive` resta la scelta naturale per l'**highlighting dichiarativo**. Ma quando ti serve lo stato di attivazione **come valore** (per un computed, un effect, logica reattiva oltre la classe CSS), da **Angular 21.1** la funzione `isActive(path, router)` ritorna un **`Signal<boolean>`** ri-valutato a ogni cambio di route.
+> [!info] Angular 21.1+ · `isActive`
+> Per evidenziare un link va benissimo `routerLinkActive`. Ma a volte ti serve lo stato attivo **come valore**, da usare in un computed o in un effect. Da **Angular 21.1** `isActive(path, router)` ritorna un **`Signal<boolean>`**, ri-valutato a ogni cambio di route.
 > ```ts
 > import { isActive, Router } from '@angular/router';
 >

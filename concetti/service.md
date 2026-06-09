@@ -22,7 +22,7 @@ export class BrowserLanguageService implements LanguageService {}
 > - `@Service()` ≡ `@Injectable({ providedIn: 'root' })`
 > - `@Service({ autoProvided: false })` ≡ `@Injectable()` (senza `providedIn`, da fornire a mano)
 >
-> Per servizi scambiabili tramite [[providers]] (es. dietro un abstract class come token) si usa `autoProvided: false`. `ng update` riscrive automaticamente i decoratori durante il bump.
+> Usi `autoProvided: false` per i servizi scambiabili tramite [[providers]] (es. dietro una classe astratta usata come token).
 
 > [!tip] Take-away
 > `@Service()` di default = root singleton. Per la lazy injection con `injectAsync` il servizio **deve** essere auto-provided (`@Service()` semplice). Vedi [[inject]] e [[providers]].

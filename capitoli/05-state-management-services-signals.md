@@ -34,8 +34,8 @@ export class FlightClient {}
 > `@Service()` crea di default **una sola istanza** (singleton) per tutta l'app, accessibile da chiunque conosca il tipo `FlightClient`. È il default adatto alla maggior parte dei casi.
 
 > [!info] Angular 22+ · `@Service` vs `@Injectable`
-> Il decoratore **`@Service()`** (Angular 22) è la forma usata in tutto il libro dalla 2ª ed.: `@Service()` ≡ `@Injectable({ providedIn: 'root' })`. **Semantica identica**, solo più conciso — `ng update` riscrive i decoratori al bump. Più avanti vedrai `@Service({ autoProvided: false })` per i servizi scambiabili (≡ `@Injectable()` senza `providedIn`). Dettagli in [[service]].
-> *(Nota: i restanti snippet di questo vault possono ancora mostrare `@Injectable({ providedIn: 'root' })`: leggilo come `@Service()`.)*
+> Il decoratore **`@Service()`** (Angular 22) è la forma usata in tutto il libro dalla 2ª edizione. Equivale a `@Injectable({ providedIn: 'root' })`: **stessa semantica**, solo più conciso. Più avanti vedrai `@Service({ autoProvided: false })` per i servizi scambiabili (= il vecchio `@Injectable()` senza `providedIn`). Dettagli in [[service]].
+> Negli snippet di questo vault può comparire ancora `@Injectable({ providedIn: 'root' })`: leggilo come `@Service()`.
 
 ## Implementing a Service
 > 📖 p.133-134
@@ -376,8 +376,8 @@ export const appConfig: ApplicationConfig = {
 Collegamenti: [[04-router-navigation-lazy-loading]] · [[providers]].
 
 ## Lazy Service Injection con `injectAsync`
-> [!info] Angular 22+
-> Per servizi che tirano dentro bundle pesanti (o usati da pochi utenti) conviene caricarli **on demand**. **`injectAsync`** (Angular 22) riceve una lambda che ritorna una `Promise` del servizio e restituisce una funzione: la **prima** chiamata fa l'import dinamico e crea l'istanza, le successive ritornano la stessa.
+> [!info] Angular 22+ · `injectAsync`
+> Alcuni servizi portano con sé bundle pesanti, o servono a pochi utenti: meglio caricarli **solo quando servono**. **`injectAsync`** (Angular 22) riceve una lambda che ritorna una `Promise` del servizio e ti dà una funzione. La **prima** chiamata fa l'import dinamico e crea l'istanza; le successive riusano la stessa.
 
 ```ts
 // checkin-page.ts

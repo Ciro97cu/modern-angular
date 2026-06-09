@@ -20,7 +20,7 @@ const flight = httpResource<Flight>(() => `/api/flight/${id()}`);
 > [!warning] Gotcha
 > La richiesta riparte ad ogni cambio delle dipendenze lette nella funzione sorgente. `httpResource` è pensata per **GET/read**; per le mutazioni usa `HttpClient` o le mutations dello store.
 
-> [!info] Angular 22+ · Snapshots
+> [!info] Angular 21.2+ · Snapshots
 > Ogni resource espone un signal **`snapshot()`** che impacchetta `status` + `value` in un unico oggetto. Lo si può trasformare con un [[linked-signal]] e ri-convertire in resource con **`resourceFromSnapshots`** → resource derivate da altre resource (prima era possibile solo per singola proprietà).
 > ```ts
 > // mantieni l'ultimo valore valido durante un reload

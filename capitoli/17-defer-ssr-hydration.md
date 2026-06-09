@@ -112,8 +112,9 @@ export const appConfig: ApplicationConfig = {
 ```
 
 > [!info] Angular 22+ · FetchBackend di default
-> Da **Angular 22** `HttpClient` usa il **`FetchBackend`** di default → `withFetch()` non serve più (è **deprecato**). La Fetch API è ovunque, è Promise-based e funziona uguale in browser e SSR. Unica cosa che non offre: l'**upload progress** → se ti serve `reportUploadProgress`, torna a XHR con `provideHttpClient(withXhr())`.
-> **Pre-22:** il default era `XhrBackend`; la fetch andava attivata con `provideHttpClient(withFetch())`, cruciale in SSR/hydration. `ng update` inserisce `withXhr()` dove l'app dipendeva dal vecchio comportamento.
+> Da **Angular 22** `HttpClient` usa la **fetch API** di default. Quindi `withFetch()` non serve più ed è deprecato: basta `provideHttpClient()`.
+> La fetch non gestisce l'**upload progress**. Se ti serve, torna a XHR: `provideHttpClient(withXhr())`.
+> **Prima della 22** il default era `XhrBackend` e la fetch si attivava con `withFetch()` (importante in SSR). Al bump, `ng update` aggiunge `withXhr()` dove serviva il vecchio comportamento.
 
 > [!tip] Take-away
 > Con la config standard di Angular 22 basta `provideHttpClient()` + `provideClientHydration(withEventReplay())`: fetch backend e hydration incrementale sono **default**.
@@ -125,9 +126,9 @@ Collegamenti: [[providers]] · le provider function (`provide*`/`with*`).
 
 L'hydration **non deve avvenire tutta in una volta**. I bundle si richiedono solo quando servono — il più tardi possibile, idealmente mai per le regioni che l'utente non tocca. Le parti più importanti diventano interattive prima; le meno importanti dopo. Si abbina naturalmente a `@defer`: le regioni da idratare on-demand si marcano con `@defer` e la clausola **`hydrate`** dice *quando* idratare.
 
-> [!info] Angular 22+ · Default invertito
-> Da **Angular 22** `provideClientHydration()` abilita l'incremental hydration **in automatico**: `withIncrementalHydration()` non serve più (resta solo per casi di opt-out). Per disattivarla usa la nuova feature **`withNoIncrementalHydration()`**.
-> **Pre-22 (Angular 19–21):** era opt-in, da attivare con `provideClientHydration(withIncrementalHydration())`. Al bump `ng update` aggiunge `withNoIncrementalHydration()` dove la feature non era richiesta, preservando il comportamento.
+> [!info] Angular 22+ · Hydration incrementale di default
+> Da **Angular 22** `provideClientHydration()` attiva l'hydration incrementale da sola: `withIncrementalHydration()` non serve più. Per disattivarla usa **`withNoIncrementalHydration()`**.
+> **Prima della 22** (Angular 19–21) era opt-in, da attivare con `withIncrementalHydration()`. Al bump, `ng update` aggiunge `withNoIncrementalHydration()` dove non era attiva, così il comportamento non cambia.
 
 ```html
 <!-- .../flight-search/flight-search.html -->

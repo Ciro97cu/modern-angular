@@ -145,8 +145,8 @@ findPromise(
 > In un'app reale `findPromise` non lo scriveresti: terresti l'Observable che già hai e useresti `rxResource`. Esiste solo a scopo dimostrativo.
 
 ### Comporre resource: Snapshots
-> [!info] Angular 22+
-> Derivare un valore da un altro è banale coi computed; per le **resource** prima si poteva proiettare solo singole proprietà (`value`/`error`/`isLoading`), non lo stato nel suo insieme. Da **Angular 21.2** ogni resource espone un signal **`snapshot()`** che impacchetta `status` + `value`. Lo trasformi con un [[linked-signal]] e lo ri-converti in resource con **`resourceFromSnapshots`**: la resource originale tiene la sua logica di load, quella derivata applica solo una trasformazione sopra.
+> [!info] Angular 21.2+
+> Coi computed derivare un valore è facile. Per le **resource** prima no: potevi proiettare solo singole proprietà (`value`/`error`/`isLoading`), non lo stato intero. Da **Angular 21.2** ogni resource espone il signal **`snapshot()`**, che racchiude `status` + `value`. Lo trasformi con un [[linked-signal]] e lo ri-converti in resource con **`resourceFromSnapshots`**. La resource di partenza mantiene la sua logica di load; quella derivata ci applica sopra solo una trasformazione.
 
 ```ts
 // filtra i risultati di una resource per un criterio extra
