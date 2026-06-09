@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Appunti Angular</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Appunti di studio su Angular">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <style>
+    :root { --theme-color: #dd0031; --theme-color-dark: #c3002f; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    .markdown-section { max-width: 850px; }
+    .markdown-section h1, .markdown-section h2 { border-bottom: 1px solid #eaecef; padding-bottom: .3em; color: #24292e; }
+    .markdown-section code { color: #c3002f; background-color: #f6f8fa; font-family: "SFMono-Regular", Menlo, Consolas, monospace; }
+    .sidebar { border-right: 1px solid #eaecef; }
+    .sidebar-nav li.active > a { color: var(--theme-color); border-right: 3px solid var(--theme-color); font-weight: 600; }
+    .app-name-link { color: var(--theme-color) !important; font-weight: 700; }
+    .markdown-section table th { background: #f6f8fa; }
+  </style>
+</head>
+<body>
+  <div id="app">Caricamento…</div>
+  <script>
+    // Risolve i link Obsidian [[nome]] / [[nome|alias]] in link Docsify (a render-time, i file .md non vengono toccati).
+    // [[NN-...]] -> /capitoli/ ; 00-index -> /00-index.md ; resto -> /concetti/
+    function wikilinkPlugin(hook) {
+      hook.beforeEach(function (content) {
+        // rimuove il frontmatter YAML (--- ... ---) così non viene stampato come testo
+        content = content.replace(/^\s*---\n[\s\S]*?\n---\n/, '');
+        // converte i wikilink
+        return content.replace(/\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]/g, function (_, target, label) {
+          target = target.trim();
+          var text = (label || target).trim();
+          var path;
+          if (/^\d{2}-/.test(target)) path = '/capitoli/' + target + '.md';
+          else if (target === '00-index') path = '/00-index.md';
+          else path = '/concetti/' + target + '.md';
+          return '[' + text + '](' + path + ')';
+        });
+      });
+    }
+
+    window.$docsify = {
+      name: 'Appunti Angular',
+      loadSidebar: true,
+      subMaxLevel: 2,
+      relativePath: true,
+      auto2top: true,
+      // un solo _sidebar.md (root) anche nelle sottocartelle capitoli/ e concetti/
+      alias: {
+        '/capitoli/_sidebar.md': '/_sidebar.md',
+        '/concetti/_sidebar.md': '/_sidebar.md',
+        '/_meta/_sidebar.md': '/_sidebar.md',
+        '/.*/_sidebar.md': '/_sidebar.md'
+      },
+      search: { placeholder: 'Cerca…', noData: 'Nessun risultato', depth: 4 },
+      copyCode: { buttonText: 'Copia', successText: 'Copiato' },
+      plugins: [wikilinkPlugin]
+    };
+  </script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-typescript.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markup.min.js"></script>
+</body>
+</html>

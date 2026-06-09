@@ -1,0 +1,51 @@
+- [🏠 Home](/)
+- [🗺️ Indice completo](/00-index.md)
+
+- **📘 Capitoli**
+  - [01 · Getting Started](/capitoli/01-getting-started.md)
+  - [02 · Signal-Based Components](/capitoli/02-signal-based-components.md)
+  - [03 · Reactive Design with Signals](/capitoli/03-reactive-design-with-signals.md)
+  - [04 · Navigation & Lazy Loading](/capitoli/04-router-navigation-lazy-loading.md)
+  - [05 · State Management (Services)](/capitoli/05-state-management-services-signals.md)
+  - [06 · Signal Forms](/capitoli/06-signal-forms.md)
+  - [07 · Testing with Vitest](/capitoli/07-testing-with-vitest.md)
+  - [08 · Sustainable Architectures](/capitoli/08-sustainable-architectures.md)
+  - [09 · NgRx Signal Store](/capitoli/09-ngrx-signal-store.md)
+  - [10 · Signal Queries & Communication](/capitoli/10-signal-queries-component-communication.md)
+  - [11 · Directives, Templates, Containers](/capitoli/11-directives-templates-containers.md)
+  - [12 · Initialization & Route Changes](/capitoli/12-initialization-route-changes.md)
+  - [13 · Agentic UI (Hashbrown)](/capitoli/13-hashbrown-agentic-ui.md)
+  - [14 · Monorepos & Libraries](/capitoli/14-monorepos-libraries.md)
+  - [15 · Internationalization](/capitoli/15-internationalization.md)
+  - [16 · Authentication & Authorization](/capitoli/16-authentication-authorization.md)
+  - [17 · Defer, SSR & Hydration](/capitoli/17-defer-ssr-hydration.md)
+  - [18 · Micro Frontends](/capitoli/18-micro-frontends.md)
+  - [19 · Forensic Architecture Analysis](/capitoli/19-forensic-architecture-analysis.md)
+
+- **🧩 Concetti · Reattività**
+  - [signal](/concetti/signal.md)
+  - [computed](/concetti/computed.md)
+  - [effect](/concetti/effect.md)
+  - [linkedSignal](/concetti/linked-signal.md)
+  - [resource / httpResource](/concetti/resource.md)
+  - [untracked](/concetti/untracked.md)
+  - [reactive context](/concetti/reactive-context.md)
+  - [equality & immutability](/concetti/equality-immutability.md)
+
+- **🧩 Concetti · Componenti & comunicazione**
+  - [signal input](/concetti/signal-input.md)
+  - [signal output](/concetti/signal-output.md)
+  - [model signal](/concetti/model-signal.md)
+  - [two-way binding](/concetti/two-way-binding.md)
+  - [content projection](/concetti/content-projection.md)
+  - [signal queries](/concetti/signal-queries.md)
+
+- **🧩 Concetti · DI & stato**
+  - [inject()](/concetti/inject.md)
+  - [injection context](/concetti/injection-context.md)
+  - [providers](/concetti/providers.md)
+  - [@Service](/concetti/service.md)
+  - [lightweight store](/concetti/lightweight-store.md)
+
+- **🛠️ Meta**
+  - [Convenzioni del vault](/_meta/conventions.md)
