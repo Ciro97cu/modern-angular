@@ -1,0 +1,317 @@
+/* ============================================================
+   Appunti Angular — tema brand rosso #dd0031, chiaro + scuro.
+   Override del tema "vue" di docsify + design token.
+   Callout impeccable-compliant (box pieni tintati, NO side-stripe).
+   ============================================================ */
+
+:root {
+  /* Brand */
+  --ng-red: #dd0031;
+  --ng-red-dark: #c3002f;
+  --ng-magenta: #e0218a;
+  --theme-color: var(--ng-red);
+
+  /* Tipografia */
+  --font-sans: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+
+  /* Superfici e testo (light) */
+  --bg: #ffffff;
+  --bg-soft: #f6f8fa;
+  --text: #1f2328;
+  --text-soft: #59636e;
+  --border: #e4e8ec;
+  --sidebar-bg: #fbfcfd;
+  --code-bg: #f4f6f8;
+  --code-inline-bg: #fdeef2;
+  --code-inline-text: #b00027;
+  --link: var(--ng-red-dark);
+  --table-head-bg: #f3eef0;
+
+  /* Citazione page-ref */
+  --ref-bg: #f6f8fa;
+  --ref-text: #59636e;
+
+  /* Callout semantici (full-tint, niente barra laterale) */
+  --cl-warn-bg: #fdf3e2;  --cl-warn-bd: #efd6a4;  --cl-warn-tx: #7a5600;
+  --cl-tip-bg:  #e8f6f0;  --cl-tip-bd:  #bfe6d4;  --cl-tip-tx:  #0a6e49;
+  --cl-note-bg: #eaf2fd;  --cl-note-bd: #cfe0fa;  --cl-note-tx: #0a5bb5;
+  --cl-ans-bg:  #ebf6ec;  --cl-ans-bd:  #c7e7cf;  --cl-ans-tx:  #14702e;
+
+  /* z-index scale (semantica, niente 9999) */
+  --z-toggle: 30;
+  --z-sidebar-toggle: 40;
+
+  --shadow-sm: 0 1px 2px rgba(27, 31, 36, .06), 0 2px 6px rgba(27, 31, 36, .08);
+}
+
+html.dark {
+  --ng-red: #ff5c8a;
+  --ng-red-dark: #ff7aa0;
+  --ng-magenta: #e0218a;
+  --theme-color: #ff5c8a;
+
+  --bg: #0d1117;
+  --bg-soft: #161b22;
+  --text: #d3dae3;
+  --text-soft: #9aa5b1;
+  --border: #232b35;
+  --sidebar-bg: #0b0f14;
+  --code-bg: #12181f;
+  --code-inline-bg: #2a141c;
+  --code-inline-text: #ff8fb0;
+  --link: #ff7aa0;
+  --table-head-bg: #161b22;
+
+  --ref-bg: #12181f;
+  --ref-text: #9aa5b1;
+
+  --cl-warn-bg: #241d0e; --cl-warn-bd: #4a3d18; --cl-warn-tx: #e3b341;
+  --cl-tip-bg:  #0f241c; --cl-tip-bd:  #1f4838; --cl-tip-tx:  #56d4a0;
+  --cl-note-bg: #0f1d2e; --cl-note-bd: #1f3a5a; --cl-note-tx: #6cb6ff;
+  --cl-ans-bg:  #0f2417; --cl-ans-bd:  #1f4a2f; --cl-ans-tx:  #57c785;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4), 0 2px 6px rgba(0, 0, 0, .5);
+}
+
+/* ---------- Base ---------- */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  transition: background .25s ease, color .25s ease;
+}
+.markdown-section {
+  max-width: 760px;
+  font-size: 16.5px;
+}
+.markdown-section p,
+.markdown-section li {
+  line-height: 1.72;
+  color: var(--text);
+  text-wrap: pretty;
+}
+.content, .markdown-section { color: var(--text); }
+
+/* ---------- Titoli ---------- */
+.markdown-section h1,
+.markdown-section h2,
+.markdown-section h3,
+.markdown-section h4 {
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.markdown-section h1 {
+  font-size: clamp(1.9rem, 1.4rem + 1.8vw, 2.5rem);
+  border-bottom: 3px solid var(--ng-red);
+  padding-bottom: .28em;
+  margin-bottom: .8em;
+}
+.markdown-section h2 {
+  font-size: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: .25em;
+  margin-top: 2.4rem;
+}
+.markdown-section h3 { font-size: 1.2rem; margin-top: 1.8rem; }
+.markdown-section a { color: var(--link); font-weight: 600; text-decoration: none; }
+.markdown-section a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* ---------- Sidebar ---------- */
+.sidebar { background: var(--sidebar-bg); border-right: 1px solid var(--border); }
+.sidebar-nav { line-height: 1.9; }
+.sidebar ul li a { color: var(--text-soft); font-size: 14px; transition: color .15s ease; }
+.sidebar ul li a:hover { color: var(--ng-red); }
+.sidebar-nav > ul > p,
+.sidebar-nav strong {
+  color: var(--text); font-size: 12px; text-transform: uppercase;
+  letter-spacing: .06em; margin-top: 1.1rem; display: block; font-weight: 700;
+}
+/* attivo: tinta + testo rosso bold, NO barra laterale */
+.sidebar-nav li.active > a {
+  color: var(--ng-red);
+  font-weight: 700;
+  background: color-mix(in oklab, var(--ng-red) 9%, transparent);
+  border-radius: 6px;
+}
+.app-name-link { color: var(--ng-red) !important; font-weight: 800; font-size: 21px; }
+.sidebar .app-name { margin-top: 1.1rem; }
+
+/* ---------- Codice ---------- */
+.markdown-section code {
+  background: var(--code-inline-bg);
+  color: var(--code-inline-text);
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-family: var(--font-mono);
+  font-size: .84em;
+}
+.markdown-section pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.markdown-section pre > code {
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: .85em;
+  line-height: 1.6;
+}
+
+/* ---------- Page-ref (blockquote semplice: > 📖 pp.x-y) ---------- */
+.markdown-section blockquote:not(.alert) {
+  background: var(--ref-bg);
+  border: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--ref-text);
+  font-size: .9em;
+  padding: .5em .9em;
+}
+.markdown-section blockquote:not(.alert) p { color: var(--ref-text); }
+
+/* ---------- Callout (flexible-alerts) — override side-stripe -> box pieno ---------- */
+.markdown-section .alert.callout {
+  border: 1px solid var(--border);
+  border-left: 1px solid var(--border) !important; /* annulla la barra 4px del plugin */
+  border-radius: 10px;
+  background: var(--bg-soft);
+  padding: .85em 1.1em;
+  margin: 1.1em 0;
+  box-shadow: none;
+}
+.markdown-section .alert.callout > p { color: var(--text); }
+.markdown-section .alert.callout .title {
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: .5em;
+  margin: 0 0 .4em;
+}
+.markdown-section .alert.callout .title .icon { opacity: .95; }
+
+/* tipi semantici */
+.markdown-section .alert.callout.warning {
+  background: var(--cl-warn-bg); border-color: var(--cl-warn-bd) !important;
+}
+.markdown-section .alert.callout.warning .title { color: var(--cl-warn-tx); }
+.markdown-section .alert.callout.tip {
+  background: var(--cl-tip-bg); border-color: var(--cl-tip-bd) !important;
+}
+.markdown-section .alert.callout.tip .title { color: var(--cl-tip-tx); }
+.markdown-section .alert.callout.note {
+  background: var(--cl-note-bg); border-color: var(--cl-note-bd) !important;
+}
+.markdown-section .alert.callout.note .title { color: var(--cl-note-tx); }
+.markdown-section .alert.callout.callout-answer {
+  background: var(--cl-ans-bg); border-color: var(--cl-ans-bd) !important;
+}
+.markdown-section .alert.callout.callout-answer .title { color: var(--cl-ans-tx); }
+
+/* ---------- Risposte Ripasso collassabili ---------- */
+.markdown-section .callout-answer.is-collapsible .title.answer-toggle {
+  cursor: pointer;
+  user-select: none;
+  margin: 0;
+  border-radius: 6px;
+  transition: background .15s ease;
+}
+.markdown-section .callout-answer.is-collapsible .title.answer-toggle:hover {
+  background: color-mix(in oklab, var(--cl-ans-tx) 10%, transparent);
+}
+.markdown-section .callout-answer.is-collapsible .title.answer-toggle::after {
+  content: "▸";
+  margin-left: auto;
+  font-size: .85em;
+  transition: transform .2s ease;
+}
+.markdown-section .callout-answer.is-collapsible.open .title.answer-toggle::after {
+  transform: rotate(90deg);
+}
+.markdown-section .callout-answer.is-collapsible .answer-body { display: none; }
+.markdown-section .callout-answer.is-collapsible.open .answer-body { display: block; }
+.markdown-section .callout-answer.is-collapsible.open .answer-body > :first-child { margin-top: .3em; }
+.markdown-section .callout-answer.is-collapsible.open .answer-body > :last-child { margin-bottom: 0; }
+
+/* ---------- Tabelle ---------- */
+.markdown-section table { display: table; width: 100%; border-collapse: collapse; }
+.markdown-section tr { background: var(--bg); border-top: 1px solid var(--border); }
+.markdown-section th { background: var(--table-head-bg); color: var(--text); font-weight: 700; }
+.markdown-section td, .markdown-section th { border: 1px solid var(--border); }
+
+/* ---------- Ricerca ---------- */
+.sidebar .search input { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 8px; }
+.sidebar .search .results-panel { background: var(--bg); }
+.sidebar .search h2, .sidebar .search .matching-post h2 { color: var(--ng-red); }
+.sidebar .search p { color: var(--text-soft); }
+.sidebar .search .clear-button { color: var(--text-soft); }
+
+/* ---------- Paginazione Prev/Next ---------- */
+.docsify-pagination-container { border-top: 1px solid var(--border); color: var(--text-soft); margin-top: 2.5rem; }
+.pagination-item-label { color: var(--text-soft); }
+.pagination-item-title { color: var(--ng-red); font-weight: 700; }
+.pagination-item a:hover .pagination-item-title { color: var(--ng-red-dark); }
+
+/* ---------- Copy code ---------- */
+.docsify-copy-code-button {
+  background: var(--ng-red) !important;
+  color: #fff !important;
+  border-radius: 0 10px 0 6px !important;
+  font-family: var(--font-sans) !important;
+}
+.docsify-copy-code-button:hover { background: var(--ng-red-dark) !important; }
+
+/* ---------- Coverpage (gradiente brand) ---------- */
+section.cover {
+  background: linear-gradient(135deg, #c3002f 0%, #dd0031 52%, #e0218a 100%) !important;
+}
+section.cover .cover-main h1,
+section.cover .cover-main h1 a,
+section.cover .cover-main h1 span,
+section.cover .cover-main > p,
+section.cover .cover-main blockquote p { color: #ffffff !important; }
+section.cover .cover-main h1 { letter-spacing: -.02em; }
+section.cover .cover-main h1 a { text-decoration: none; }
+section.cover .cover-main > p a {
+  border: 1px solid rgba(255, 255, 255, .85);
+  color: #fff;
+  border-radius: 8px;
+  transition: background .2s ease, color .2s ease;
+}
+section.cover .cover-main > p a.primary,
+section.cover .cover-main > p a:hover { background: #fff; color: var(--ng-red-dark); border-color: #fff; }
+section.cover.show ~ .sidebar,
+section.cover.show ~ .content { display: none; }
+
+/* ---------- Toggle tema ---------- */
+#theme-toggle {
+  position: fixed; top: 14px; right: 16px; z-index: var(--z-toggle);
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--bg-soft); color: var(--text);
+  font-size: 18px; line-height: 1; cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .15s ease, background .2s ease, color .2s ease, border-color .2s ease;
+}
+#theme-toggle:hover { transform: scale(1.08); background: var(--ng-red); color: #fff; border-color: var(--ng-red); }
+#theme-toggle:focus-visible { outline: 2px solid var(--ng-red); outline-offset: 2px; }
+
+/* ---------- Mermaid ---------- */
+.markdown-section .mermaid { text-align: center; background: transparent; margin: 1.2em 0; }
+.markdown-section .mermaid code { background: transparent; color: inherit; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .markdown-section { font-size: 16px; }
+  #theme-toggle { top: 10px; right: 12px; width: 36px; height: 36px; font-size: 16px; }
+}
+
+/* ---------- Motion ridotto ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

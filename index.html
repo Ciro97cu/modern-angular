@@ -4,23 +4,14 @@
   <meta charset="UTF-8">
   <title>Appunti Angular</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Appunti di studio su Angular">
+  <meta name="description" content="Appunti di studio su Angular — Modern Angular (2ª ed., Angular 22)">
+  <meta name="theme-color" content="#dd0031">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
-  <style>
-    :root { --theme-color: #dd0031; --theme-color-dark: #c3002f; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    .markdown-section { max-width: 850px; }
-    .markdown-section h1, .markdown-section h2 { border-bottom: 1px solid #eaecef; padding-bottom: .3em; color: #24292e; }
-    .markdown-section code { color: #c3002f; background-color: #f6f8fa; font-family: "SFMono-Regular", Menlo, Consolas, monospace; }
-    .sidebar { border-right: 1px solid #eaecef; }
-    .sidebar-nav li.active > a { color: var(--theme-color); border-right: 3px solid var(--theme-color); font-weight: 600; }
-    .app-name-link { color: var(--theme-color) !important; font-weight: 700; }
-    .markdown-section table th { background: #f6f8fa; }
-    /* diagrammi mermaid: centrati, niente sfondo da blocco codice */
-    .markdown-section .mermaid { text-align: center; background: transparent; margin: 1em 0; }
-    .markdown-section .mermaid code { background: transparent; color: inherit; }
-  </style>
+  <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
   <div id="app">Caricamento…</div>
@@ -48,14 +39,99 @@
     function mermaidPlugin(hook) {
       hook.doneEach(function () {
         if (!window.mermaid) return;
-        if (!window.__mermaidInit) { mermaid.initialize({ startOnLoad: false, theme: 'neutral' }); window.__mermaidInit = true; }
+        if (!window.__mermaidInit) {
+          var darkNow = document.documentElement.classList.contains('dark');
+          mermaid.initialize({ startOnLoad: false, theme: darkNow ? 'dark' : 'neutral' });
+          window.__mermaidInit = true;
+        }
         try { mermaid.run({ querySelector: '.markdown-section .mermaid' }); } catch (e) { /* già renderizzati */ }
       });
     }
 
+    // Rende collassabili i callout "Risposta" (Obsidian [!success]- / [!success]+) anche sul sito.
+    // Il contenuto .md resta invariato: lavoriamo solo sul DOM renderizzato da flexible-alerts.
+    function collapsibleAnswersPlugin(hook) {
+      hook.doneEach(function () {
+        var callouts = document.querySelectorAll('.markdown-section .alert.callout-answer');
+        callouts.forEach(function (el) {
+          if (el.dataset.collapsibleReady) return;
+          var heading = el.querySelector('p:first-child, .alert-heading, strong');
+          if (!heading) return;
+          // Obsidian usa il suffisso -/+ subito dopo il tipo: [!success]-  -> collassato di default
+          var raw = (heading.textContent || '').trim();
+          var startsCollapsed = true; // default per le risposte: nascoste
+          if (/^[-+]/.test(raw)) {
+            startsCollapsed = raw.charAt(0) === '-';
+            heading.textContent = raw.replace(/^[-+]\s*/, '');
+          }
+          el.classList.add('is-collapsible');
+          el.dataset.collapsibleReady = '1';
+          // tutto ciò che segue l'heading è il corpo della risposta
+          var body = [];
+          var n = heading.nextSibling;
+          while (n) { body.push(n); n = n.nextSibling; }
+          var wrap = document.createElement('div');
+          wrap.className = 'answer-body';
+          body.forEach(function (node) { wrap.appendChild(node); });
+          el.appendChild(wrap);
+          heading.classList.add('answer-toggle');
+          heading.setAttribute('role', 'button');
+          heading.setAttribute('tabindex', '0');
+          function setState(open) {
+            el.classList.toggle('open', open);
+            heading.setAttribute('aria-expanded', open ? 'true' : 'false');
+          }
+          setState(!startsCollapsed);
+          heading.addEventListener('click', function () { setState(!el.classList.contains('open')); });
+          heading.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setState(!el.classList.contains('open')); }
+          });
+        });
+      });
+    }
+
+    // Toggle tema chiaro/scuro, persistito in localStorage (key: ng-doc-theme).
+    function themeTogglePlugin(hook) {
+      hook.mounted(function () {
+        var KEY = 'ng-doc-theme';
+        var btn = document.createElement('button');
+        btn.id = 'theme-toggle';
+        btn.type = 'button';
+        btn.setAttribute('aria-label', 'Cambia tema chiaro/scuro');
+        var saved = localStorage.getItem(KEY);
+        var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        function apply() {
+          document.documentElement.classList.toggle('dark', dark);
+          btn.textContent = dark ? '☀' : '☾';
+          btn.title = dark ? 'Passa al tema chiaro' : 'Passa al tema scuro';
+          if (window.mermaid && window.__mermaidInit) {
+            // re-init mermaid theme on toggle; i diagrammi già a video restano, i nuovi seguono il tema
+            mermaid.initialize({ startOnLoad: false, theme: dark ? 'dark' : 'neutral' });
+          }
+        }
+        apply();
+        btn.addEventListener('click', function () {
+          dark = !dark;
+          localStorage.setItem(KEY, dark ? 'dark' : 'light');
+          apply();
+        });
+        document.body.appendChild(btn);
+      });
+    }
+    // Imposta il tema il prima possibile per evitare il flash (prima ancora di docsify).
+    (function () {
+      try {
+        var saved = localStorage.getItem('ng-doc-theme');
+        var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.classList.toggle('dark', dark);
+      } catch (e) {}
+    })();
+
     window.$docsify = {
       name: 'Appunti Angular',
       loadSidebar: true,
+      coverpage: true,
+      onlyCover: false,
       subMaxLevel: 2,
       relativePath: true,
       auto2top: true,
@@ -77,25 +153,34 @@
           }
         }
       },
-      // callout Obsidian: [!info] [!tip] [!warning] [!note]  (corpo markdown preservato)
+      // callout Obsidian: [!info] [!tip] [!warning] [!note] [!success]  (corpo markdown preservato)
       'flexible-alerts': {
         style: 'callout',
         note:    { label: 'Nota' },
         tip:     { label: 'Suggerimento' },
         warning: { label: 'Attenzione' },
-        info:    { label: 'Info', className: 'note', icon: 'icon-note' }
+        info:    { label: 'Info', className: 'note', icon: 'icon-note' },
+        success: { label: 'Risposta', className: 'callout-answer', icon: 'icon-success' }
+      },
+      pagination: {
+        previousText: 'Precedente',
+        nextText: 'Successivo',
+        crossChapter: true,
+        crossChapterText: true
       },
       search: { placeholder: 'Cerca…', noData: 'Nessun risultato', depth: 4 },
       copyCode: { buttonText: 'Copia', successText: 'Copiato' },
-      plugins: [wikilinkPlugin, mermaidPlugin]
+      plugins: [wikilinkPlugin, mermaidPlugin, collapsibleAnswersPlugin, themeTogglePlugin]
     };
   </script>
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify-plugin-flexible-alerts"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-typescript.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markup.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 </body>
