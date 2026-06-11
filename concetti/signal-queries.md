@@ -16,7 +16,7 @@ items = contentChildren(ItemComponent);     // Signal<readonly ItemComponent[]>
 first = viewChild.required(ChildCmp);        // versione required
 ```
 
-> [!warning] Gotcha
+> [!warning]
 > Disponibili dopo il rendering della rispettiva fase; leggili in [[effect]] o nei hook appropriati, non nel costruttore. Il libro invita a **mettere in discussione** l'abuso di `viewChild` (preferire input/output e servizi).
 
 **Usato in:** [[10-signal-queries-component-communication]], [[11-directives-templates-containers]]

@@ -15,7 +15,7 @@ value.set('ciao');             // emette automaticamente valueChange
 <my-input [(value)]="text" />  <!-- bind bidirezionale -->
 ```
 
-> [!tip] Take-away
+> [!tip]
 > `model` = input + output sincronizzati. Usalo per componenti tipo form-control/custom input.
 
 **Usato in:** [[02-signal-based-components]], [[06-signal-forms]]

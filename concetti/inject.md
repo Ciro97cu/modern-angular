@@ -14,7 +14,7 @@ export class FlightService {
 }
 ```
 
-> [!tip] Take-away
+> [!tip]
 > Più componibile dei parametri del costruttore: abilita funzioni helper riusabili (es. guardie, resolver, "injectable functions"). Cosa è disponibile dipende dalla gerarchia dei [[providers]]. I servizi si dichiarano con [[service|@Service()]].
 
 > [!info] Angular 22+ · injectAsync

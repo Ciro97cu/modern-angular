@@ -17,7 +17,7 @@ providers: [
 ]
 ```
 
-> [!tip] Take-away
+> [!tip]
 > Provider a livello **componente/route** creano istanze locali (utile per stato per-feature, vedi [[lightweight-store]]); root crea singleton applicativi. Esistono **provider functions** (`provideHttpClient()`, `provideRouter()`) come API idiomatica.
 
 > [!info] Angular 22+

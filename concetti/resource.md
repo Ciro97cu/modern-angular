@@ -17,7 +17,7 @@ const flight = httpResource<Flight>(() => `/api/flight/${id()}`);
 // flight.value(), flight.isLoading(), flight.error(), flight.reload()
 ```
 
-> [!warning] Gotcha
+> [!warning]
 > La richiesta riparte ad ogni cambio delle dipendenze lette nella funzione sorgente. `httpResource` è pensata per **GET/read**; per le mutazioni usa `HttpClient` o le mutations dello store.
 
 > [!info] Angular 21.2+ · Snapshots

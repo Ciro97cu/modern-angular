@@ -14,7 +14,7 @@ label = input('', { alias: 'caption' });  // alias + default
 count = input(0, { transform: numberAttribute }); // transform
 ```
 
-> [!tip] Take-away
+> [!tip]
 > `input.required` non ha default e fallisce a compile-time se non passato. Per un input **scrivibile** (two-way) usa invece [[model-signal]].
 
 **Usato in:** [[02-signal-based-components]]

@@ -14,7 +14,7 @@ count.set(5);        // scrittura
 count.update(n => n + 1); // 6
 ```
 
-> [!warning] Gotcha
+> [!warning]
 > Notifica i dipendenti solo se il **valore cambia** secondo l'[[equality-immutability|equality]] (default `Object.is`). Mutare un oggetto in place (`obj.x = 1`) NON notifica: usa `.set`/`.update` con un nuovo riferimento.
 
 **Usato in:** [[02-signal-based-components]], [[03-reactive-design-with-signals]], [[05-state-management-services-signals]]

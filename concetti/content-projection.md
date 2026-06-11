@@ -19,7 +19,7 @@ Permette a un componente di **renderizzare contenuto fornito dal padre** tramite
 </app-card>
 ```
 
-> [!tip] Take-away
+> [!tip]
 > Il contenuto proiettato resta nel contesto del **padre** (binding e lifecycle del padre). Per interagirci da codice → [[signal-queries]] (`contentChild`). Versione programmatica con `ng-template`/`ViewContainerRef` nel cap. direttive.
 
 **Usato in:** [[02-signal-based-components]], [[10-signal-queries-component-communication]], [[11-directives-templates-containers]]

@@ -14,7 +14,7 @@ selected.set('B');        // override locale
 options.set(['X', 'Y']);  // selected torna a 'X'
 ```
 
-> [!tip] Take-away
+> [!tip]
 > Sta a metà tra [[signal]] (scrivibile) e [[computed]] (derivato): scrivibile **e** reattivo alla sorgente.
 
 **Usato in:** [[03-reactive-design-with-signals]]

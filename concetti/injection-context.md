@@ -17,7 +17,7 @@ ngOnInit() {
 }
 ```
 
-> [!warning] Gotcha
+> [!warning]
 > Chiamare `inject()` fuori contesto (es. in un callback async o in un metodo di lifecycle) lancia un errore. Cattura l'`Injector` con `inject(Injector)` se ti serve più tardi.
 
 **Usato in:** [[05-state-management-services-signals]]

@@ -24,7 +24,7 @@ export class BrowserLanguageService implements LanguageService {}
 >
 > Usi `autoProvided: false` per i servizi scambiabili tramite [[providers]] (es. dietro una classe astratta usata come token).
 
-> [!tip] Take-away
+> [!tip]
 > `@Service()` di default = root singleton. Per la lazy injection con `injectAsync` il servizio **deve** essere auto-provided (`@Service()` semplice). Vedi [[inject]] e [[providers]].
 
 **Usato in:** [[05-state-management-services-signals]], [[09-ngrx-signal-store]], [[12-initialization-route-changes]], [[08-sustainable-architectures]]

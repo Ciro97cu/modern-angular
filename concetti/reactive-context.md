@@ -11,7 +11,7 @@ Il **contesto reattivo** è l'esecuzione di una funzione tracciante ([[computed]
 - Angular è **glitch-free**: niente stati intermedi incoerenti propagati ai consumatori (vedi [[equality-immutability]]).
 - Per leggere senza dipendere → [[untracked]].
 
-> [!tip] Take-away
+> [!tip]
 > Pensare in termini di **grafo dei signal** (sorgenti → derivati → effetti/UI) è il modello mentale chiave del reactive design.
 
 **Usato in:** [[03-reactive-design-with-signals]]

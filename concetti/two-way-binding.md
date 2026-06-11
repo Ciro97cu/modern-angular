@@ -13,7 +13,7 @@ La sintassi **"banana in a box"** `[(prop)]="expr"` è zucchero per un property 
 <my-input [value]="text" (valueChange)="text.set($event)" />
 ```
 
-> [!warning] Gotcha
+> [!warning]
 > Richiede la convenzione di naming `prop` + `propChange`. Con i signal, `model()` la fornisce out-of-the-box.
 
 **Usato in:** [[02-signal-based-components]]

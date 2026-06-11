@@ -17,7 +17,7 @@ export class FlightStore {
 }
 ```
 
-> [!tip] Take-away
+> [!tip]
 > Granularità e posizione contano: store per-feature forniti a livello [[providers|route/componente]] per scope e auto-cleanup; evita cicli/ridondanze tra store. Per esigenze più ricche → [[09-ngrx-signal-store|NgRx Signal Store]].
 
 **Usato in:** [[05-state-management-services-signals]], [[08-sustainable-architectures]]

@@ -16,7 +16,7 @@ this.flightChange.emit(updated);
 <flight-card (flightChange)="onChange($event)" />
 ```
 
-> [!tip] Take-away
+> [!tip]
 > Coppia naturale di [[signal-input]] per il pattern "input giù, event su". Per il caso bidirezionale combinato (`[(x)]`) c'è [[model-signal]] / [[two-way-binding]].
 
 **Usato in:** [[02-signal-based-components]]

@@ -13,10 +13,10 @@ const qty = signal(2);
 const total = computed(() => price() * qty()); // 200, ricalcolato on-demand
 ```
 
-> [!tip] Take-away
+> [!tip]
 > Le dipendenze sono **auto-tracciate** ([[reactive-context]]): vengono raccolte solo i signal effettivamente letti durante l'esecuzione. Un ramo non eseguito (dentro un `if`) non crea dipendenza.
 
-> [!warning] Gotcha
+> [!warning]
 > Deve essere **puro**: niente side-effect, niente `.set()` su altri signal. Per gli effetti collaterali usa [[effect]].
 
 **Usato in:** [[03-reactive-design-with-signals]], [[02-signal-based-components]]

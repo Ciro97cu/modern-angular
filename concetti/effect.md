@@ -15,7 +15,7 @@ effect((onCleanup) => {
 });
 ```
 
-> [!warning] Gotcha
+> [!warning]
 > Non è il posto per **derivare stato** (usa [[computed]]) né per sincronizzare due signal a vicenda (rischio loop). Scrivere su un signal dentro un effect è sconsigliato; se serve, valuta [[linked-signal]]. Per leggere un signal senza dipenderne usa [[untracked]].
 
 **Usato in:** [[03-reactive-design-with-signals]]

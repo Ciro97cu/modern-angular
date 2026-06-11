@@ -14,7 +14,7 @@ effect(() => {
 });
 ```
 
-> [!tip] Take-away
+> [!tip]
 > Tipico per loggare/accedere a contesto ausiliario senza accoppiare l'effetto a quel signal.
 
 **Usato in:** [[03-reactive-design-with-signals]]

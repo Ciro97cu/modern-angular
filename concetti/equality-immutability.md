@@ -14,7 +14,7 @@ list().push(x);
 list.update(l => [...l, x]);
 ```
 
-> [!warning] Gotcha
+> [!warning]
 > Mutazioni in place (`obj.prop = ...`, `arr.push(...)`) lasciano i computed/effect/UI **non aggiornati**. È anche alla base della proprietà **glitch-free**: i consumatori vedono solo valori coerenti e stabilizzati.
 
 **Usato in:** [[03-reactive-design-with-signals]]
