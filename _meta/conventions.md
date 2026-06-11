@@ -10,6 +10,9 @@ Vault Obsidian. Scopo: **studio personale / ripasso**. Fonte: `modern-angular_v2
 - **Filename, titoli di sezione e nomi delle API in inglese** (es. `signal()`, `computed`, `effect`, `inject`, `httpResource`, `linkedSignal`, `withComponentInputBinding`). Non tradurre i termini tecnici Angular.
 - Codice in inglese, **re-indentato** fedelmente alle convenzioni Angular/TS (l'estrazione dal PDF appiattisce l'indentazione).
 
+### Regola keyword (precisione contestuale)
+Quando la prosa descrive un **meccanismo di codice**, cita il costrutto esatto in backtick invece di parafrasarlo con una parola italiana. Vale soprattutto per le **keyword JS/TS** (`this`, `super`, `new`, ...) che è facile fondere in un dimostrativo: non scrivere *"questo tab"* quando il codice fa `currentTab() === this` → scrivi che è un **confronto d'identità con `this`** (l'istanza corrente). I dimostrativi italiani normali restano dove non c'è collisione con una keyword. Obiettivo: prosa fluida **e** ancorata al codice.
+
 ## Struttura
 ```
 00-index.md          home/MOC: mappa dei 19 capitoli + concetti cardine
@@ -67,21 +70,27 @@ tags: [tipo/capitolo, <tematici>]
 // snippet commentato, re-indentato
 ```
 
-> [!warning] Gotcha
+> [!warning]
 > <punto insidioso>
 
-> [!tip] Take-away
+> [!tip]
 > <cosa ricordare>
 
 Collegamenti: [[concetto]], [[NN-altro-capitolo]]
 
 ## 🔁 Ripasso lampo
-1. <domanda>
-2. <domanda>
-3. <domanda>
-(3-5 domande di autovalutazione)
 
-**Take-away del capitolo:** <2-4 bullet con i punti chiave.>
+**1.** <domanda>
+> [!success]- Risposta
+> <risposta concisa>
+
+**2.** <domanda>
+> [!success]- Risposta
+> <risposta concisa>
+
+(3-6 domande di autovalutazione, ognuna con la risposta in callout pieghevole)
+
+**In sintesi:** <2-4 bullet con i punti chiave.>
 ```
 
 ## Template nota atomica (concetti/)
@@ -99,11 +108,17 @@ aliases: [<sinonimi/varianti>]
 // snippet minimo
 ```
 
-> [!warning] Gotcha
+> [!warning]
 > <insidia tipica>
 
 **Usato in:** [[NN-capitolo]], [[NN-capitolo]]
 ```
+
+## Callout
+- `> [!warning]` (insidie) e `> [!tip]` (cose da ricordare) vanno **senza titolo custom** — niente "Gotcha"/"Take-away": Obsidian mostra l'etichetta di default.
+- `> [!info]` mantiene il titolo quando è informativo (es. `[!info] Angular 22+`, `[!info] Versioning del vault`).
+- `> [!success]- Risposta` (collassato, nota il `-`) per le risposte del **Ripasso lampo**.
+- La sezione di chiusura del capitolo si chiama **In sintesi:** (non "Take-away").
 
 ## Tag controllati
 - tipo: `tipo/capitolo`, `tipo/concetto`
