@@ -7,7 +7,7 @@ tags: [tipo/capitolo, monorepo, architecture, angular-22]
 # 14 · Monorepos & Reusable Libraries
 > 📖 cap.14 · pp.384-399 — *Modern Angular* v2.0.0
 
-Un singolo progetto Angular basta finché il codice è piccolo: appena cresce, i team raggiungono i propri limiti. La risposta sono i **monorepo**, un'unica repo che raggruppa più applicazioni e **librerie riutilizzabili**. Le librerie servono a sotto-strutturare un sistema grande (vedi i moduliths del [[08-sustainable-architectures|cap.8]]) e, quando servono in altri progetti, si **pubblicano via npm**.
+Un singolo progetto Angular basta finché il codice è piccolo: appena cresce, i team raggiungono i propri limiti. La risposta sono i [[glossario#monorepo|monorepo]], un'unica repo che raggruppa più applicazioni e **librerie riutilizzabili**. Le librerie servono a sotto-strutturare un sistema grande (vedi i moduliths del [[08-sustainable-architectures|cap.8]]) e, quando servono in altri progetti, si **pubblicano via npm**.
 
 Il capitolo parte dalla **Angular CLI** (monorepo manuale, build e publish) e poi passa a **Nx**, più potente: build incrementali, module boundaries, cache distribuita e parallelizzazione.
 
@@ -113,7 +113,7 @@ Prima di pubblicare si cura il `package.json` della libreria (Listing 14-7):
 
 - **`name`** — nome con cui il pacchetto è pubblicato e installato. Può avere uno **scope** introdotto con `@` (es. `@my`): mette ordine indicando da quale area arriva il pacchetto (spesso nome azienda o progetto) e fa sì che solo chi ha i diritti possa pubblicare sotto quello scope.
 - **`version`** — a ogni pubblicazione serve un numero **ancora disponibile** (non già usato).
-- **`peerDependencies`** — dipendenze che il consumer deve installare a parte per usare il pacchetto; supportano range con espressioni booleane. Di regola **da preferire** alle `dependencies` perché non impongono una versione precisa al consumer.
+- **`peerDependencies`** — dipendenze che il consumer (chi usa la libreria) deve installare a parte per usare il pacchetto; supportano range di versioni con espressioni booleane (es. `>= 11.0.0`, "qualsiasi versione dalla 11 in su"). Di regola **da preferire** alle `dependencies` perché non impongono una versione precisa al consumer.
 - **`dependencies`** — installate insieme al pacchetto.
 
 > [!warning]
@@ -133,7 +133,7 @@ I building block delle librerie si testano come tutti gli altri (vedi [[07-testi
 ng test util-logger
 ```
 
-Per dare agli altri subproject del monorepo accesso alle librerie, la CLI imposta dei **path mapping** in `tsconfig.json` (root del monorepo). Di default puntano alla cartella `dist/` (Listing 14-10), il che obbligherebbe a **ricompilare la lib dopo ogni modifica** — tedioso ed error-prone. Meglio farli puntare al **sorgente** (al `public-api`), riusando se possibile lo scope di `package.json` (Listing 14-11):
+Per dare agli altri subproject del monorepo accesso alle librerie, la CLI imposta dei **path mapping** in `tsconfig.json` (root del monorepo). Di default puntano alla cartella `dist/` (Listing 14-10), il che obbligherebbe a **ricompilare la lib dopo ogni modifica** — noioso e facile da sbagliare (ti dimentichi di ricompilare e usi codice vecchio). Meglio farli puntare al **sorgente** (al `public-api`), riusando se possibile lo scope di `package.json` (Listing 14-11):
 
 ```jsonc
 // tsconfig.json (root) — meglio puntare al sorgente, non a dist/
@@ -151,7 +151,7 @@ import { Logger } from '@my/util-logger';
 ```
 
 > [!warning]
-> **Dentro la libreria stessa** non usare il proprio path mapping, né importare dal proprio `public-api`: crea **riferimenti circolari**. Dopo aver cambiato i path mapping, **riavvia l'IDE**.
+> **Dentro la libreria stessa** non usare il proprio path mapping, né importare dal proprio `public-api`: crea **riferimenti circolari** (il file A importa B che a sua volta importa A, un cerchio che il compilatore non sa sciogliere). Dopo aver cambiato i path mapping, **riavvia l'IDE**.
 
 Prova: si inietta `Logger` nell'`App` di `playground-app` (qui in stile costruttore classico):
 
@@ -228,7 +228,7 @@ npm install @my/util-logger --registry http://localhost:4873
 ## Faster Builds and More Convenience with Nx
 > 📖 pp.393-394
 
-Il limite della soluzione CLI: gli sviluppatori devono **sapere quali app sono cambiate** e lanciare a mano la build giusta; e il build server, per sicurezza, finisce comunque per ricostruire e testare tutto. Meglio lasciare che sia il **tooling** a capire cosa è cambiato — p.es. calcolando un **hash** dei file sorgente che confluiscono in ogni app: se l'hash cambia, quell'app va ricostruita o ritestata.
+Il limite della soluzione CLI: gli sviluppatori devono **sapere quali app sono cambiate** e lanciare a mano la build giusta; e il build server, per sicurezza, finisce comunque per ricostruire e testare tutto. Meglio lasciare che sia il **tooling** (gli strumenti di build) a capire cosa è cambiato — p.es. calcolando un **hash** dei file sorgente che confluiscono in ogni app (l'hash è una specie di "impronta digitale": un codice breve calcolato dai file, che cambia appena cambia anche un solo file). Se l'hash cambia, quell'app va ricostruita o ritestata.
 
 **Nx** implementa questa idea e aggiunge molto altro. Oltre ad Angular supporta React e backend Node.js, e integra senza setup manuale i tool comuni dello sviluppo web: i testing tool Jest, Cypress e Playwright, il server npm Verdaccio e Storybook per la documentazione interattiva dei componenti. Per gli sviluppatori Angular è naturale: la **Nx CLI** si usa come la Angular CLI, basta sostituire `ng` con `nx` e gli argomenti restano in gran parte gli stessi (`nx build`, `nx serve`, `nx g app`, `nx g lib`, ...).
 
@@ -342,7 +342,7 @@ Collegamenti: [[08-sustainable-architectures]] (Sheriff, Detective, moduliths) �
 ## Incremental Builds with Nx
 > 📖 p.397
 
-Gli stessi dati del grafo delle dipendenze alimentano le **build incrementali** che Nx offre out of the box. Con `nx build`, se i sorgenti che confluiscono nell'app non sono cambiati, il risultato arriva **subito dalla cache locale** (cartella `.nx`, ignorata dal `.gitignore` del progetto):
+Gli stessi dati del grafo delle dipendenze alimentano le **build incrementali** che Nx offre out of the box (già pronte, senza configurazione). Build "incrementale" significa che Nx ricostruisce solo ciò che è davvero cambiato, non tutto da capo. Con `nx build`, se i sorgenti che confluiscono nell'app non sono cambiati, il risultato arriva **subito dalla cache locale** (cartella `.nx`, ignorata dal `.gitignore` del progetto):
 
 ```bash
 nx build miles
@@ -355,7 +355,7 @@ npx nx run-many -t build --all
 Anche unit test, E2E e linting sono incrementali allo stesso modo; Nx va oltre e li **cacha a livello di libreria**: dividere l'app in più librerie migliora le performance.
 
 > [!warning]
-> Lo stesso sarebbe possibile per `nx build` rendendo le singole lib **buildable** (`nx g lib myLib --buildable`), ma in pratica **raramente porta vantaggi**: i rebuild incrementali a livello di applicazione sono preferibili.
+> Lo stesso sarebbe possibile per `nx build` rendendo le singole lib **buildable** (compilabili come pacchetto a sé, non solo insieme all'app: `nx g lib myLib --buildable`), ma in pratica **raramente porta vantaggi**: i rebuild incrementali a livello di applicazione sono preferibili.
 
 ## Distributed Cache with Nx Cloud
 > 📖 p.397
