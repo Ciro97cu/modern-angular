@@ -256,7 +256,7 @@ Tipi di binding:
 ### Exhaustive @switch
 > 📖 pp.43-44 (Listing 2-12/2-14)
 
-Un'insidia tipica dello `@switch` è dimenticare di gestire un valore aggiunto al tipo in seguito. Da **Angular 21.2** il ramo `@default` può chiedere al compilatore un **exhaustiveness check**. Restringendo `passengerStatus` da `string` a una **literal union** `'A' | 'B' | 'C'`, quando l'espressione dello `@switch` **è la union** basta la forma breve `@default never;`: TypeScript restringe a `never` una volta gestiti tutti i casi.
+Un'insidia tipica dello `@switch` è dimenticare di gestire un valore aggiunto al tipo in seguito. Da **Angular 21.2** il ramo `@default` può chiedere al compilatore un **exhaustiveness check** (un controllo che verifica di aver coperto *tutti* i casi possibili: se ne resta scoperto uno, errore). Restringendo `passengerStatus` da `string` a una **literal union** `'A' | 'B' | 'C'` (un tipo che ammette solo questi valori esatti, non una stringa qualsiasi), quando l'espressione dello `@switch` **è la union** basta la forma breve `@default never;`: man mano che gestisci i casi TypeScript "consuma" i valori rimasti, finché non resta nulla — il tipo `never` (nessun valore possibile).
 
 > [!info] Angular 22+
 > ```html
@@ -268,7 +268,7 @@ Un'insidia tipica dello `@switch` è dimenticare di gestire un valore aggiunto a
 > }
 > ```
 > Se aggiungi `'D'` alla union senza il relativo `@case`, il template **non compila**.
-> Quando invece fai switch su una **proprietà** di una discriminated union (il discriminatore) e non sulla union intera, TypeScript sa restringere la proprietà ma non sa dire se l'intera union è coperta: serve la forma `never(<expression>)` (**Angular 22**), che indica esplicitamente al compilatore quale espressione controllare per la copertura completa.
+> Quando invece fai switch su una **proprietà** di una discriminated union (una union di oggetti che si distinguono per il valore di un campo comune — il *discriminatore*, qui `kind`) e non sulla union intera, TypeScript sa restringere la singola proprietà ma non sa dire se l'intera union è coperta: serve la forma `never(<expression>)` (**Angular 22**), che indica esplicitamente al compilatore quale espressione controllare per la copertura completa.
 > ```html
 > @switch (loyalty().kind) {
 >   @case ('senator')  { <p>Senator (Lounge access: {{ loyalty().loungeAccess }})</p> }
@@ -440,7 +440,7 @@ protected readonly flightsResource = httpResource<Flight[]>(
 In alternativa a `error()` puoi guardare il signal `status()`, che vale uno tra: `idle` (niente caricato) · `loading` · `reloading` · `error` · `resolved` (caricamento riuscito) · `local` (valore cambiato localmente via `set`/`update`).
 
 > [!tip]
-> `httpResource` gestisce da sola le **race condition**: se più richieste partono in rapida successione tiene **solo l'ultima** e scarta le risposte precedenti che arrivano dopo (come `switchMap` in RxJS — la richiesta in corso viene abortita o ignorata). `reload()` invece, se chiamato mentre una richiesta è già in corso, **viene ignorato** (come `exhaustMap`). Queste semantiche sono ideali per il fetch, ma non per update/delete → un altro motivo per cui `HttpClient` resta rilevante.
+> `httpResource` gestisce da sola le [[glossario#race-condition|race condition]] (quando più richieste partite in rapida successione si "sorpassano" e rischi di mostrare la risposta sbagliata, cioè non quella dell'ultima ricerca): se più richieste partono di fila tiene **solo l'ultima** e scarta le risposte precedenti che arrivano dopo (come `switchMap` in RxJS — un operatore che annulla la richiesta in corso quando ne parte una nuova). `reload()` invece, se chiamato mentre una richiesta è già in corso, **viene ignorato** (come `exhaustMap`, l'operatore che ignora le nuove chiamate finché quella attiva non finisce). Queste semantiche sono ideali per il fetch, ma non per update/delete → un altro motivo per cui `HttpClient` resta rilevante.
 
 Collegamenti: [[resource]] · approfondimento in [[03-reactive-design-with-signals]].
 
@@ -453,7 +453,7 @@ Crescendo l'app conviene spezzare i componenti complessi in pezzi piccoli e riut
 ng g c domains/ticketing/ui/flight-card
 ```
 
-Prima di estrarlo si sostituisce `selectedFlight` con un `basket`: un `Record` che mappa id-volo → booleano (i voli 3 e 5 sono nel carrello fin dall'inizio, a scopo dimostrativo). L'aggiornamento è **immutabile** (nuovo riferimento d'oggetto → Angular rileva il cambio):
+Prima di estrarlo si sostituisce `selectedFlight` con un `basket`: un `Record` (tipo TypeScript per un oggetto-dizionario chiave→valore) che mappa id-volo → booleano (i voli 3 e 5 sono nel carrello fin dall'inizio, a scopo dimostrativo). L'aggiornamento è **immutabile** (nuovo riferimento d'oggetto → Angular rileva il cambio):
 
 ```ts
 protected readonly basket = signal<Record<number, boolean>>({
@@ -533,7 +533,7 @@ export class FlightCard {
 
 Dal padre il binding **non cambia**: si lega ancora a `[selected]` e `(selectedChange)`. La differenza è di intento: un `model()` serve quando il figlio deve **riscrivere subito** la modifica al padre; con `input` + `output` il figlio controlla con precisione *quando* notificare.
 
-**Two-way binding** "banana in a box" `[(prop)]` — zucchero per un property + un event binding con naming `prop`/`propChange`. Esempio: uno `SimpleDelayStepper` con `value = model(0)` che incrementa/decrementa di 15 minuti.
+**Two-way binding** "banana in a box" `[(prop)]` — zucchero sintattico (una scrittura più breve che si espande in qualcosa di più verboso, senza aggiungere funzionalità) per un property + un event binding con naming `prop`/`propChange`. Esempio: uno `SimpleDelayStepper` con `value = model(0)` che incrementa/decrementa di 15 minuti.
 
 ```ts
 // src/app/domains/shared/ui-common/simple-delay-stepper/simple-delay-stepper.ts
