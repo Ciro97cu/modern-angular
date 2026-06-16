@@ -7,7 +7,7 @@ tags: [tipo/capitolo, services, state-management, di, signals, angular-22]
 # 05 · State Management with Services & Signals
 > 📖 cap.5 · pp.132-156 — *Modern Angular* v2.0.0
 
-Finora tutta la logica è vissuta nei componenti. Crescendo, l'app conviene separi le responsabilità spostando la funzionalità riusabile in service: classi riusabili che si possono **scambiare** con altre implementazioni dello stesso contratto. Lo scambio serve a due cose — supportare configurazioni diverse (es. clienti diversi) e migliorare la **testabilità** (sostituire l'accesso al backend con un mock). Il capitolo costruisce un `FlightClient` per l'accesso ai dati, percorre i dettagli della **Dependency Injection** ([[inject]], injection context, dipendenze tra service, providers e scope) e infine implementa uno **store** signal-based per gestire lo stato della feature `flight-search`.
+Finora tutta la logica è vissuta nei componenti. Crescendo, all'app conviene separare le responsabilità spostando la funzionalità riusabile in service: classi riusabili che si possono **scambiare** con altre implementazioni dello stesso contratto (cioè che espongono gli stessi metodi). Lo scambio serve a due cose — supportare configurazioni diverse (es. clienti diversi) e migliorare la **testabilità** (sostituire l'accesso al backend con un mock, una finta implementazione che restituisce dati statici). Il capitolo costruisce un `FlightClient` per l'accesso ai dati, percorre i dettagli della **[[glossario#dependency-injection-di|Dependency Injection]]** (il meccanismo con cui Angular fornisce ai componenti le istanze dei service di cui hanno bisogno: [[inject]], injection context, dipendenze tra service, providers e scope) e infine implementa uno **[[glossario#store|store]]** signal-based per gestire lo stato della feature `flight-search`.
 
 ## Generating a Service
 > 📖 pp.132-133
@@ -20,7 +20,7 @@ ng generate service domains/ticketing/data/flight-client
 ng g s domains/ticketing/data/flight-client
 ```
 
-Originariamente i service avevano il suffisso `Service`. Oggi la CLI **non aggiunge più alcun suffisso**: conviene scegliere un suffisso semantico per categoria — qui i service di data access usano `Client` (come `HttpClient`). Il risultato è una classe decorata con [[service|@Service()]]:
+Originariamente i service avevano il suffisso `Service`. Oggi la CLI **non aggiunge più alcun suffisso**: conviene scegliere un suffisso che dica a che tipo di service appartiene la classe — qui i service di accesso ai dati usano `Client` (come `HttpClient`). Il risultato è una classe decorata con [[service|@Service()]]:
 
 ```ts
 // src/app/domains/ticketing/data/flight-client.ts
@@ -106,7 +106,7 @@ Collegamenti: [[inject]].
 ## Injection Context
 > 📖 pp.135-136
 
-`inject` va chiamato in un **injection context** valido: i field initializer (come sopra) e i constructor. Angular e le librerie definiscono altre aree eseguite in injection context, e se ne può creare una con `runInInjectionContext`, che richiede un'istanza dell'`Injector` di Angular (a sua volta iniettabile):
+`inject` va chiamato in un **injection context** valido: i field initializer (l'inizializzazione di un campo direttamente nella sua dichiarazione, come sopra `private flightClient = inject(...)`) e i constructor. Angular e le librerie definiscono altre aree eseguite in injection context, e se ne può creare una con `runInInjectionContext`, che richiede un'istanza dell'`Injector` di Angular (a sua volta iniettabile):
 
 ```ts
 import {
@@ -215,7 +215,7 @@ export class BrowserLanguageService implements LanguageService {
 > [!warning]
 > Il token è una **classe astratta**, non un'interfaccia: TypeScript rimuove le interfacce in compilazione, mentre il base type serve **a runtime** per risolvere `inject(LanguageService)`. Le classi astratte invece sopravvivono alla compilazione. Le implementazioni usano `implements`, non `extends`: il compilatore verifica solo che forniscano gli stessi membri del base type (semantica simil-interfaccia), senza ereditarietà.
 
-Si configura un **provider**, di solito in `app.config.ts`. `provide` è il **token** (cosa chiedi), `useClass` l'implementazione (cosa ottieni):
+Si configura un **provider**, di solito in `app.config.ts`. `provide` è il **[[glossario#injection-token|token]]** (l'identificatore con cui chiedi una dipendenza via `inject` — cosa chiedi), `useClass` l'implementazione (cosa ottieni):
 
 ```ts
 // src/app/app.config.ts
@@ -337,7 +337,7 @@ export class FlightSearch {
 
 La configurazione vale per il componente **e per tutti i suoi figli**, che ricevono la stessa istanza. È utile quando un gruppo di sotto-componenti strettamente accoppiati condivide stato (es. `TabbedPane`/`Tab`, [[10-signal-queries-component-communication|cap.10]]); per componenti poco accoppiati meglio comunicare via input/output. Vale anche la short-hand (`providers: [DefaultLanguageService]` + `inject(DefaultLanguageService)`): in tal caso componente e figli ricevono la propria istanza del `DefaultLanguageService`.
 
-**Stesso token a livelli diversi** — lo scope più interno fa **shadowing**:
+**Stesso token a livelli diversi** — lo scope più interno fa **shadowing** (oscura quello esterno: chi sta dentro vede la versione più vicina, non quella di livello app):
 
 ```ts
 // Application-level
@@ -356,7 +356,7 @@ Collegamenti: [[providers]] · [[injection-context]].
 ## Route-local Services & Auto Cleanup
 > 📖 pp.145-146
 
-Gli **Environment Provider** definiscono un altro scope DI per intere parti dell'app; il router li usa per fornire service a tutti i componenti associati a una rotta. Si aggiunge la property `providers` alla config della route:
+Gli **Environment Provider** (provider validi per un intero "ambiente", cioè una porzione dell'app, non per un singolo componente) definiscono un altro scope DI per intere parti dell'app; il router li usa per fornire service a tutti i componenti associati a una rotta. Si aggiunge la property `providers` alla config della route:
 
 ```ts
 // src/app/domains/ticketing/ticketing.routes.ts
@@ -407,7 +407,7 @@ Collegamenti: [[04-router-navigation-lazy-loading]] · [[providers]].
 > 📖 pp.146-148
 
 > [!info] Angular 22+ · `injectAsync`
-> Alcuni servizi portano con sé bundle troppo pesanti per essere caricati eagerly, o servono solo a una piccola parte di utenti: caricarne il codice **solo quando serve** è un'ottimizzazione utile. **`injectAsync`** (Angular 22) riceve una lambda che ritorna una `Promise` del servizio e restituisce una funzione: la **prima** chiamata fa l'import dinamico e crea l'istanza; le successive riusano la stessa, senza roundtrip di rete.
+> Alcuni servizi portano con sé bundle troppo pesanti per essere caricati eagerly (subito, all'avvio dell'app), o servono solo a una piccola parte di utenti: caricarne il codice **solo quando serve** è un'ottimizzazione utile. **`injectAsync`** (Angular 22) riceve una lambda che ritorna una `Promise` del servizio e restituisce una funzione: la **prima** chiamata fa l'import dinamico e crea l'istanza; le successive riusano la stessa, senza roundtrip di rete (senza dover riscaricare di nuovo il codice dal server).
 
 Esempio reale: la `CheckinPage` integra un `UpgradeService` solo quando l'utente richiede davvero un upgrade.
 
@@ -430,9 +430,9 @@ export class CheckinPage {
 }
 ```
 
-L'`import('./upgrade-service')` dinamico mette `UpgradeService` in un bundle separato, caricato solo on demand. L'opzione `prefetch` elimina il ritardo del primo uso pre-caricando in background appena la sua `Promise` si risolve: l'helper `onIdle` delega a `requestIdleCallback` (con fallback `setTimeout` dove non supportato), così il bundle parte quando il browser è idle. Per forzare un timeout dopo cui il prefetch parte comunque: `onIdle({ timeout: 100 })`.
+L'`import('./upgrade-service')` dinamico mette `UpgradeService` in un bundle separato, caricato solo on demand (solo al momento del bisogno). Il primo uso ha però un piccolo ritardo (il bundle va scaricato): l'opzione `prefetch` lo elimina pre-caricando il bundle in background appena la sua `Promise` si risolve. L'helper `onIdle` delega a `requestIdleCallback` (con fallback `setTimeout` dove non supportato), così il bundle parte quando il browser è idle (libero, senza altro lavoro in corso). Per forzare un timeout dopo cui il prefetch parte comunque: `onIdle({ timeout: 100 })`.
 
-Perché la lazy injection funzioni, il servizio target **deve essere auto-provided**, cioè decorato con [[service|@Service()]] (pre-Angular 22: `@Injectable({ providedIn: 'root' })`):
+Perché la lazy injection (l'iniezione pigra, caricata solo all'uso) funzioni, il servizio target **deve essere auto-provided** (registrato in automatico nel root injector, senza bisogno di metterlo nei `providers`), cioè decorato con [[service|@Service()]] (pre-Angular 22: `@Injectable({ providedIn: 'root' })`):
 
 ```ts
 // src/app/domains/checkin/feature-checkin/upgrade-service.ts
@@ -533,7 +533,7 @@ function toFlightsWithDelays(flights: Flight[], delay: number): Flight[] {
 
 I consumer vedono **solo signal read-only e metodi**: lo store nasconde writable signal, resource e `FlightClient`. È cruciale quando più componenti lavorano sullo stesso stato (wizard, multi-step form).
 
-**Unidirectional data flow** dello store:
+**Unidirectional data flow** dello store (flusso di dati a senso unico: i componenti chiedono modifiche con i metodi, i dati tornano indietro come signal read-only — mai scrittura diretta):
 
 ```mermaid
 flowchart LR
@@ -637,7 +637,7 @@ Collegamenti: [[linked-signal]] · [[effect]] · [[06-signal-forms|Signal Forms 
 ## Delegated Signals
 > 📖 pp.153-155
 
-Per una UX reattiva serve chiamare `updateFilter` **a ogni** modifica di `from`/`to`. Un **delegated signal** delega lettura e scrittura ad altre parti del sistema: qui delega l'intero oggetto `filter` allo store. Non fa (ancora) parte di Angular — ci sono discussioni in corso per aggiungerlo — quindi nell'example project sta in `delegated-signal.ts` (cartella `src/app/domains/shared/util-common`), implementato come `linkedSignal` che fa override di `set` e `update`.
+Per una UX reattiva serve chiamare `updateFilter` **a ogni** modifica di `from`/`to`. Un **delegated signal** delega (affida ad altri) sia la lettura sia la scrittura: invece di tenere il valore al proprio interno, legge e scrive su un'altra parte del sistema — qui sullo store, per l'intero oggetto `filter`. Non fa (ancora) parte di Angular — ci sono discussioni in corso per aggiungerlo — quindi nell'example project sta in `delegated-signal.ts` (cartella `src/app/domains/shared/util-common`), implementato come `linkedSignal` che fa override di `set` e `update`.
 
 `delegatedSignal(read, write)` accetta due parametri: il primo è la funzione di lettura (come per `linkedSignal`); il secondo è una funzione chiamata a ogni update, usata per riscrivere il nuovo valore nello store.
 
@@ -661,7 +661,7 @@ export class FlightSearch {
 }
 ```
 
-Per evitare che il `delegatedSignal` triggeri la resource a **ogni** tasto, si fa **debounce** dell'input assegnando uno schema alla `filterForm`:
+Per evitare che il `delegatedSignal` triggeri la resource a **ogni** tasto, si fa **[[glossario#debounce-debouncing|debounce]]** dell'input (si aspetta una breve pausa di digitazione prima di reagire, così non parte una richiesta a ogni carattere) assegnando uno schema alla `filterForm`:
 
 ```ts
 import { debounce, form } from '@angular/forms/signals';
@@ -697,7 +697,7 @@ Collegamenti: [[lightweight-store]] · [[providers]].
 ## Outlook: NgRx Signal Store
 > 📖 p.156
 
-Implementare store con service + signal è abbastanza semplice (incapsulare signal e resource, fornire routine di update controllato, delegare al data access). Ma dopo qualche store ti accorgi che genera molto **lavoro ripetitivo e boilerplate**. La libreria signal-based più popolare per ridurlo è il **NgRx Signal Store**: snellisce l'implementazione e offre diversi helper utili — dettagli nel [[09-ngrx-signal-store|cap.9]].
+Implementare store con service + signal è abbastanza semplice (incapsulare signal e resource, fornire routine di update controllato, delegare al data access). Ma dopo qualche store ti accorgi che genera molto **lavoro ripetitivo e boilerplate** (codice standard che riscrivi quasi identico ogni volta). La libreria signal-based più popolare per ridurlo è il **NgRx Signal Store**: snellisce l'implementazione e offre diversi helper utili — dettagli nel [[09-ngrx-signal-store|cap.9]].
 
 ## 🔁 Ripasso lampo
 
