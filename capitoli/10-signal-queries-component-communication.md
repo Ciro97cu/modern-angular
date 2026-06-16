@@ -64,7 +64,7 @@ export class Tab {
 ```
 
 - `title` è un [[signal-input|input()]] obbligatorio.
-- `visible` è un [[computed]] che vale `true` solo quando il tab corrente del padre **è proprio questa istanza**. Il confronto `this.pane.currentTab() === this` è un controllo di **identità**: `this` qui è la keyword JavaScript, cioè l'istanza di `Tab` su cui sta girando il `computed`. Quando il padre cambia `currentTab()`, il `computed` si ricalcola e solo il tab giusto risulta `visible`.
+- `visible` è un [[computed]] che vale `true` solo quando il tab corrente del padre **è proprio questa istanza**. Il confronto `this.pane.currentTab() === this` è un controllo di **identità** (verifica che sia lo stesso identico oggetto in memoria, non solo due oggetti con gli stessi valori): `this` qui è la keyword JavaScript, cioè l'istanza di `Tab` su cui sta girando il `computed`. Quando il padre cambia `currentTab()`, il `computed` si ricalcola e solo il tab giusto risulta `visible`.
 - Il template usa `@if (visible())` + `<ng-content>` per proiettare il contenuto solo nel tab attivo.
 
 Uso dal chiamante (la pagina About):
@@ -139,7 +139,7 @@ export class TabbedPane {
 - Ogni `Tab` si aggancia passando `this` (la propria istanza) a `registerTab` dal costruttore.
 
 > [!warning]
-> Per far funzionare il `Tab` **anche senza** un `TabbedPane` padre, inietta con `{ optional: true }`: se Angular non trova un'implementazione per il token restituisce `undefined` invece di lanciare. Poi proteggi la chiamata con l'optional chaining (`?.`).
+> Per far funzionare il `Tab` **anche senza** un `TabbedPane` padre, inietta con `{ optional: true }`: se Angular non trova un'implementazione per il token (la chiave con cui si chiede una dipendenza, qui la classe `TabbedPane`) restituisce `undefined` invece di lanciare un errore. Poi proteggi la chiamata con l'optional chaining (`?.`, l'operatore che evita l'errore se prima del punto c'è `null`/`undefined`).
 
 ```ts
 private pane = inject(TabbedPane, { optional: true });
@@ -148,7 +148,7 @@ constructor() {
 }
 ```
 
-Collegamenti: [[inject]] · DI approfondita in [[05-state-management-services-signals]].
+Collegamenti: [[inject]] · [[glossario#dependency-injection-di|DI]] approfondita in [[05-state-management-services-signals]].
 
 ## View and Content
 > 📖 pp.302-303
@@ -250,7 +250,7 @@ export class Tab {
 
 Il confronto `this._pane?.currentTab() === this` è di nuovo un controllo d'identità con la keyword `this` (l'istanza del `Tab`); qui serve l'optional chaining (`?.`) perché `_pane` viene popolato solo **dopo** che l'`effect` del pane ha assegnato sé stesso, quindi all'inizio può essere `undefined`.
 
-Oltre a `contentChildren` (molti elementi) esiste `contentChild` (esattamente uno). Entrambi accettano due tipi di filtro — il **tipo** di componente o una **template reference**:
+Oltre a `contentChildren` (molti elementi) esiste `contentChild` (esattamente uno). Entrambi accettano due tipi di filtro — il **tipo** di componente o una **template reference** (l'etichetta `#nome` messa nel markup, usata qui come stringa per identificare gli elementi da prendere):
 
 ```ts
 readonly firstTab = contentChild(Tab);          // per tipo, singolo
@@ -318,7 +318,7 @@ Si usa `afterRenderEffect` per essere certi che la view sia pronta e il canvas g
 > 📖 p.307
 
 > [!warning]
-> Interagire direttamente con la View **rimpiazza il data binding dichiarativo** (una feature centrale di Angular) con codice imperativo tuo: più difficile da seguire e mantenere, e gli update diretti delle proprietà possono innescare cicli di change detection. Gli autori mettono in discussione **ogni** `viewChild`/`viewChildren` in code review.
+> Interagire direttamente con la View **rimpiazza il data binding dichiarativo** (la via normale di Angular: dichiari nel template cosa mostrare e ci pensa lui ad aggiornarlo) con codice imperativo tuo (l'aggiorni a mano, passo passo): più difficile da seguire e mantenere, e gli update diretti delle proprietà possono innescare cicli di [[glossario#change-detection|change detection]] (il giro che Angular fa per rilevare i cambiamenti e riaggiornare la UI). Gli autori mettono in discussione **ogni** `viewChild`/`viewChildren` in code review.
 
 L'uso si considera giustificato **solo** quando:
 - un controllo di terze parti non permette il data binding per certe proprietà;
@@ -345,7 +345,7 @@ Collegamenti: [[signal-queries]].
 ## Comunicazione via template variables
 > 📖 pp.308
 
-Una **template variable** assegnata a un componente fornisce un **riferimento all'istanza** di quel componente: il template padre può chiamarne i metodi o leggerne le proprietà direttamente.
+Una [[glossario#template-variable|template variable]] (una variabile dichiarata nel template con `#nome`) assegnata a un componente fornisce un **riferimento all'istanza** di quel componente: il template padre può chiamarne i metodi o leggerne le proprietà direttamente.
 
 ```html
 <h1>About</h1>
@@ -471,7 +471,7 @@ export class Tab implements TabInfo {
 ```
 
 > [!tip]
-> **Vantaggio:** accoppiamento lasco — pane e tab dipendono solo dall'API condivisa di `TabRegistry`, non l'uno dall'altro; la comunicazione attraversa più livelli di gerarchia senza fatica.
+> **Vantaggio:** accoppiamento lasco (le parti si conoscono il meno possibile, così cambiarne una non costringe a toccare le altre) — pane e tab dipendono solo dall'API condivisa di `TabRegistry`, non l'uno dall'altro; la comunicazione attraversa più livelli di gerarchia senza fatica.
 > **Svantaggio:** comunicazione **implicita** — a prima vista non si capisce chi parla con chi. Data binding e template reference sono più espliciti.
 
 Collegamenti: [[providers]] · [[inject]] · pattern di store condiviso in [[lightweight-store]] e [[05-state-management-services-signals]] · uso delle query nelle direttive in [[11-directives-templates-containers]].
