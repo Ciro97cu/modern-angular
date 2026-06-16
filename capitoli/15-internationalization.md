@@ -250,12 +250,12 @@ ng extract-i18n --format json   # genera messages.json con le espressioni
 ```
 
 > [!warning]
-> Puoi caricare i testi di `loadTranslations` anche via HTTP (es. `HttpClient`), ma **devono essere disponibili prima del primo uso**. Essendo le richieste HTTP asincrone, non è facile garantirlo: usa un **resolver** che ritarda il routing (cfr. cap. 8).
+> Puoi caricare i testi di `loadTranslations` anche via HTTP (es. `HttpClient`), ma **devono essere disponibili prima del primo uso**. Essendo le richieste HTTP asincrone, non è facile garantirlo: usa un [[glossario#resolver|resolver]] che ritarda il routing (cfr. cap. 8).
 
 ## Taking Grammatical Forms into Account (ICU: plural / select)
 > 📖 pp.408-410
 
-Scambiare i testi è solo uno dei compiti dell'internazionalizzazione: vanno gestite anche le **forme grammaticali** come il genere e la distinzione singolare/plurale (lingue diverse hanno numeri diversi di generi e di forme plurali). Il compiler I18N offre una grammatica dedicata nel template (sintassi ICU).
+Scambiare i testi è solo uno dei compiti dell'internazionalizzazione: vanno gestite anche le **forme grammaticali** come il genere e la distinzione singolare/plurale (lingue diverse hanno numeri diversi di generi e di forme plurali). Il compiler I18N offre una grammatica dedicata nel template (sintassi ICU — Unicode "International Components for Unicode", lo standard per esprimere plurali e generi nei messaggi tradotti).
 
 **Plural** — "1 flight" vs "3 flights":
 
@@ -311,14 +311,14 @@ Perché funzioni, alla pipe `date` vanno passati **formati logici** (`short`, `m
 La pipe `number` non richiede aggiustamenti: usa automaticamente i separatori delle migliaia e dei decimali del locale corrente. Per le versioni buildate con `ng build --localize` non serve altro per ottenere il formato corretto.
 
 > [!warning]
-> Le pipe servono **solo per l'output**. Per localizzare l'**input** servono controlli di terze parti (es. il datepicker gratuito di Angular Material) o un `ControlValueAccessor` custom che supporti il formato di input desiderato (cfr. cap. 18).
+> Le pipe servono **solo per l'output**. Per localizzare l'**input** servono controlli di terze parti (es. il datepicker gratuito di Angular Material) o un `ControlValueAccessor` custom (il pezzo di codice che fa da ponte tra un controllo di form Angular e il widget HTML, traducendo avanti e indietro il valore) che supporti il formato di input desiderato (cfr. cap. 18).
 
 Collegamenti: pipe `date`/`number` locale-aware viste in [[02-signal-based-components]].
 
 ## Outlook: Community Solutions (ngx-translate, Transloco)
 > 📖 p.411
 
-La I18N del compiler eccelle in **performance** (testi intessuti nei bundle, zero costo runtime per load e data binding), ma paga in **flessibilità**: la rinuncia deliberata al data binding significa **niente cambio lingua a runtime**, solo hyperlink ad altre versioni di lingua. Qui si perdono i vantaggi delle SPA.
+La I18N del compiler eccelle in **performance** (testi intessuti nei bundle, zero costo runtime per load e data binding), ma paga in **flessibilità**: la rinuncia deliberata al data binding significa **niente cambio lingua a runtime**, solo hyperlink ad altre versioni di lingua. Qui si perdono i vantaggi delle SPA (Single Page Application — l'app gira in un'unica pagina senza ricaricarsi a ogni navigazione, mantenendo lo stato).
 
 Le soluzioni community **ngx-translate** e **Transloco** **invertono** vantaggi e svantaggi: permettono load e switch di lingua **a runtime**, ma si appoggiano al data binding, che (teoricamente) può incidere sulla performance.
 
