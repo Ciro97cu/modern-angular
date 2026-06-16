@@ -7,29 +7,29 @@ tags: [tipo/capitolo, architecture, state-management, angular-22]
 # 08 · Sustainable Architectures for Modern Angular
 > 📖 cap.8 · pp.231-253 — *Modern Angular* v2.0.0
 
-Le soluzioni enterprise devono restare **manutenibili nel lungo periodo**. Il capitolo raccoglie approcci architetturali collaudati: aspetti statici e dinamici, pattern e tecniche, e soprattutto come **far rispettare** l'architettura definita (enforcing via linting). Tre blocchi: come tagliare il sistema in **verticali**, come strutturarli (Architecture Matrix + modulith con Sheriff/Detective) e come collocare i **lightweight store** dentro un flusso dati unidirezionale.
+Le soluzioni enterprise devono restare **manutenibili nel lungo periodo**. Il capitolo raccoglie approcci architetturali collaudati: aspetti statici e dinamici, pattern e tecniche, e soprattutto come **far rispettare** l'architettura definita (enforcing via linting, cioè impedire automaticamente con un analizzatore di codice gli import che violano le regole). Tre blocchi: come tagliare il sistema in **verticali**, come strutturarli (Architecture Matrix + [[glossario#modulith|modulith]] con Sheriff/Detective) e come collocare i **lightweight [[glossario#store|store]]** (piccoli contenitori di stato, semplici service Angular) dentro un flusso dati unidirezionale.
 
 ## Vertical Slicing — perché
 > 📖 pp.231-232
 
-Un'app enterprise va suddivisa in parti più piccole che evolvono separatamente: un cambiamento in una parte non deve generare problemi inattesi altrove. La soluzione è il **vertical slicing** — taglio *verticale* per **business domain**, in contrapposizione al *layering* orizzontale che separa per funzione tecnica. Ogni verticale è responsabile di un dominio (o di una parte ben definita di dominio) e implementa un set di use case correlati sullo **stesso modello di dominio**. I verticali devono sapere il meno possibile l'uno dell'altro, così che le modifiche in un'area non producano effetti collaterali altrove.
+Un'app enterprise va suddivisa in parti più piccole che evolvono separatamente: un cambiamento in una parte non deve generare problemi inattesi altrove. La soluzione è il **[[glossario#vertical-slicing|vertical slicing]]** — taglio *verticale* per **business domain** (per area di business, es. *prenotazione*, *check-in*), in contrapposizione al *layering* orizzontale che separa per funzione tecnica (es. tutta la UI insieme, tutti i service insieme). Ogni verticale è responsabile di un dominio (o di una parte ben definita di dominio) e implementa un set di use case correlati sullo **stesso modello di dominio**. I verticali devono sapere il meno possibile l'uno dell'altro, così che le modifiche in un'area non producano effetti collaterali altrove.
 
 Benefici:
-- **Low Coupling** — ogni verticale si sviluppa, testa e rilascia in modo il più indipendente possibile; le modifiche restano locali e si riducono le dipendenze tecniche e organizzative.
-- **High Cohesion** — ciò che è correlato vive insieme; un cambiamento a uno use case avviene in un contesto coerente, senza attraversare più layer o team.
+- **Low Coupling** (poche dipendenze fra le parti) — ogni verticale si sviluppa, testa e rilascia in modo il più indipendente possibile; le modifiche restano locali e si riducono le dipendenze tecniche e organizzative.
+- **High Cohesion** (ciò che cambia insieme sta insieme) — un cambiamento a uno use case avviene in un contesto coerente, senza attraversare più layer o team.
 - **Conway's Law** — i sistemi riflettono le strutture di comunicazione dell'organizzazione. Definire i team in funzione dell'architettura desiderata (**Inverse Conway Maneuver**) evita attriti: idealmente **un team = un verticale** (o più), e **un verticale = un solo team**.
-- **Team autonomi** — un verticale ben definito dà a un team responsabilità piena (funzionale e tecnica) → delivery unit indipendenti, ownership chiara, feedback più rapido.
+- **Team autonomi** — un verticale ben definito dà a un team responsabilità piena (funzionale e tecnica) → unità che consegnano valore in modo indipendente, responsabilità chiara su chi possiede cosa (ownership), feedback più rapido.
 - **Carico cognitivo ridotto** — chi lavora su un verticale coeso affronta un perimetro funzionale/tecnico ben delimitato → più focus, produttività e qualità.
 
 ## Trovare i confini (boundaries)
 > 📖 pp.232-234
 
-L'idea di verticalizzazione compare in **DDD** e nei **Self-Contained Systems (SCS)**, e oggi si usa per strutturare monoliti, micro servizi e [[18-micro-frontends|micro frontend]]. Lo **Strategic Design** di DDD offre un approccio sistematico: suddivide il sistema in **bounded context**, ciascuno col proprio domain model e responsabile di una parte specifica del dominio. La comunicazione tra contesti avviene con mezzi ben definiti: idealmente **eventing** (loose coupling), ma anche API per comunicazione diretta.
+L'idea di verticalizzazione compare in **DDD** (Domain-Driven Design, la progettazione guidata dal dominio di business) e nei **Self-Contained Systems (SCS)**, e oggi si usa per strutturare monoliti, micro servizi e [[18-micro-frontends|micro frontend]]. Lo **Strategic Design** di DDD offre un approccio sistematico: suddivide il sistema in **bounded context** (contesti delimitati: zone del dominio con un linguaggio e un modello propri), ciascuno col proprio domain model e responsabile di una parte specifica del dominio. La comunicazione tra contesti avviene con mezzi ben definiti: idealmente **eventing** (i contesti si scambiano *eventi* invece di chiamarsi direttamente → restano poco accoppiati, *loose coupling*), ma anche API per comunicazione diretta.
 
 Per identificare i confini si guardano i **processi di business** e il **linguaggio** dei domain expert. Indicatori:
 - **Language** — gli stessi termini con lo stesso significato in step diversi → stesso bounded context; stessi termini con **significati diversi** → contesti diversi.
 - **Responsibilities** — responsabilità diverse portano spesso a termini e modelli diversi.
-- **Pivotal Events** — punti di svolta decisivi nel processo (es. *flight booked*, *passenger checked-in*, *flight boarded*): difficili da annullare, ad alto impatto, spesso un **handover** verso un altro ruolo con un linguaggio diverso (dopo la prenotazione subentra la compagnia aerea, che vede il volo in modo diverso dal cliente). Metafora: i **cambi di scena** in un film — un pezzo di trama è concluso e le scene successive ci costruiscono sopra.
+- **Pivotal Events** (eventi cardine) — punti di svolta decisivi nel processo (es. *flight booked*, *passenger checked-in*, *flight boarded*): difficili da annullare, ad alto impatto, spesso un **handover** (un passaggio di consegne) verso un altro ruolo con un linguaggio diverso (dopo la prenotazione subentra la compagnia aerea, che vede il volo in modo diverso dal cliente). Metafora: i **cambi di scena** in un film — un pezzo di trama è concluso e le scene successive ci costruiscono sopra.
 
 > [!warning]
 > Le tre euristiche possono **contraddirsi**: nell'esempio del libro il bounded context che contiene *Check-in Luggage* cambia forma a seconda dell'euristica scelta (l'esempio è scelto apposta). Non deve preoccupare: in architettura **non esiste l'unica soluzione perfetta**, ci sono opzioni con conseguenze. L'architetto moderno non è il decisore ma chi garantisce che si prendano **decisioni consapevoli**, pesando le opzioni insieme a team e domain expert — e la prima decisione **non è scolpita nella pietra**: si raffina con il refactoring.
@@ -48,7 +48,7 @@ Il **Big Picture Event Storming** sviluppa la vista d'insieme → ideale per dis
 | Swimlanes | suddivisioni gialle orizzontali | processi opzionali/paralleli |
 | Milestones | note blu in alto | dividono il processo in poche sezioni |
 
-Oltre ai pivotal event, anche le **swimlane** sono buoni candidati per i confini. Per approfondire singole parti del dominio si usano poi i **Process-oriented Event Storming**.
+Oltre ai pivotal event, anche le **swimlane** (le "corsie" orizzontali che raggruppano i passi di un processo parallelo o opzionale) sono buoni candidati per i confini. Per approfondire singole parti del dominio si usano poi i **Process-oriented Event Storming**.
 
 > [!tip]
 > Meglio lavorare **on-site** (anche se nei libri si disegna a computer): il valore vero è la comunicazione. Le parti irrilevanti si sostituiscono con `...` (ellissi).
@@ -56,7 +56,7 @@ Oltre ai pivotal event, anche le **swimlane** sono buoni candidati per i confini
 ## Different Models & slicing nel frontend
 > 📖 pp.236-237
 
-Altra lezione chiave di DDD: **modelli diversi per contesti diversi**. La parola "flight" lo mostra — nel contesto *booking* è un'offerta vendibile (fare class, prezzo, disponibilità posti); nel contesto *boarding* è un processo operativo (gate, posto, stato di sicurezza). Forzare entrambi i significati in **un solo modello** produce campi irrilevanti e validazioni fragili. Tenerli separati è uno degli scopi principali dello strategic design e porta a **verticali disaccoppiati** che evolvono in modo indipendente. La riconciliazione tra contesti avviene spesso via **domain event** nel backend (es. Booking pubblica `TicketCancelled`, Boarding lo riceve e rimuove il passeggero dalla lista).
+Altra lezione chiave di DDD: **modelli diversi per contesti diversi**. La parola "flight" lo mostra — nel contesto *booking* è un'offerta vendibile (fare class cioè classe tariffaria, prezzo, disponibilità posti); nel contesto *boarding* è un processo operativo (gate, posto, stato di sicurezza). Forzare entrambi i significati in **un solo modello** produce campi irrilevanti e validazioni fragili. Tenerli separati è uno degli scopi principali dello strategic design e porta a **verticali disaccoppiati** che evolvono in modo indipendente. La riconciliazione tra contesti avviene spesso via **domain event** nel backend (es. Booking pubblica `TicketCancelled`, Boarding lo riceve e rimuove il passeggero dalla lista).
 
 **Slicing nel frontend.** Nella maggior parte dei progetti lo slicing del frontend **rispecchia quello del backend** → low coupling, high cohesion, allineamento dei team, autonomia, carico cognitivo ridotto. Ma a volte si sceglie deliberatamente uno slicing diverso (es. backend con molti calcoli complessi e frontend semplice; oppure frontend che gestisce workflow fatti di azioni implementate in contesti backend diversi). In quei casi serve **tradurre** il linguaggio del backend in quello del frontend (o del singolo slice frontend): pattern elegante è il **Backend for Frontend (BFF)** — fisicamente nel backend ma **logicamente parte del frontend** e (idealmente) sotto responsabilità del team frontend. Oltre alla traduzione tra bounded context offre anche caching, security e monitoring.
 
@@ -67,9 +67,9 @@ Per implementare i verticali si suddividono i domini in **moduli** secondo una *
 
 | Categoria | Contenuto | Comunica con il backend? |
 |---|---|---|
-| **feature** | use case con **smart component** (poco riusabili, focalizzati su una singola feature); parlano col backend, tipicamente via store o service | sì |
-| **ui** | **dumb/presentational component** riusabili (design system, componenti tecnici generali come un `ticket`); comunicano solo via properties & events, senza domain knowledge | no |
-| **data** | domain model (vista client) + service che ci operano (validazione, backend, state management con i relativi view model) | sì |
+| **feature** | use case con **smart component** (componenti "intelligenti" che orchestrano dati e logica; poco riusabili, focalizzati su una singola feature); parlano col backend, tipicamente via store o service | sì |
+| **ui** | **dumb/presentational component** riusabili (componenti "muti", solo di presentazione: ricevono dati e basta — design system, componenti tecnici generali come un `ticket`); comunicano solo via properties & events (proprietà in ingresso ed eventi in uscita), senza domain knowledge (non conoscono il dominio di business) | no |
+| **data** | domain model (il modello del dominio, vista lato client) + service che ci operano (validazione, backend, state management con i relativi view model, cioè versioni dello stato preparate apposta per una vista) | sì |
 | **util** | helper generici: logging, auth, lavoro sulle date | — |
 
 L'area **shared** offre codice per tutti i domini: deve contenere soprattutto codice **tecnico** (il codice domain-specific sta nei singoli domini). Quindi la maggior parte di `ui`/`util` sta in `shared`, mentre `feature`/`data` stanno nei singoli domini.
@@ -92,17 +92,17 @@ graph TD
 > Non condividere troppo via `shared` e via moduli `util`. Un sistema che condivide gran parte del codice finisce con **molto coupling** e mina le idee stesse di vertical slicing e layering. Entrambe le regole servono proprio a disaccoppiare ed **evitare cicli**.
 
 > [!tip]
-> La matrice è una **reference architecture**: alcuni team riducono layer e regole, altri ne aggiungono; il layer `data` a volte si chiama `domain` o `state`.
+> La matrice è una **reference architecture** (un modello di riferimento da adattare, non una regola rigida): alcuni team riducono layer e regole, altri ne aggiungono; il layer `data` a volte si chiama `domain` o `state`.
 
 ## Feature-Local Source Code (VSA)
 > 📖 pp.239-241
 
 Combinare verticali e layer può **spargere** il codice di un singolo use case su più moduli/cartelle → più carico cognitivo, meno coesione. La **Vertical Slice Architecture (VSA)** di Jimmy Bogard usa il **feature slicing**: tutto il codice di una feature sta in **un solo posto**. Tradotto al frontend, un feature module include anche i dumb component, gli store e i service di accesso al backend → alta coesione, basso carico cognitivo (ciò che cambia insieme sta insieme).
 
-Il feature slicing funziona al meglio quando **tutti i building block** (model e data access compresi) sono locali alla feature e non riusati altrove. In pratica però feature affini condividono linguaggio, modello, stato e data access; inoltre i verticali aiutano l'allineamento con la struttura dei team. Per questo il feature slicing si **combina** con il vertical slicing per dominio: si parte con building block feature-local (dumb component, service, store) e, **quando** servono in altre feature, li si **promuove** al layer `ui` o `data` del dominio.
+Il feature slicing funziona al meglio quando **tutti i building block** (i pezzi che la compongono: model e data access compresi) sono locali alla feature e non riusati altrove. In pratica però feature affini condividono linguaggio, modello, stato e data access; inoltre i verticali aiutano l'allineamento con la struttura dei team. Per questo il feature slicing si **combina** con il vertical slicing per dominio: si parte con building block feature-local (dumb component, service, store) e, **quando** servono in altre feature, li si **promuove** al layer `ui` o `data` del dominio.
 
 > [!warning]
-> La VSA richiede un team **esperto** che sappia *quando* è il momento di refactorare. Applicata bene: building block **as local as possible, as global as necessary**. Nell'app d'esempio molti store sono feature-local e ci sono persino dumb component feature-local (`PassengerCard`, `LuggageCard`): questo **aggira** le regole del layering, ma una singola feature dev'essere abbastanza semplice da capire e refactorare on demand.
+> La VSA richiede un team **esperto** che sappia *quando* è il momento di refactorare. Applicata bene: building block **as local as possible, as global as necessary** (il più locali possibile, globali solo quando serve davvero). Nell'app d'esempio molti store sono feature-local (vivono dentro la singola feature) e ci sono persino dumb component feature-local (`PassengerCard`, `LuggageCard`): questo **aggira** le regole del layering, ma una singola feature dev'essere abbastanza semplice da capire e refactorare on demand (quando capita il bisogno).
 
 ## Implementation Options
 > 📖 pp.241-242
@@ -145,7 +145,7 @@ Dentro i moduli, i soliti building block Angular: component, directive, pipe, se
 
 Buona pratica: **nascondere i dettagli implementativi** di un modulo. I file privati si cambiano liberamente; quelli esposti vanno mantenuti con cura per evitare breaking change. Un feature module potrebbe esporre **solo le proprie route** — i consumer non assumono nulla sull'implementazione dietro le route, che resta modificabile.
 
-Modo tradizionale JS: **public API via barrel file** (`index.ts`) che ri-esporta i costrutti pubblici.
+Modo tradizionale JS: **public API via [[glossario#barrel|barrel file]]** (`index.ts`) — un file unico che ri-esporta i costrutti pubblici di un modulo, così gli altri importano solo da lì.
 
 ```ts
 // index.ts
@@ -153,9 +153,9 @@ export * from './flight-booking.routes';
 ```
 
 > [!warning]
-> I barrel hanno due svantaggi: (1) è noioso ri-esportare tutti i costrutti pubblici in `index.ts`; (2) **rompono tree-shaking e lazy loading** — a runtime si caricano anche costrutti non necessari nascosti dietro lo stesso barrel.
+> I barrel hanno due svantaggi: (1) è noioso ri-esportare tutti i costrutti pubblici in `index.ts`; (2) **rompono [[glossario#tree-shaking|tree-shaking]] e [[glossario#lazy-loading|lazy loading]]** (rispettivamente: la rimozione del codice non usato dal bundle, e il caricamento di un pezzo di app solo quando serve) — a runtime si caricano anche costrutti non necessari nascosti dietro lo stesso barrel.
 
-Approccio **convention-based preferito** (barrel-less): tutti i costrutti privati in una cartella con un nome speciale, `internal`. Gli altri moduli non devono accedere a `internal` (lo si fa rispettare con **Sheriff**).
+Approccio **convention-based preferito** (basato su una convenzione di nomi invece che su un file barrel, *barrel-less*): tutti i costrutti privati in una cartella con un nome speciale, `internal`. Gli altri moduli non devono accedere a `internal` (lo si fa rispettare con **Sheriff**).
 
 ```text
 src/app/domains/checkin/data
@@ -233,7 +233,7 @@ export const config: SheriffConfig = {
 
 - I **tag** si riferiscono ai **nomi di cartella**; `<domain>`/`<name>` sono placeholder. Una cartella sotto `src/app/domains/booking` che inizia per `feature-` riceve i tag `domain:booking` e `type:feature`.
 - `domain:*` può dipendere da `sameTag` (stesso dominio) e da `domain:shared`. Le altre regole impongono che ogni layer veda solo i layer sottostanti.
-- `root: '*'` → le cartelle non categorizzate nella root (es. la **shell** dell'app) accedono a tutto; regola analoga per `testing`.
+- `root: '*'` → le cartelle non categorizzate nella root (es. la **shell** dell'app, cioè l'involucro che monta e collega i moduli) accedono a tutto; regola analoga per `testing`.
 
 > [!warning]
 > Se la cartella di un modulo contiene un `index.ts`, Sheriff lo considera la **public API** e bypassarlo è un errore di lint. Con `enableBarrelLess: true` i barrel **non** sono richiesti: senza `index.ts`, i file in `internal` sono privati e tutto il resto è accessibile dall'esterno.
@@ -250,7 +250,7 @@ npm i @softarc/detective
 npx detective
 ```
 
-Si selezionano le cartelle che rappresentano i moduli e Detective mostra un **dependency graph**. Tecnicamente le dipendenze sono **import tra file di moduli diversi**: cliccando un arco si vede il numero di import, e lo **spessore** dell'arco ne indica la quantità. Detective implementa anche **metodi di analisi forense** per scoprire pattern nascosti sulla salute della modularizzazione → [[19-forensic-architecture-analysis|cap.19]].
+Si selezionano le cartelle che rappresentano i moduli e Detective mostra un **dependency graph** (il grafo delle dipendenze: i moduli sono nodi, le frecce indicano chi dipende da chi). Tecnicamente le dipendenze sono **import tra file di moduli diversi**: cliccando un arco si vede il numero di import, e lo **spessore** dell'arco ne indica la quantità. Detective implementa anche **metodi di analisi forense** per scoprire pattern nascosti sulla salute della modularizzazione → [[19-forensic-architecture-analysis|cap.19]].
 
 ## Lightweight Path Mappings
 > 📖 p.248
@@ -286,9 +286,9 @@ L'import a tre parti riflette la posizione nella matrice: **workspace** (`@fligh
 ## Lightweight Stores & architettura — Unidirectional Data Flow
 > 📖 pp.249-250
 
-Le app frontend moderne usano **più store fine-grained e leggeri**; a differenza del classico Redux, lo stato è **sparso** in più punti → dove metterli? quanto grandi? possono accedersi a vicenda?
+Le app frontend moderne usano **più store fine-grained e leggeri** (a grana fine, cioè piccoli e con responsabilità mirata); a differenza del classico Redux (lo store unico e centralizzato), lo stato è **sparso** in più punti → dove metterli? quanto grandi? possono accedersi a vicenda?
 
-Nei sistemi reattivi un cambiamento ne innesca un altro, e così via: cascate difficili da capire e mantenere. Il **flusso dati unidirezionale** previene questo: i dati scorrono in **una sola direzione** e per ogni evento (utente) esiste un percorso chiaro. Gli store sono ideali per implementarlo.
+Nei sistemi reattivi un cambiamento ne innesca un altro, e così via: catene di aggiornamenti a catena (cascate) difficili da capire e mantenere. Il **flusso dati unidirezionale** previene questo: i dati scorrono in **una sola direzione** e per ogni evento (utente) esiste un percorso chiaro. Gli store sono ideali per implementarlo.
 
 ```mermaid
 graph LR
@@ -338,7 +338,7 @@ Questo lo rende disponibile anche ai figli e garantisce **un'istanza per istanza
 ## Granularità di uno Store
 > 📖 p.251
 
-Un lightweight store in Angular è **solo un service** → vale il **single-responsibility principle**. Spesso conviene spezzare uno slice in store più fine-grained: tipicamente **uno store per entità** usata nella feature, più uno o due per lo **stato UI**. Esempio dall'app: la feature *booking* ha `FlightsStore`, `FlightDetailStore`, `PassengerStore`, `PassengerDetailStore`.
+Un lightweight store in Angular è **solo un service** → vale il **single-responsibility principle** (ogni store fa una cosa sola). Spesso conviene spezzare uno slice in store più fine-grained: tipicamente **uno store per entità** usata nella feature, più uno o due per lo **stato UI**. Esempio dall'app: la feature *booking* ha `FlightsStore`, `FlightDetailStore`, `PassengerStore`, `PassengerDetailStore`.
 
 ## Comunicazione tra Store
 > 📖 pp.252-253
@@ -347,7 +347,7 @@ Sparpagliando lo stato su più store/layer, uno use case spesso ha bisogno di st
 
 1. **Accesso diretto store-to-store** — il più semplice, ma crea **coupling** e può generare **cicli**. Accettabile *solo* se uno store di layer superiore **legge** da uno di layer inferiore (il layering previene i cicli).
 2. **Service di orchestrazione** — un service combina più store ed è usato dai feature component. Nell'app, `SummaryStore` combina `FlightsStore` e `PassengerStore` per il summary component (flight + passenger selezionati).
-3. **Eventing** — uno store pubblica un evento al cambio di stato, gli altri si sottoscrivono e si aggiornano. È la soluzione **più pulita** in termini di coupling (store disaccoppiati, niente cicli), ma aggiunge un livello di **indirezione** e complessità. Ripresa con l'**Event API** del [[09-ngrx-signal-store|cap.9]].
+3. **Eventing** — uno store pubblica un evento al cambio di stato, gli altri si sottoscrivono e si aggiornano. È la soluzione **più pulita** in termini di coupling (store disaccoppiati, niente cicli), ma aggiunge un livello di **indirezione** (un passaggio in più: chi pubblica e chi reagisce non si conoscono direttamente) e complessità. Ripresa con l'**Event API** del [[09-ngrx-signal-store|cap.9]].
 
 ```mermaid
 graph TD
