@@ -7,14 +7,14 @@ tags: [tipo/capitolo, routing, lifecycle, di, http, angular-22]
 # 12 · Initialization & Route Changes
 > 📖 cap.12 · pp.342-356 — *Modern Angular* v2.0.0
 
-Prima di poter usare una feature spesso serve **inizializzarla**: caricare dati, registrare error handler, avviare servizi. Sul frontend questo significa che l'app deve caricare dati prima di proseguire, e tipicamente accade allo **startup** e al **cambio rotta**. Il capitolo raccoglie i meccanismi tecnici per agganciarsi a questi momenti: **initializers** (application/environment/platform), **guards** (consentire/negare activation e deactivation), **router events**, **resolver** (caricare dati *prima* dell'attivazione della rotta) e **HttpInterceptors** (ispezionare/modificare richieste e risposte HTTP).
+Prima di poter usare una feature spesso serve **inizializzarla**: caricare dati, registrare error handler, avviare servizi. Sul frontend questo significa che l'app deve caricare dati prima di proseguire, e tipicamente accade allo **startup** (l'avvio dell'app) e al **cambio rotta**. Il capitolo raccoglie i meccanismi tecnici per agganciarsi a questi momenti: **initializers** (application/environment/platform), [[glossario#guard|guards]] (consentire/negare activation e deactivation, cioè l'entrata e l'uscita da una rotta), **router events**, [[glossario#resolver|resolver]] (caricare dati *prima* dell'attivazione della rotta) e [[glossario#interceptor-httpinterceptor|HttpInterceptors]] (ispezionare/modificare richieste e risposte HTTP).
 
 Tutti questi hook girano in un [[injection-context]], quindi usano [[inject]]`(...)` direttamente invece della constructor injection.
 
 ## Initializers
 > 📖 pp.342-345
 
-Gli initializer servono per i compiti tecnici da eseguire *prima* che la UI parta davvero: caricare la configurazione a runtime, registrare error handler globali, avviare servizi di background. Angular offre tre livelli di hook; il più comune è l'**application initializer** (spesso detto `appInitializer`), che può **bloccare il bootstrap** finché il lavoro asincrono non è completo.
+Gli initializer servono per i compiti tecnici da eseguire *prima* che la UI parta davvero: caricare la configurazione a runtime (i valori letti all'avvio, non scritti nel codice), registrare error handler globali, avviare servizi di background. Angular offre tre livelli di hook (punti di aggancio); il più comune è l'**application initializer** (spesso detto `appInitializer`), che può **bloccare il bootstrap** (mettere in pausa l'avvio dell'app) finché il lavoro asincrono non è completo.
 
 ### Application Initializers
 > 📖 pp.342-344
@@ -79,12 +79,12 @@ export class ConfigService {
 ```
 
 > [!warning]
-> Un application initializer **ritarda il primo render** e può far sembrare lo startup lento. Se ti servono dati solo per una feature specifica, caricali in modo **lazy** (es. all'attivazione della rotta, via [[#Resolver]]) invece di bloccare l'intera app.
+> Un application initializer **ritarda il primo render** e può far sembrare lo startup lento. Se ti servono dati solo per una feature specifica, caricali in modo [[glossario#lazy-loading|lazy]] (solo quando servono davvero, es. all'attivazione della rotta, via [[#Resolver]]) invece di bloccare l'intera app.
 
 ### Environment Initializers
 > 📖 p.344
 
-Mentre `provideAppInitializer` è **globale** (gira col root injector), un **environment initializer** gira quando viene creato un **environment injector** — utile per setup *feature-* o *route-scoped* quando usi provider a livello di rotta (vedi [[04-router-navigation-lazy-loading]]). Nel demo, la feature route `bookingRoutes` lo registra nel proprio array `providers`.
+Mentre `provideAppInitializer` è **globale** (gira col root injector, l'injector radice condiviso da tutta l'app), un **environment initializer** gira quando viene creato un **environment injector** (un injector locale, ad es. quello di una rotta) — utile per setup *feature-* o *route-scoped*, cioè limitati a una singola feature o rotta, quando usi provider a livello di rotta (vedi [[04-router-navigation-lazy-loading]]). Nel demo, la feature route `bookingRoutes` lo registra nel proprio array `providers`.
 
 ```ts
 // src/app/domains/ticketing/ticketing.routes.ts
@@ -131,7 +131,7 @@ Funzioni guard tipizzate (nomi funzionali moderni):
 ### Preventing Route Activation (CanActivateFn)
 > 📖 pp.345-347
 
-Esempio: un auth guard che redirige al login gli utenti non autenticati. Non è una questione di sicurezza — nelle SPA browser-based la **sicurezza va sempre imposta sul backend** — ma di *usability*: l'app può reindirizzare l'utente alla pagina di login quando serve (vedi [[16-authentication-authorization]]).
+Esempio: un auth guard che redirige al login gli utenti non autenticati. Non è una questione di sicurezza — nelle SPA browser-based (le single-page application, dove il codice gira nel browser dell'utente) la **sicurezza va sempre imposta sul backend** — ma di *usability* (comodità d'uso): l'app può reindirizzare l'utente alla pagina di login quando serve (vedi [[16-authentication-authorization]]).
 
 ```ts
 // src/app/domains/shared/util-auth/auth.guard.ts
@@ -369,7 +369,7 @@ export class App {
 
 Problema: se il componente legge l'id dalla rotta e *poi* inizia a caricare, il caricamento parte **dopo** che la navigazione è completata. Il router emette `NavigationEnd` appena il routing finisce, ma in quel momento il load asincrono può essere ancora in corso: lo spinner basato sugli eventi si spegne troppo presto, l'utente aspetta più del dovuto e il template deve gestire un valore `null`/`undefined`.
 
-I **resolver** risolvono il problema: sono funzioni (`ResolveFn<T>`) che girano **prima** dell'attivazione della rotta. Il router **attende** la Promise/Observable e solo dopo attiva la rotta. Il valore risolto si legge da `route.data`, *oppure* il resolver può **pilotare uno store** che il componente legge.
+I **resolver** risolvono il problema: sono funzioni (`ResolveFn<T>`) che girano **prima** dell'attivazione della rotta. Il router **attende** la Promise/Observable e solo dopo attiva la rotta. Il valore risolto si legge da `route.data`, *oppure* il resolver può **pilotare uno [[glossario#store|store]]** (un contenitore di stato condiviso) che il componente legge.
 
 ```ts
 // src/app/domains/ticketing/feature-booking/passenger-edit/passenger-resolver.ts
@@ -426,7 +426,7 @@ L'oggetto `resolve` mappa chiavi a funzioni resolver. Il router esegue ogni reso
 
 Gli interceptor sono **funzioni** che ispezionano e modificano le richieste HTTP in uscita e le risposte in entrata. Casi tipici: aggiungere header di autenticazione, error handling globale, supportare formati oltre il JSON.
 
-Seguono il pattern **Chain of Responsibility**: ogni interceptor può passare la richiesta alla funzione successiva (`next`); in fondo alla catena parte la richiesta vera. Nel demo, l'auth interceptor è un `HttpInterceptorFn` che aggiunge un Bearer token alle richieste e gestisce gli errori 401/403.
+Seguono il pattern **Chain of Responsibility** (catena di responsabilità: una sequenza di funzioni in cui ognuna fa la sua parte e poi passa il lavoro alla successiva): ogni interceptor può passare la richiesta alla funzione successiva (`next`); in fondo alla catena parte la richiesta vera. Nel demo, l'auth interceptor è un `HttpInterceptorFn` che aggiunge un Bearer token (il token di autenticazione spedito negli header) alle richieste e gestisce gli errori 401/403.
 
 ```ts
 // src/app/domains/shared/util-auth/auth.interceptor.ts
@@ -477,7 +477,7 @@ export const appConfig: ApplicationConfig = {
 ```
 
 > [!warning]
-> `HttpRequest` e `HttpHeaders` sono **immutabili**: per modificarli devi `req.clone({ ... })`, non mutarli in place. E l'**ordine** dell'array in `withInterceptors([...])` determina l'ordine della catena: ogni interceptor riceve la richiesta eventualmente già modificata dai precedenti e la passa al successivo.
+> `HttpRequest` e `HttpHeaders` sono **[[equality-immutability|immutabili]]** (non si possono cambiare una volta creati): per modificarli devi `req.clone({ ... })`, cioè crearne una copia modificata, non cambiarli sul posto. E l'**ordine** dell'array in `withInterceptors([...])` determina l'ordine della catena: ogni interceptor riceve la richiesta eventualmente già modificata dai precedenti e la passa al successivo.
 
 Collegamenti: [[inject]] · [[providers]] · [[16-authentication-authorization]] (Bearer token / gestione 401-403).
 
