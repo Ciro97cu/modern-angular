@@ -7,9 +7,9 @@ tags: [tipo/capitolo, micro-frontends, architecture, angular-22]
 # 18 · Micro Frontends: Scaling Across Multiple Teams
 > 📖 cap.18 · pp.435-455 — *Modern Angular* v2.0.0
 
-I sistemi enterprise sono spesso sviluppati da più team cross-funzionali. Per farli procedere in autonomia, riducendo al minimo il bisogno di coordinarsi, conviene **modularizzare verticalmente** il sistema in aree a basso accoppiamento che ogni team può gestire da sé. Finora nel libro i verticali erano semplici cartelle (vedi [[08-sustainable-architectures]]); i **Micro Frontends** fanno un passo in più: a ogni verticale dedicano una **applicazione separata**, deployabile in modo indipendente.
+I sistemi enterprise sono spesso sviluppati da più team cross-funzionali. Per farli procedere in autonomia, riducendo al minimo il bisogno di coordinarsi, conviene **modularizzare verticalmente** il sistema (tagliarlo per [[glossario#vertical-slicing|aree funzionali]] — es. "prenotazioni", "fatturazione" — invece che per livelli tecnici) in aree a basso accoppiamento che ogni team può gestire da sé. Finora nel libro i verticali erano semplici cartelle (vedi [[08-sustainable-architectures]]); i [[glossario#micro-frontend|**Micro Frontends**]] fanno un passo in più: a ogni verticale dedicano una **applicazione separata**, deployabile in modo indipendente (rilasciabile da sola, senza ridistribuire il resto del sistema).
 
-Il capitolo spiega cosa sono i Micro Frontends e le loro conseguenze, come implementarli con Angular e **Native Federation**, e come affrontare gli scenari **multi-version / multi-framework** tipici degli ambienti corporate.
+Il capitolo spiega cosa sono i Micro Frontends e le loro conseguenze, come implementarli con Angular e [[glossario#native-federation-module-federation|**Native Federation**]], e come affrontare gli scenari **multi-version / multi-framework** (più micro frontend che girano insieme pur usando versioni diverse di Angular, o framework diversi tra loro) tipici degli ambienti corporate.
 
 ## Cosa sono i Micro Frontends — motivazioni
 > 📖 pp.435-436
@@ -26,17 +26,17 @@ Come i Microservices, offrono vantaggi sia tecnici sia organizzativi: app più p
 Ogni decisione architetturale ha conseguenze, anche negative:
 
 - **UI/UX incoerente**: micro frontend sviluppati separatamente possono divergere nell'aspetto.
-- **Più bundle da scaricare** → tempi di caricamento peggiori e maggiore pressione sulla memoria.
+- **Più bundle da scaricare** (un bundle è il file JS impacchettato che il browser scarica) → tempi di caricamento peggiori e maggiore pressione sulla memoria.
 - Definire confini verticali netti, e implementarli come app separate, è **difficile**. E mentre tante piccole app a prima vista semplificano l'implementazione, integrarle in una soluzione unica aggiunge complessità.
-- La sfida più grande osservata in pratica: si passa da una **compile-time integration** a una **runtime integration**. Non si prevedono facilmente i problemi che nascono quando app sviluppate e deployate separatamente iniziano a interagire a runtime. L'attuale generazione di framework SPA (Angular in primis) è pensata per **ottimizzazioni a compile-time**: il compiler usa i type check per individuare i conflitti ed emette codice ottimizzato per il **tree-shaking**, e la CLI fornisce una build altamente ottimizzata. L'uso "off-label" necessario ai micro frontend mina alcuni di questi vantaggi.
+- La sfida più grande osservata in pratica: si passa da una **compile-time integration** (le parti vengono messe insieme e verificate dal compiler quando costruisci l'app) a una **runtime integration** (le parti si incontrano solo nel browser, mentre l'app gira). Non si prevedono facilmente i problemi che nascono quando app sviluppate e deployate separatamente iniziano a interagire a runtime. L'attuale generazione di framework SPA (Angular in primis) è pensata per **ottimizzazioni a compile-time**: il compiler usa i type check (controlli sui tipi) per individuare i conflitti ed emette codice ottimizzato per il [[glossario#tree-shaking|**tree-shaking**]] (rimuovere a build il codice non usato), e la CLI fornisce una build altamente ottimizzata. L'uso "off-label" (cioè in un modo diverso da quello per cui questi strumenti sono nati) necessario ai micro frontend mina alcuni di questi vantaggi.
 
 > [!tip]
-> Le controindicazioni si possono compensare: un **design system** per la coerenza UI/UX, il lazy-loading delle singole parti del sistema. Per approfondire le strategie di compensazione: il [survey su 150+ practitioner](https://www.angulararchitects.io/blog/consequences-of-micro-frontends-survey-results/).
+> Le controindicazioni si possono compensare: un **design system** (libreria condivisa di componenti e regole grafiche) per la coerenza UI/UX, il [[glossario#lazy-loading|lazy-loading]] (caricare le parti del sistema solo quando servono) delle singole parti del sistema. Per approfondire le strategie di compensazione: il [survey su 150+ practitioner](https://www.angulararchitects.io/blog/consequences-of-micro-frontends-survey-results/).
 
 ## Self-Contained Systems (SCS)
 > 📖 p.437
 
-L'approccio **Self-Contained System** separa la funzionalità di un sistema più grande in tanti sistemi indipendenti e collaboranti. Buoni candidati: Domain / Bounded Context in ottica **DDD**. Ogni SCS può avere un backend e un frontend ed è **molto debolmente accoppiato**.
+L'approccio **Self-Contained System** separa la funzionalità di un sistema più grande in tanti sistemi indipendenti e collaboranti. Buoni candidati: Domain / Bounded Context in ottica **DDD** (Domain-Driven Design — il metodo che ritaglia il software intorno alle aree di business e ai loro confini netti). Ogni SCS può avere un backend e un frontend ed è **molto debolmente accoppiato** (le parti dipendono il meno possibile l'una dall'altra).
 
 - Backend: comunicazione preferita via **REST/HTTP** o messaging.
 - Frontend: integrazione gestita **unicamente via hyperlink**.
@@ -49,13 +49,13 @@ Un SCS si può vedere come una combinazione speciale di microservice + micro fro
 ## Native Federation
 > 📖 pp.438-440
 
-**Module Federation** (in webpack dalla v5) è spesso visto come un punto di svolta per i micro frontend: permette di caricare **on-demand** parti di app compilate e pubblicate separatamente.
+**Module Federation** (in webpack dalla v5) è spesso visto come un punto di svolta per i micro frontend: permette di caricare **on-demand** (solo al momento del bisogno) parti di app compilate e pubblicate separatamente.
 
 - Una **shell** (ufficialmente *host*) definisce segmenti URL che puntano ai Micro Frontends (ufficialmente *remotes*).
 - I remote **pubblicano** parti di programma (componenti, moduli Angular) che la shell carica **a runtime**.
 - Le **dipendenze sono condivise** a runtime: Angular viene caricato **una sola volta** anche se più micro frontend lo usano.
 
-**Native Federation** (`@angular-architects/native-federation`) porta lo stesso mental model **fuori da webpack**: stesse opzioni e configurazione di Module Federation, ma funziona con qualsiasi build tool e usa tecnologie **browser-native** (ECMAScript modules + **Import Maps**) per garantire supporto a lungo termine dai browser e abilitare implementazioni alternative.
+**Native Federation** (`@angular-architects/native-federation`) porta lo stesso mental model (modo di ragionare, stessi concetti) **fuori da webpack**: stesse opzioni e configurazione di Module Federation, ma funziona con qualsiasi build tool e usa tecnologie **browser-native** (già parte degli standard del browser, senza strumenti extra): ECMAScript modules (i moduli JS standard, con `import`/`export`) + **Import Maps** (una mappa che dice al browser dove trovare ogni modulo da importare). Così garantisce supporto a lungo termine dai browser e abilita implementazioni alternative.
 
 - Gira **prima e dopo** il bundler vero e proprio nella build → indipendente dal bundler usato (esbuild, ecc.). Dovendo anch'esso creare qualche bundle, delega al bundler scelto, collegato via **adapter** intercambiabili.
 - A runtime piazza remote e librerie condivise in **bundle ECMAScript** dedicati e conformi agli standard; le info su questi bundle stanno in **file di metadati** (`remoteEntry.json`) che formano la base di un **Import Map** standard, dicendo al browser quali bundle caricare e da dove.
@@ -70,12 +70,12 @@ graph TD
   Shell -. shared .-> Shared
 ```
 
-Il progetto demo è `flights42`: una shell (`flights`) e remote come `miles` (Angular) e `svelte-app` (Web Component basato su Svelte).
+Il progetto demo è `flights42`: una shell (`flights`) e remote come `miles` (Angular) e `svelte-app` ([[glossario#web-component-custom-element|Web Component]] basato su Svelte — un elemento HTML personalizzato, standard del browser, che incapsula un componente di un altro framework).
 
 ## Setup di un Micro Frontend (remote)
 > 📖 pp.441-442
 
-Per Angular e la CLI, Native Federation offre uno schematic `ng add`. Questo comando aggiunge Native Federation al progetto `miles` e lo configura come **remote** che funge da Micro Frontend:
+Per Angular e la CLI, Native Federation offre uno schematic `ng add` (uno schematic è uno script della CLI che genera/modifica i file del progetto per te). Questo comando aggiunge Native Federation al progetto `miles` e lo configura come **remote** che funge da Micro Frontend:
 
 ```bash
 ng add @angular-architects/native-federation --project miles --port 4201 --type remote
@@ -139,7 +139,7 @@ ng add @angular-architects/native-federation --project flights --port 4200 --typ
 
 Il manifest viene generato di default nella cartella `public/` dell'host. Trattandolo come **asset**, può essere scambiato in fase di deploy per adattare l'app all'ambiente. Mappa i nomi dei remote ai loro metadati (il `remoteEntry.json` che Native Federation aggiunge in build). Anche se `ng add` lo genera, **va controllato** per sistemare le porte o rimuovere voci che non sono remote.
 
-`ng add` genera anche un `federation.config.js` per l'host. Manca l'entry `exposes`, dato che un host di norma non pubblica file ad altri host — ma nulla vieta di aggiungerlo se l'host fa anche da remote. La feature opzionale `ignoreUnusedDeps`, attivata dallo schematic per tutti i nuovi progetti, fa ignorare a Native Federation le librerie presenti in `package.json` ma non usate dall'app (es. usate solo da altre app dello stesso monorepo).
+`ng add` genera anche un `federation.config.js` per l'host. Manca l'entry `exposes`, dato che un host di norma non pubblica file ad altri host — ma nulla vieta di aggiungerlo se l'host fa anche da remote. La feature opzionale `ignoreUnusedDeps`, attivata dallo schematic per tutti i nuovi progetti, fa ignorare a Native Federation le librerie presenti in `package.json` ma non usate dall'app (es. usate solo da altre app dello stesso [[glossario#monorepo|monorepo]] — un unico repository che contiene più progetti).
 
 Il `main.ts`, anch'esso modificato da `ng add`, **inizializza** Native Federation col manifest:
 
@@ -251,7 +251,7 @@ La navigazione della shell linka alle route del remote tramite il **prefisso di 
 
 Si può abilitare via **librerie condivise**, ma **con cautela**: i micro frontend nascono per disaccoppiare i frontend tra loro; se un frontend si aspetta informazioni da un altro, succede l'opposto. Nella pratica si condivide solo qualche **informazione contestuale** (username corrente, client corrente, qualche filtro globale).
 
-Serve prima una shared library: un npm package sviluppato a parte oppure una libreria interna al progetto Angular (generabile con `ng g lib util-auth` — vedi [[14-monorepos-libraries]]). Nel demo, `util-auth` espone un service stateful che usa un RxJS `BehaviorSubject` per un meccanismo publish/subscribe, così le parti interessate vengono notificate sui cambi di valore:
+Serve prima una shared library: un npm package sviluppato a parte oppure una libreria interna al progetto Angular (generabile con `ng g lib util-auth` — vedi [[14-monorepos-libraries]]). Nel demo, `util-auth` espone un service stateful (un servizio che conserva uno stato, qui il valore corrente) che usa un RxJS `BehaviorSubject` (un contenitore osservabile che tiene l'ultimo valore e lo "trasmette" a chi è in ascolto) per un meccanismo publish/subscribe (uno pubblica i cambi, gli altri si iscrivono e vengono notificati), così le parti interessate vengono notificate sui cambi di valore:
 
 > [!info] Angular 22+
 > `@Service()` (senza argomenti) è il nuovo equivalente del vecchio `@Injectable({ providedIn: 'root' })`: dichiara un service iniettabile e registrato nello scope root. Qui la fonte usa proprio `@Service()`. Dettagli in [[service]].
@@ -271,7 +271,7 @@ export class AuthService {
 }
 ```
 
-Le lib interne al monorepo vanno rese accessibili via **path mapping** nel `tsconfig.json`:
+Le lib interne al monorepo vanno rese accessibili via **path mapping** (in `tsconfig.json` si dice a TypeScript che un nome breve come `@flights42/util-auth` corrisponde a un certo file su disco) nel `tsconfig.json`:
 
 ```json
 // tsconfig.json
@@ -288,14 +288,14 @@ Le lib interne al monorepo vanno rese accessibili via **path mapping** nel `tsco
 ## Soluzioni multi-version / multi-framework
 > 📖 pp.448-449
 
-Finora si è assunto che shell e remote usino **stesso framework e versione**. Per integrare micro frontend basati su framework e/o versioni **diversi** servono accorgimenti aggiuntivi. Non è qualcosa da introdurre senza un buon motivo: tipicamente **sistemi legacy** o la combinazione di prodotti esistenti in una suite.
+Finora si è assunto che shell e remote usino **stesso framework e versione**. Per integrare micro frontend basati su framework e/o versioni **diversi** servono accorgimenti aggiuntivi. Non è qualcosa da introdurre senza un buon motivo: tipicamente **sistemi legacy** (vecchi sistemi ancora in uso, difficili da aggiornare) o la combinazione di prodotti esistenti in una suite.
 
 ### Astrarre i Micro Frontends con Web Components
 > 📖 pp.449-450
 
-Primo passo: **astrarre** i diversi framework e versioni. Approccio diffuso: usare **Web Components** che incapsulano interi Micro Frontends — non i Web Components ideali nel senso di widget riutilizzabili, ma web component **a grana grossa** che rappresentano interi domini (es. un'app Svelte caricata in una shell Angular).
+Primo passo: **astrarre** i diversi framework e versioni (nasconderne le differenze dietro un'interfaccia comune, così la shell li tratta tutti allo stesso modo). Approccio diffuso: usare **Web Components** che incapsulano interi Micro Frontends — non i Web Components ideali nel senso di widget riutilizzabili, ma web component **a grana grossa** (grossi, non piccoli widget) che rappresentano interi domini (es. un'app Svelte caricata in una shell Angular).
 
-Scrivere un Web Component che delega a un framework, invece di scrivere direttamente sul DOM, non è difficile. Angular lo semplifica con **`@angular/elements`** (`npm i @angular/elements`), che converte un componente Angular in Web Component — tecnicamente lo *wrappa* in un Web Component creato al volo. Con gli Standalone Components:
+Scrivere un Web Component che delega a un framework (gli passa il lavoro di disegnare la UI), invece di scrivere direttamente sul DOM, non è difficile. Angular lo semplifica con **`@angular/elements`** (`npm i @angular/elements`), che converte un componente Angular in Web Component — tecnicamente lo *wrappa* (lo avvolge) in un Web Component creato al volo. Con gli Standalone Components:
 
 ```ts
 // projects/mfe2/src/bootstrap.ts
@@ -314,7 +314,7 @@ import { NgZone } from '@angular/core';
 })();
 ```
 
-- Queste righe **sostituiscono il bootstrap** dell'app. `createApplication` crea un'app Angular con un root injector, configurato tramite l'array `providers`.
+- Queste righe **sostituiscono il bootstrap** dell'app (l'avvio normale di Angular). `createApplication` crea un'app Angular con un root injector (il contenitore radice della [[glossario#dependency-injection-di|dependency injection]], da cui si recuperano i servizi), configurato tramite l'array `providers`.
 - Invece di fare il bootstrap di un componente, `createCustomElement` trasforma uno standalone component in web component.
 - `customElements.define` (API del browser) lo registra col nome `mfe2-root`: da lì il browser renderizza il web component (e quindi il componente Angular dietro di esso) ovunque compaia `<mfe2-root></mfe2-root>` nel markup.
 
@@ -409,7 +409,7 @@ E si registra il remote `svelte-app` nel manifest:
 ### Condividere Zone.js
 > 📖 p.453
 
-In origine Angular usava la libreria **Zone.js** come fondamento della change detection. I nuovi progetti non la generano più, ma se un progetto esistente la usa ancora bisogna **condividere l'istanza** di `NgZone` (il service che rappresenta Zone.js dentro Angular). La `App` component della shell può esporre il proprio `NgZone` nel namespace globale:
+In origine Angular usava la libreria [[glossario#zoneless-zonejs|**Zone.js**]] come fondamento della [[glossario#change-detection|change detection]] (il meccanismo con cui Angular si accorge dei cambiamenti e aggiorna la UI). I nuovi progetti non la generano più, ma se un progetto esistente la usa ancora bisogna **condividere l'istanza** di `NgZone` (il service che rappresenta Zone.js dentro Angular). La `App` component della shell può esporre il proprio `NgZone` nel namespace globale (`globalThis`, un oggetto visibile a tutto il codice nella pagina):
 
 ```ts
 // Conceptual: shell's root component
