@@ -7,14 +7,14 @@ tags: [tipo/capitolo, directives, templates, angular-22]
 # 11 · Directives, Templates, and Containers
 > 📖 cap.11 · pp.312-341 — *Modern Angular* v2.0.0
 
-Le librerie di componenti (Angular Material & co.) non spediscono solo UI pronte: poggiano su una manciata di mattoni che rendono i componenti flessibili e riusabili — **attribute directive** che potenziano altri componenti, **structural directive**, template e componenti dinamici, manipolazioni DOM controllate. Il capitolo attraversa questi meccanismi con un insieme minimo di costrutti riusabili: una **tooltip directive** (in due versioni), una **DataTable** e un **DialogService**.
+Le librerie di componenti (Angular Material & co.) non spediscono solo UI pronte: poggiano su una manciata di mattoni che rendono i componenti flessibili e riusabili — [[glossario#attribute-directive|**attribute directive**]] (directive senza template, che aggiungono comportamento a un elemento esistente) che potenziano altri componenti, [[glossario#structural-directive|**structural directive**]] (directive che aggiungono/rimuovono elementi dal DOM, come `*ngIf`), template e componenti dinamici, manipolazioni DOM controllate. Il capitolo attraversa questi meccanismi con un insieme minimo di costrutti riusabili: una **tooltip directive** (in due versioni), una **DataTable** e un **DialogService**.
 
 Idea cardine: un **componente è solo una directive con un template**. La `@Directive` ha quasi tutte le proprietà di `@Component`, mancano solo quelle legate al template (`template`/`templateUrl`, `styles`/`styleUrls`, `viewProviders`).
 
 ## Attribute Directives — definire una directive
 > 📖 pp.312-315
 
-Le **attribute directive** aggiungono comportamento a elementi esistenti senza portare una propria view. Il nome riflette la convenzione: di solito il selector punta a elementi con un certo **attributo**, ma è solo una convenzione, non un obbligo. L'esempio sostituisce il classico `(click)` per azioni critiche con un click che prima mostra un dialog di conferma e scatena l'handler **solo** se l'utente conferma.
+Le **attribute directive** aggiungono comportamento a elementi esistenti senza portare una propria view (senza un template proprio: si "agganciano" a un elemento già nel template). Il nome riflette la convenzione: di solito il selector (il pattern CSS che dice a Angular su quali elementi applicarsi) punta a elementi con un certo **attributo**, ma è solo una convenzione, non un obbligo. L'esempio sostituisce il classico `(click)` per azioni critiche con un click che prima mostra un dialog di conferma e scatena l'handler (la funzione che reagisce all'evento) **solo** se l'utente conferma.
 
 La directive si importa nei `imports` del componente standalone che la usa:
 
@@ -79,7 +79,7 @@ Si applica come attributo:
 I selector seguono le possibilità CSS, quindi si può restringere il match: `button[appClickWithWarning]` (solo `<button>`), `div.container button[appClickWithWarning]` (solo dentro un `div.container`). Per la UI di conferma l'esempio usa il `Dialog` della Angular CDK con un piccolo `ConfirmComponent`; in alternativa basterebbe il `confirm()` del browser.
 
 > [!tip]
-> L'opzione `host` del decorator lega proprietà ed eventi all'elemento host: binding di `class:`/`style.`/proprietà e **host listener** tipo `'(click)': '...'`. È il modo signal-era di fare ciò che un tempo si faceva con `@HostBinding`/`@HostListener`.
+> L'opzione `host` del decorator lega proprietà ed eventi all'[[glossario#host-elemento-host|elemento host]] (l'elemento DOM su cui la directive è applicata): binding di `class:`/`style.`/proprietà e **host listener** (un ascoltatore di eventi attaccato a quell'elemento) tipo `'(click)': '...'`. È il modo signal-era di fare ciò che un tempo si faceva con `@HostBinding`/`@HostListener`.
 
 ## Comunicare con l'ambiente & template variables
 > 📖 pp.315-316
@@ -90,7 +90,7 @@ Come i componenti, le directive comunicano col chiamante via `input()`/`output()
 <button (appClickWithWarning)="deleteAll()">Delete All!</button>
 ```
 
-Una directive si referenzia anche con una **template variable**. Dietro un elemento, nel template, possono esserci più directive (oltre a un eventuale componente), quindi serve dire ad Angular quale si intende: il valore di `exportAs` fa da chiave.
+Una directive si referenzia anche con una [[glossario#template-variable|**template variable**]] (una variabile locale del template, dichiarata con `#nome`, che dà un riferimento all'elemento o all'istanza). Dietro un elemento, nel template, possono esserci più directive (oltre a un eventuale componente), quindi serve dire ad Angular quale si intende: il valore di [[glossario#exportas|`exportAs`]] (il nome pubblico con cui la directive si fa "esportare" verso le template variable) fa da chiave.
 
 ```html
 <button (appClickWithWarning)="deleteAll()" #cww="clickWithWarning">Delete All!</button>
@@ -102,7 +102,7 @@ Una directive si referenzia anche con una **template variable**. Dietro un eleme
 ## Controlled DOM-Manipulations
 > 📖 pp.316-318
 
-A volte una directive deve creare/gestire elementi DOM **fuori dal template** (overlay, tooltip, popover che devono sfuggire a `overflow`/posizionamento dei genitori). È una manipolazione di basso livello: usarla solo se non c'è un'astrazione di più alto livello, e **ripulire sempre** gli elementi creati alla distruzione, pena memory leak e nodi orfani.
+A volte una directive deve creare/gestire elementi DOM **fuori dal template** (overlay, tooltip, popover che devono sfuggire a `overflow`/posizionamento dei genitori). È una manipolazione di basso livello (tocchi il DOM a mano, con codice, invece di lasciar fare ad Angular): usarla solo se non c'è un'astrazione di più alto livello, e **ripulire sempre** gli elementi creati alla distruzione, pena memory leak (memoria occupata e mai liberata) e nodi orfani (elementi rimasti nella pagina senza più nessuno che li gestisce).
 
 ```ts
 // src/app/domains/shared/ui-common/simple-tooltip.directive.ts
@@ -187,7 +187,7 @@ Uso:
 </button>
 ```
 
-`appSimpleTooltip` fa doppio gioco: marca l'elemento da potenziare e fa da **nome dell'input** (via `alias`). Allineare il nome di un input al selector è l'unica eccezione lecita all'uso degli alias (di norma sconsigliati dal linter perché introducono indirezione).
+`appSimpleTooltip` fa doppio gioco: marca l'elemento da potenziare e fa da **nome dell'input** (via `alias`, cioè un nome esterno diverso dal nome della proprietà nella classe). Allineare il nome di un input al selector è l'unica eccezione lecita all'uso degli alias (di norma sconsigliati dal linter perché introducono indirezione: il nome che scrivi nel template non coincide con quello nel codice, e questo rende più difficile seguirne le tracce).
 
 > [!warning]
 > Qui serve `afterRenderEffect`, non un `effect` normale: con un `effect` la logica girerebbe **troppo presto**, prima che l'host sia posizionato, e il tooltip finirebbe nel posto sbagliato.
@@ -202,8 +202,8 @@ Collegamenti: [[inject]] · [[injection-context]] · [[signal-input]].
 
 Oltre alla [[content-projection]] dichiarativa (`<ng-content>`), si può renderizzare il contenuto di un **template via codice**: più flessibilità, e si può proiettare lo stesso template più volte con parametri diversi.
 
-- Un **template** (`<ng-template>`) definisce markup che Angular **non renderizza subito**.
-- Un **container** è il punto dove quel template può essere istanziato. Angular mette ogni componente e ogni markup statico in un container invisibile; lo si recupera (es. via DI come `ViewContainerRef`) e ci si aggiungono elementi.
+- Un **template** (`<ng-template>`) definisce markup che Angular **non renderizza subito** (resta "in attesa", lo si istanzia quando serve).
+- Un **container** è il punto dove quel template può essere istanziato (la "presa" del DOM in cui infilare le view generate). Angular mette ogni componente e ogni markup statico in un container invisibile; lo si recupera (es. via [[glossario#dependency-injection-di|DI]] come `ViewContainerRef`) e ci si aggiungono elementi.
 
 Il `Tooltip` riceve un `TemplateRef` e lo renderizza nel view container, invece di creare DOM a mano:
 
@@ -306,7 +306,7 @@ Uso (il template si passa come `TemplateRef`, ottenuto con la variabile `#tmpl`)
 ## Passare parametri ai template (context object)
 > 📖 pp.322-324
 
-Quando si renderizza un template si può passare un **context object** con parametri usabili come variabili nel template (anche in data binding).
+Quando si renderizza un template si può passare un **context object** (un oggetto coi "dati di ingresso" del template) con parametri usabili come variabili nel template (anche in data binding).
 
 ```ts
 interface TooltipContext {
@@ -377,7 +377,7 @@ Collegamenti: [[content-projection]].
 ## Structural Directives — desugaring
 > 📖 pp.324-326
 
-Le **structural directive** sono solo directive ordinarie con un po' di zucchero sintattico che ne rende l'uso più compatto. Assumono che l'host sia un **template** renderizzabile su richiesta (una o più volte) e offrono una **microsyntax** per parametri e binding. È il chiamante (non la directive) a decidere l'uso strutturale, prefissando l'attributo con `*`.
+Le **structural directive** sono solo directive ordinarie con un po' di zucchero sintattico (una scrittura abbreviata e comoda che il compilatore espande in qualcosa di più verboso) che ne rende l'uso più compatto. Assumono che l'host (l'elemento su cui la directive è applicata) sia un **template** renderizzabile su richiesta (una o più volte) e offrono una **microsyntax** (una mini-grammatica che sta tutta dentro le virgolette dell'attributo) per parametri e binding. È il chiamante (chi usa la directive nel template), non la directive stessa, a decidere l'uso strutturale, prefissando l'attributo con `*`.
 
 Esempio `appTableField` (cella formattata di tabella). Questa scrittura:
 
@@ -494,7 +494,7 @@ export class DataTable<T extends object> {
 }
 ```
 
-`contentChildren(TableField)` popola `fields` con tutti i figli che usano la directive; `ngTemplateOutlet` riceve un `TemplateRef` e un context. Sembra molto boilerplate per una tabella semplice, ma diventa la base per aggiungere in modo riusabile sorting, filtering, paginazione, colonne di edit a tutta l'app.
+`contentChildren(TableField)` popola `fields` con tutti i figli che usano la directive; `ngTemplateOutlet` riceve un `TemplateRef` e un context. Sembra molto boilerplate (codice ripetitivo e di servizio, tanto per far funzionare le cose) per una tabella semplice, ma diventa la base per aggiungere in modo riusabile sorting, filtering, paginazione, colonne di edit a tutta l'app.
 
 Collegamenti: [[signal-queries]] (la query `contentChildren`) · [[10-signal-queries-component-communication]].
 
@@ -590,7 +590,7 @@ export class About {
 }
 ```
 
-Costrutti di supporto — un evento e un `InjectionToken` per passare i dati:
+Costrutti di supporto — un evento e un [[glossario#injection-token|`InjectionToken`]] (una "chiave" per registrare e recuperare un valore via DI quando non c'è una classe da iniettare) per passare i dati:
 
 ```ts
 // src/app/domains/shared/ui-common/dialog/dialog-event.ts
@@ -632,7 +632,7 @@ export class DialogService {
 }
 ```
 
-Il `DialogOutlet` riceve gli eventi e crea un **injector figlio** che espone `DIALOG_DATA`, poi passa tipo e injector a `ngComponentOutlet`:
+Il `DialogOutlet` riceve gli eventi e crea un **injector figlio** (un injector locale, che eredita dal padre ma aggiunge i propri provider — qui i dati del dialog), che espone `DIALOG_DATA`, poi passa tipo e injector a `ngComponentOutlet`:
 
 ```ts
 // src/app/domains/shared/ui-common/dialog/dialog-outlet.ts
