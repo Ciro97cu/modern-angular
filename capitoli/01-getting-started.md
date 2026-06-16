@@ -15,7 +15,7 @@ Setup dell'ambiente, generazione del progetto con la **Angular CLI** e prima let
 - **IDE**: in teoria basta un editor di testo, ma un IDE specializzato dà syntax highlighting, code completion e debugging integrato. Gli autori consigliano **VS Code** (gratuito, multipiattaforma) o **WebStorm/IntelliJ** (commerciali, JetBrains).
   - Su VS Code installa l'extension pack *Angular Essentials* di John Papa (View → Extensions): include l'**Angular Language Service** (code completion nei template HTML) ed **ESLint**.
   - Su IntelliJ verifica che i plugin **Angular** e **TypeScript** siano attivi.
-- **Node.js**: tutto il tooling di sviluppo/build/test poggia su Node. Usa le versioni **LTS**; se ti servono versioni diverse tra progetti, gestiscile con un version manager come **NVM**.
+- **Node.js**: tutto il tooling di sviluppo/build/test poggia su Node. Usa le versioni **LTS** (Long-Term Support, quelle con supporto a lungo termine, le più stabili); se ti servono versioni diverse tra progetti, gestiscile con un version manager (un programma che tiene installate più versioni di Node e ti fa passare dall'una all'altra) come **NVM**.
 - **Angular CLI**: tool ufficiale del team Angular per generare, buildare e testare; viene aggiornato a ogni nuova versione di Angular. Installazione globale (`-g` la rende disponibile ovunque sulla macchina; senza `-g` npm installerebbe solo nel progetto locale):
 
 ```bash
@@ -37,7 +37,7 @@ ng serve -o   # -o apre il browser
 ## Generare e avviare un progetto
 > 📖 pp.20-22
 
-`ng new` scarica e configura automaticamente l'intera toolchain: compilatore TypeScript, strumenti di test e i build tool che producono i bundle ottimizzati per la produzione.
+`ng new` scarica e configura automaticamente l'intera toolchain (la catena di strumenti che servono per lavorare al progetto): compilatore TypeScript, strumenti di test e i build tool che, in fase di compilazione, impacchettano i sorgenti in **bundle** (pochi file ottimizzati pronti per la produzione).
 
 ```bash
 ng new flights42     # genera struttura + toolchain; rispondi Enter alle domande
@@ -122,7 +122,7 @@ Collegamenti: [[signal]] · approfondimenti su componenti e binding in [[02-sign
 ## Bootstrap dell'applicazione
 > 📖 pp.25-27
 
-All'avvio Angular esegue `main.ts`, che fa il **bootstrap** del root component: da lì in poi mostra l'intero albero di componenti.
+All'avvio Angular esegue `main.ts`, che fa il **bootstrap** del root component (lo avvia e lo "monta" nella pagina, mettendolo in moto): da lì in poi mostra l'intero albero di componenti.
 
 ```ts
 // src/main.ts
@@ -169,7 +169,7 @@ I servizi globali si registrano in `providers` tramite [[providers|provider func
   - `npm i <pkg>` (alias di `npm install <pkg>`) installa la libreria — es. `npm install @ngrx/signals`, usata più avanti per la gestione dello stato.
   - `ng add <pkg>` installa **e configura**: es. `ng add @angular/material` imposta theming e tipografia di Material (il libro ne usa parti selezionate per dialog e toast). Rispondi Enter alle domande per i default.
 - **Componenti e stili pronti**: il libro fa copiare nel progetto i file del repo `angular-architects/flights42-assets` (uno `styles.css` globale e i componenti `navbar`/`sidebar` con i rispettivi template, più un `app.html` modificato che li referenzia) per non perdere tempo su styling e menu.
-- **Configurare gli schematics** in `angular.json` (nodo `projects/<project-name>/schematics`) per ridurre il rumore in fase di studio e usare **OnPush**:
+- **Configurare gli schematics** (le "ricette" che la CLI usa quando genera file con `ng generate`: dicono cosa creare e con quali opzioni di default) in `angular.json` (nodo `projects/<project-name>/schematics`) per ridurre il rumore in fase di studio e usare **OnPush**:
 
 ```jsonc
 "schematics": {
@@ -190,13 +190,13 @@ I servizi globali si registrano in `providers` tramite [[providers|provider func
 }
 ```
 
-`skipTests: true` evita di generare i file di test per componenti, direttive, pipe e service — non perché lo scaffolding sia sbagliato, ma perché in [[07-testing-with-vitest]] questi file si scrivono a mano per mostrarne i concetti.
+`skipTests: true` evita di generare i file di test per componenti, direttive, pipe e service — non perché lo scaffolding sia sbagliato (lo *scaffolding* è la generazione automatica dei file di partenza da parte della CLI), ma perché in [[07-testing-with-vitest]] questi file si scrivono a mano per mostrarne i concetti.
 
-- **Linter**: `ng lint` esegue ESLint. La CLI lo **configura alla prima esecuzione** (Enter per i default → set di regole Angular + TS); personalizzi in `eslint.config.js`. In VS Code gli errori compaiono mentre scrivi se hai l'estensione ESLint (inclusa nell'Angular Essentials pack).
-- **Build di produzione**: `ng build` compila TS → JS, bundla e ottimizza (minify + tree-shaking, che rimuove il codice inutilizzato). Output in `dist/<app>/browser`, es. `dist/flights42/browser`: copiali su un web server per il deploy.
+- **Linter**: `ng lint` esegue ESLint. Un *linter* è uno strumento che analizza il codice e segnala errori comuni e violazioni dello stile di scrittura. La CLI lo **configura alla prima esecuzione** (Enter per i default → set di regole Angular + TS); personalizzi in `eslint.config.js`. In VS Code gli errori compaiono mentre scrivi se hai l'estensione ESLint (inclusa nell'Angular Essentials pack).
+- **Build di produzione**: `ng build` compila TS → JS, bundla (raggruppa tutto in pochi file) e ottimizza (minify, cioè comprime il codice togliendo spazi e accorciando i nomi, + [[glossario#tree-shaking|tree-shaking]], che rimuove il codice inutilizzato). Output in `dist/<app>/browser`, es. `dist/flights42/browser`: copiali su un web server per il deploy.
 
 > [!info] Angular 22+
-> **OnPush** è la strategia di change detection raccomandata: Angular aggiorna un componente **solo quando i suoi dati cambiano** (es. quando un signal fornisce un nuovo valore) invece di ricontrollare tutta l'app. I signal la rendono naturale. **Da Angular 22 è il default.**
+> **OnPush** è la strategia di [[glossario#change-detection|change detection]] raccomandata (la change detection è il meccanismo con cui Angular controlla cos'è cambiato e ridisegna la UI di conseguenza): Angular aggiorna un componente **solo quando i suoi dati cambiano** (es. quando un signal fornisce un nuovo valore) invece di ricontrollare tutta l'app. I signal la rendono naturale. **Da Angular 22 è il default.**
 
 > [!tip]
 > Anche se OnPush è ormai il default, il libro continua a scrivere `changeDetection: ChangeDetectionStrategy.OnPush` esplicitamente in **ogni** `@Component`, per due motivi: rende la scelta **visibile a colpo d'occhio** (codice auto-documentante) e resta **retrocompatibile** con versioni < 22, dove gli snippet copiati si comportano allo stesso modo.
