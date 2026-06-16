@@ -7,7 +7,7 @@ tags: [tipo/capitolo, ngrx, state-management, signals, angular-22]
 # 09 · State Management with NgRx Signal Store
 > 📖 cap.9 · pp.254-297 — *Modern Angular* v2.0.0
 
-Una SPA mantiene lo stato mentre l'utente cambia rotta: dati caricati via HTTP, ma anche interazioni UI (filtri impostati, elementi selezionati). Implementare lo store a mano (vedi [[05-state-management-services-signals|cap.5]]) funziona, ma produce **molto codice ripetitivo**: esporre signal read-only per i consumer ma scrivibili dall'interno, integrare le resource per il caricamento, gestire stati di errore e di loading. Il **NgRx SignalStore** (`@ngrx/signals`) elimina gran parte di questo boilerplate ed è oggi la soluzione di state management più diffusa per Angular moderno, integrandosi nativamente con i [[signal]].
+Una SPA mantiene lo stato mentre l'utente cambia rotta: dati caricati via HTTP, ma anche interazioni UI (filtri impostati, elementi selezionati). Implementare lo [[glossario#store|store]] (il contenitore centralizzato dello stato) a mano (vedi [[05-state-management-services-signals|cap.5]]) funziona, ma produce **molto codice ripetitivo**: esporre signal read-only per i consumer ma scrivibili dall'interno, integrare le resource per il caricamento, gestire stati di errore e di loading. Il **NgRx SignalStore** (`@ngrx/signals`) elimina gran parte di questo boilerplate ed è oggi la soluzione di state management più diffusa per Angular moderno, integrandosi nativamente con i [[signal]].
 
 In tutto il capitolo lo store è un **service** che incapsula lo stato di una feature, composto da una pila di **features** (`withState`, `withComputed`, ...) passate a `signalStore()`. Alcune features arrivano dalla community via NgRx Toolkit (`@angular-architects/ngrx-toolkit`): `withResource`, `withDevtools`, `withMutations`.
 
@@ -150,7 +150,7 @@ Collegamenti: [[signal]] · [[computed]] · [[resource]] · [[inject]] · [[ligh
 ## Inspecting the Store with the Redux DevTools
 > 📖 pp.263-265
 
-I **Redux DevTools** (estensione Chrome/Firefox) ispezionano lo stato e le sue transizioni nel tempo, incluso il **time-travel debugging**. Anche se SignalStore non implementa il pattern Redux, ci si collega con la feature `withDevtools` del NgRx Toolkit: la stringa passata è il nome del *branch* nell'albero DevTools (per distinguere più store).
+I **Redux DevTools** (estensione Chrome/Firefox) ispezionano lo stato e le sue transizioni nel tempo, incluso il **time-travel debugging** (puoi tornare indietro a uno stato precedente e "riavvolgere" la sequenza di cambiamenti per vedere come ci sei arrivato). Anche se SignalStore non implementa il pattern Redux, ci si collega con la feature `withDevtools` del NgRx Toolkit: la stringa passata è il nome del *branch* nell'albero DevTools (per distinguere più store).
 
 ```ts
 import { withDevtools } from '@angular-architects/ngrx-toolkit';
@@ -211,11 +211,11 @@ withMutations((store) => ({
 })),
 ```
 
-I due type parameter sono il tipo dell'argomento e il tipo del valore di ritorno (qui entrambi `Flight`). La mutation aggiunge allo store il metodo `saveFlight` **più** i signal di stato `saveFlightIsPending` e `saveFlightError`, senza boilerplate. Il `MatSnackBar` di Angular Material si inietta con `withProps`. L'`operator` riflette gli operatori di flattening di RxJS:
+I due type parameter sono il tipo dell'argomento e il tipo del valore di ritorno (qui entrambi `Flight`). La mutation aggiunge allo store il metodo `saveFlight` **più** i signal di stato `saveFlightIsPending` e `saveFlightError`, senza boilerplate. Il `MatSnackBar` di Angular Material si inietta con `withProps`. L'`operator` riflette gli operatori di flattening di RxJS (quelli che decidono come gestire più chiamate sovrapposte: `switchMap`, `mergeMap`, `concatMap`, `exhaustMap`):
 
 - `switchOp` — annulla la chiamata precedente quando ne parte una nuova (conta solo l'ultima).
 - `mergeOp` — esegue tutte le chiamate in parallelo, indipendenti.
-- `concatOp` — le accoda ed esegue una alla volta. **Default**: preserva l'ordine, evita race condition, non annulla nulla.
+- `concatOp` — le accoda ed esegue una alla volta. **Default**: preserva l'ordine, evita [[glossario#race-condition|race condition]] (due chiamate che finiscono in ordine imprevedibile, con la più vecchia che rischia di sovrascrivere la più recente), non annulla nulla.
 - `exhaustOp` — ignora le nuove finché una è in corso (anti doppio-submit).
 
 > [!tip]
@@ -265,7 +265,7 @@ createSaveRxMutation(options: Partial<RxMutationOptions<Flight, Flight>>) {
 
 Lo SignalStore offre due **reactive methods**, ri-eseguiti automaticamente quando i valori passati cambiano. Sono come un [[effect]] esplicito che reagisce **solo** ai valori in ingresso, non agli altri signal usati al loro interno.
 
-**`rxMethod<T>`** (dall'entry point `@ngrx/signals/rxjs-interop`) sfrutta la potenza di RxJS: riceve un Observable, lo fa passare per gli operator forniti e lo ritorna. Si sottoscrive da solo, quindi serve un `tap` per lavorare col risultato. Il chiamante può passare un valore *plain*, un `Signal<T>` o un `Observable<T>`: per signal/observable, ogni nuovo valore attraversa la pipe.
+**`rxMethod<T>`** (dall'entry point `@ngrx/signals/rxjs-interop`) sfrutta la potenza di RxJS: riceve un Observable, lo fa passare per gli operator forniti e lo ritorna. Si sottoscrive da solo (fa lui la `subscribe`, non devi farla tu), quindi per lavorare col risultato serve un `tap` dentro la pipe. Il chiamante può passare un valore *plain*, un `Signal<T>` o un `Observable<T>`: per signal/observable, ogni nuovo valore attraversa la pipe.
 
 ```ts
 protected readonly fn = rxMethod<number>((number$) =>
@@ -333,7 +333,7 @@ connectFlightId: signalMethod<number>((id) => {
 ## Entity Management and Normalization
 > 📖 pp.278-286
 
-Lo stato è spesso fatto di **entità** (voli, passeggeri). La feature `withEntities` (da `@ngrx/signals/entities`) riduce il boilerplate e incoraggia best practice come la normalizzazione.
+Lo stato è spesso fatto di **[[glossario#entity-normalization|entità]]** (voli, passeggeri — gli oggetti-dominio identificati da un ID). La feature `withEntities` (da `@ngrx/signals/entities`) riduce il boilerplate e incoraggia best practice come la normalizzazione.
 
 ```ts
 import { setAllEntities, withEntities } from '@ngrx/signals/entities';
@@ -384,7 +384,7 @@ const passengerConfig = entityConfig({ entity: type<Passenger>(), collection: 'p
 > [!tip]
 > Spesso è meglio **splittare le collection in store separati** (uno store per tipo di entità per feature, più magari uno per la UI state) anziché ammassarle in un unico store: con gli store leggeri come SignalStore è la prassi, e tiene gli store piccoli e a responsabilità distinta.
 
-**Normalizzazione.** Mettere strutture annidate dal backend direttamente nello store porta a **duplicati** (lo stesso passeggero su più voli) e a stati incoerenti, e rende difficile rimodellare i dati per le varie viste. Come nei DB relazionali si normalizza: ogni tipo di entità nella sua collection, i riferimenti solo via ID. Una sola istanza per entità, joinabile per ogni vista via `computed`.
+**Normalizzazione.** Mettere strutture annidate dal backend direttamente nello store porta a **duplicati** (lo stesso passeggero su più voli) e a stati incoerenti, e rende difficile rimodellare i dati per le varie viste. Come nei DB relazionali si normalizza: ogni tipo di entità nella sua collection, i riferimenti solo via ID. Una sola istanza per entità, ricomponibile (joinabile, come una *join* SQL che riunisce dati collegati) per ogni vista via `computed`.
 
 ```ts
 export type FlightState     = Flight    & { passengerIds: number[] };
@@ -406,15 +406,15 @@ withComputed((store) => ({
 })),
 ```
 
-I dati si normalizzano dal backend (se controllabile, o con un BFF) oppure lato client dopo il load (con `map`/`reduce`). Si può **saltare** la normalizzazione se l'app legge soltanto i dati o aggiorna sempre l'intera struttura annidata.
+I dati si normalizzano dal backend (se controllabile, o con un BFF — *Backend For Frontend*, un servizio intermedio che adatta i dati alle esigenze del frontend) oppure lato client dopo il load (con `map`/`reduce`). Si può **saltare** la normalizzazione se l'app legge soltanto i dati o aggiorna sempre l'intera struttura annidata.
 
 ## Event API: Flux and Redux
 > 📖 pp.287-292
 
-L'**Event API** porta il pattern **Flux** / Redux (dello store NgRx "Global") nel mondo dei Signal Store, per **disaccoppiare** gli store dai loro consumer tramite eventi.
+L'**Event API** porta il pattern **Flux** / Redux (il modello a flusso unidirezionale in cui lo stato cambia solo in risposta a eventi, mai con scritture dirette; è quello dello store NgRx "Global") nel mondo dei Signal Store, per **disaccoppiare** gli store dai loro consumer tramite eventi.
 
 > [!info] Mental model
-> Quando una feature usa più store, o uno store serve più feature, crescono complessità, rischio di incoerenze e cicli difficili da debuggare (se gli store si notificano a vicenda i cambiamenti). Invece di chiamare i metodi degli store, i componenti **dispatchano eventi**. Gli store registrano dei **reducer** che dicono come aggiornare lo stato in reazione a eventi specifici: se l'evento li riguarda reagiscono, altrimenti lo ignorano. I componenti non conoscono la struttura interna degli store. I **reducer sono sempre sincroni**; per i side effect e l'async ci sono gli **event handler** (erano gli "effects" dell'NgRx Global, rinominati per non confonderli con l'`effect` di Angular): Observable che ricevono eventi e ne pubblicano altri col risultato — un ponte tra eventi. Poiché con SignalStore ci sono **più store** (non uno globale come in Redux), il pattern prevede un **dispatcher** che inoltra gli eventi a tutti gli store.
+> Quando una feature usa più store, o uno store serve più feature, crescono complessità, rischio di incoerenze e cicli difficili da debuggare (se gli store si notificano a vicenda i cambiamenti). Invece di chiamare i metodi degli store, i componenti **[[glossario#dispatch|dispatchano]] eventi** (cioè "lanciano" un evento nel sistema, senza sapere chi lo riceverà). Gli store registrano dei **[[glossario#reducer|reducer]]** (funzioni che, dato lo stato attuale e un evento, calcolano il nuovo stato) che dicono come aggiornare lo stato in reazione a eventi specifici: se l'evento li riguarda reagiscono, altrimenti lo ignorano. I componenti non conoscono la struttura interna degli store. I **reducer sono sempre sincroni**; per i side effect e l'async ci sono gli **event handler** (erano gli "effects" dell'NgRx Global, rinominati per non confonderli con l'`effect` di Angular): Observable che ricevono eventi e ne pubblicano altri col risultato — un ponte tra eventi. Poiché con SignalStore ci sono **più store** (non uno globale come in Redux), il pattern prevede un **dispatcher** che inoltra gli eventi a tutti gli store.
 
 ```mermaid
 flowchart LR
@@ -443,7 +443,7 @@ export const luggageEvents = eventGroup({
 });
 ```
 
-Pattern tipico per le operazioni async: tre eventi (trigger / success / error). Il team NgRx consiglia un `source` **fine-grained** che punti al consumer concreto (componente/service/store): es. `loadLuggageTriggered` in un gruppo `luggageOverviewEvents` con source `LuggageOverview` (usato dal componente per il trigger), e gli esiti in `luggageApiEvents` con source `LuggageApi` (usati dai reducer/handler dello store). Così si vede subito chi scatena cosa.
+Pattern tipico per le operazioni async: tre eventi (trigger / success / error). Il team NgRx consiglia un `source` **fine-grained** (granulare, specifico anziché generico) che punti al consumer concreto (componente/service/store): es. `loadLuggageTriggered` in un gruppo `luggageOverviewEvents` con source `LuggageOverview` (usato dal componente per il trigger), e gli esiti in `luggageApiEvents` con source `LuggageApi` (usati dai reducer/handler dello store). Così si vede subito chi scatena cosa.
 
 **Reducer** — feature `withReducer`; `on(event, fn)` collega un evento al reducer, che riceve il payload (tipizzato) e ritorna lo stato (partial, patchato sopra lo stato dello store).
 
