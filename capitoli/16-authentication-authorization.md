@@ -7,7 +7,7 @@ tags: [tipo/capitolo, security]
 # 16 · Modern Patterns for Authentication & Authorization
 > 📖 cap.16 · pp.412-421 — *Modern Angular* v2.0.0
 
-Poche applicazioni gestionali fanno a meno dell'autenticazione. Il capitolo presenta due varianti: prima la classica **cookie-based authentication**, poi la **token-based security** con OAuth 2 e OpenID Connect (OIDC). La buona notizia: l'autenticazione moderna si implementa **soprattutto sul server**. Sul frontend non scrivi quasi codice, ma devi capire e saper inquadrare i concetti, anche solo per discuterli con i colleghi backend. Per questo il capitolo è più **concettuale** degli altri.
+Poche applicazioni gestionali fanno a meno dell'autenticazione. Il capitolo presenta due varianti: prima la classica **cookie-based authentication** (l'utente è riconosciuto da un cookie che il browser allega da solo), poi la **token-based security** con [[glossario#oauth-2-oidc|OAuth 2 e OpenID Connect (OIDC)]] (il client porta con sé un *token*, una stringa che dimostra chi è e cosa può fare). La buona notizia: l'autenticazione moderna si implementa **soprattutto sul server**. Sul frontend non scrivi quasi codice, ma devi capire e saper inquadrare i concetti, anche solo per discuterli con i colleghi backend. Per questo il capitolo è più **concettuale** degli altri.
 
 > [!tip]
 > Nelle SPA la **sicurezza va sempre imposta sul backend**. Guard e interceptor lato client (vedi [[12-initialization-route-changes]]) sono questioni di *usability*, non di sicurezza: il vero controllo lo fa il server.
@@ -34,16 +34,16 @@ Nel passo 2 l'autenticazione può avvenire in più modi: l'app può inviare user
 ### Cookies and XSRF
 > 📖 p.413
 
-**Cross-Site Request Forgery (CSRF/XSRF)** è un attacco in cui un aggressore fa scatenare a un utente autenticato un'azione a sua insaputa:
+**[[glossario#xsrf-csrf|Cross-Site Request Forgery (CSRF/XSRF)]]** è un attacco in cui un aggressore fa eseguire a un utente già loggato un'azione a sua insaputa, sfruttando il fatto che il browser allega da solo i cookie di quell'utente:
 
 1. L'utente fa login sulla tua web app e riceve un cookie.
 2. Visita una pagina controllata dall'aggressore.
 3. Quella pagina accede alla tua web app: per esempio offre un form che invia i suoi dati al tuo sito, o un link che chiama la tua pagina con certi parametri.
 4. L'utente invia il form o segue il link: poiché il browser **allega il cookie** alle richieste verso il tuo sito, l'azione viene eseguita a suo nome.
 
-I cookie **`SameSite`** già limitano molto questo attacco. Un'ulteriore mitigazione sono gli **XSRF token** (da non confondere con i security token della sezione successiva): stringhe casuali che l'app Angular riceve dal backend e deve includere nelle **richieste state-changing** (POST/PUT/DELETE) verso la stessa origin, provando così che la richiesta proviene davvero da lei e non da una pagina controllata dall'aggressore.
+I cookie **`SameSite`** già limitano molto questo attacco. Un'ulteriore mitigazione sono gli **XSRF token** (da non confondere con i security token della sezione successiva): stringhe casuali che l'app Angular riceve dal backend e deve includere nelle **richieste state-changing** (cioè quelle che modificano dati lato server: POST/PUT/DELETE) verso la stessa origin, provando così che la richiesta proviene davvero da lei e non da una pagina controllata dall'aggressore.
 
-`HttpClient` implementa questa protezione **out of the box**: alla load si aspetta il token in un cookie `XSRF-TOKEN`, ne memorizza il valore e lo rispedisce al server a ogni richiesta nell'header `X-XSRF-TOKEN`. Sul server devi solo emettere il cookie `XSRF-TOKEN` e verificare l'header `X-XSRF-TOKEN` a ogni richiesta successiva; è importante emettere un **nuovo token, imprevedibile, dopo ogni login** per quell'utente.
+`HttpClient` implementa questa protezione **out of the box** (già pronta, senza configurarla): al caricamento dell'app si aspetta il token in un cookie `XSRF-TOKEN`, ne memorizza il valore e lo rispedisce al server a ogni richiesta nell'header `X-XSRF-TOKEN`. Sul server devi solo emettere il cookie `XSRF-TOKEN` e verificare l'header `X-XSRF-TOKEN` a ogni richiesta successiva; è importante emettere un **nuovo token, imprevedibile, dopo ogni login** per quell'utente.
 
 Per personalizzare i nomi di cookie e header, usa `withXsrfConfiguration` quando provvedi `HttpClient`:
 
@@ -72,7 +72,7 @@ Una seconda linea di difesa è validare gli header `Origin`/`Referer` inviati da
 ## Token-based Security
 > 📖 pp.414-417
 
-Spesso bisogna integrare identity solution esistenti (Active Directory, sistemi LDAP) per abilitare il **single sign-on**; inoltre nelle web app moderne il client deve ottenere il diritto di accedere ai servizi **per conto** dell'utente loggato. I **security token** risolvono tutti questi requisiti con eleganza.
+Spesso bisogna integrare identity solution esistenti (sistemi di gestione delle identità degli utenti, come Active Directory o LDAP) per abilitare il **single sign-on** (un unico login che dà accesso a più applicazioni); inoltre nelle web app moderne il client deve ottenere il diritto di accedere ai servizi **per conto** dell'utente loggato. I **security token** risolvono tutti questi requisiti con eleganza.
 
 > [!warning]
 > Sia OAuth 2 sia OpenID Connect devono girare **su HTTPS** per essere sicuri. (La demo del libro lo omette solo per semplicità.)
@@ -102,7 +102,7 @@ Il **formato** dell'access token e le misure di validazione sono dettagli implem
 - **access token** → per accedere al **backend**.
 - **ID token** → il client legge **direttamente** le info utente.
 
-A differenza degli access token, la struttura degli **ID token è prescritta**: sono **sempre JSON Web Token (JWT)**, firmabili e/o cifrabili. OIDC definisce inoltre uno **Userinfo endpoint**: un servizio HTTP che, presentando l'access token, restituisce ulteriori dati sull'utente (indirizzo postale, foto profilo, …). Quali claim stiano già nell'ID token e quali vadano richiesti via Userinfo è una scelta di configurazione dell'identity solution.
+A differenza degli access token, la struttura degli **ID token è prescritta** (cioè il formato è fissato dallo standard, non libero): sono **sempre [[glossario#jwt-json-web-token|JSON Web Token (JWT)]]**, firmabili e/o cifrabili. OIDC definisce inoltre uno **Userinfo endpoint**: un servizio HTTP che, presentando l'access token, restituisce ulteriori dati sull'utente (indirizzo postale, foto profilo, …). Quali claim (le singole informazioni sull'utente contenute nel token, vedi sotto) stiano già nell'ID token e quali vadano richiesti via Userinfo è una scelta di configurazione dell'identity solution.
 
 ### JSON Web Token
 > 📖 pp.416-418
@@ -150,7 +150,7 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9 . eyJuYmYiOjEz[...]BlbmlkIn0 . Nt5pBRqGvDFn
 ### OAuth 2 and OIDC Flows
 > 📖 pp.418-419
 
-I **flow** specificano i messaggi da scambiare perché il client ottenga l'access o l'ID token. Per le SPA era stato originariamente definito l'**Implicit Flow** — corrisponde alla vista d'insieme descritta sopra — ma oggi si raccomanda l'**Authorization Code Flow** combinato con **PKCE** (*Proof Key for Code Exchange*); l'Implicit Flow è addirittura **deprecato** con OAuth 2.1.
+I **flow** sono le sequenze di messaggi da scambiare perché il client ottenga l'access o l'ID token. Per le SPA era stato originariamente definito l'**Implicit Flow** — corrisponde alla vista d'insieme descritta sopra — ma oggi si raccomanda l'**Authorization Code Flow** combinato con **[[glossario#pkce|PKCE]]** (*Proof Key for Code Exchange*); l'Implicit Flow è addirittura **deprecato** (sconsigliato e destinato a sparire) con OAuth 2.1.
 
 ```mermaid
 sequenceDiagram
@@ -177,11 +177,11 @@ Cosa ti serve sapere:
 ### Client-side OAuth 2
 > 📖 p.419
 
-Agli albori delle SPA si usava OAuth 2 **direttamente sul client**. Librerie come `angular-oauth2-oidc` gestiscono i dettagli del protocollo e restituiscono un access token, che il client può poi inoltrare all'API — per esempio via un **HttpInterceptor** che aggiunge l'header `Authorization: Bearer ...` (vedi [[12-initialization-route-changes]]).
+Agli albori delle SPA si usava OAuth 2 **direttamente sul client**. Librerie come `angular-oauth2-oidc` gestiscono i dettagli del protocollo e restituiscono un access token, che il client può poi inoltrare all'API — per esempio via un **[[glossario#interceptor-httpinterceptor|HttpInterceptor]]** (un filtro che intercetta le richieste HTTP in uscita) che aggiunge l'header `Authorization: Bearer ...` (vedi [[12-initialization-route-changes]]).
 
 C'è però un problema serio con OAuth 2 client-side:
 
-- L'access token è **solo una stringa** e non esiste un modo **sicuro** per conservarlo nel browser. Codice JavaScript malevolo iniettato nel client può rubarlo — e gli **injection attack** figurano da anni in alto nella OWASP Top 10.
+- L'access token è **solo una stringa** e non esiste un modo **sicuro** per conservarlo nel browser. Codice JavaScript malevolo iniettato nel client può rubarlo — e gli **injection attack** (attacchi in cui l'aggressore inietta codice ostile nella pagina, tipicamente via XSS) figurano da anni in alto nella OWASP Top 10 (la classifica di riferimento dei principali rischi di sicurezza web).
 - Non c'è un buon modo di **rinfrescare** i token nel browser. Per limitare la superficie d'attacco si usano access token **a vita breve** (anche 10 minuti) → serve un modo di ottenere un nuovo access token **senza interazione utente**, cioè il **token refresh**.
 - OAuth 2 prevede un **refresh token** scambiabile on demand per un nuovo access token (e un nuovo refresh token), ma un refresh token rubato consente di impersonare l'utente **a lungo termine**. Per questo OAuth 2 **non consente l'uso di refresh token nei browser**.
 
@@ -195,7 +195,7 @@ Per i rischi visti, l'OAuth 2 Working Group raccomanda (nel best practice *OAuth
 
 Per ricordare l'utente corrente, il backend emette un **session cookie**; in alternativa alla session server-side può emettere un cookie che contiene i token. Grazie ai security attribute `HttpOnly` e `SameSite` visti sopra, questo è più sicuro che maneggiare token nel browser.
 
-Per non spargere la logica server nelle API dell'app, la si incapsula in un **reverse proxy** riusabile — un **Backend for Frontend (BFF)**, che l'autore chiama anche **Authentication Gateway**:
+Per non spargere la logica server nelle API dell'app, la si incapsula in un **reverse proxy** riusabile (un intermediario che riceve le richieste del client e le inoltra ai servizi dietro di sé) — un **Backend for Frontend (BFF)**, che l'autore chiama anche **Authentication Gateway**:
 
 - Tutte le chiamate del client passano per il **gateway**.
 - Il gateway **ottiene e rinfresca** i token e li **inoltra** al resource server (Web API).
@@ -211,7 +211,7 @@ flowchart LR
 Il gateway può essere un componente riusabile in più progetti, oppure parte del backend-for-frontend (che racchiude tutta la logica server della SPA, Web API inclusa: in quel caso il gateway ne è solo una parte). Vantaggi: poiché i token non raggiungono mai il browser **molti degli attacchi visti non si applicano**, e il frontend si semplifica drasticamente — l'utente è autenticato **senza alcun codice frontend**. Per (ri)autenticare o fare logout basta **reindirizzare** l'utente a una URL del gateway; le info sull'utente corrente arrivano da un semplice servizio del gateway; il **token refresh** lo gestisce il gateway on demand.
 
 > [!tip]
-> Per maggiore sicurezza, **non** emettere access token validi su tutti i domini del sistema (sarebbe come girare sempre con una *master key*): ottieni un token **scoped** a un dominio e scambialo per token validi in altri domini **solo quando serve**.
+> Per maggiore sicurezza, **non** emettere access token validi su tutti i domini del sistema (sarebbe come girare sempre con una *master key*, una chiave che apre tutto): ottieni un token **scoped** a un dominio (valido solo per quel dominio) e scambialo per token validi in altri domini **solo quando serve**.
 
 Collegamenti: [[12-initialization-route-changes]] (auth guard come usability; `authInterceptor` che allega il `Bearer` token e gestisce 401/403) · [[17-defer-ssr-hydration]] (il BFF/gateway si combina con il rendering lato server).
 
