@@ -15,7 +15,7 @@ I **Signal Forms** colmano il divario fra la reattività basata su [[signal]] e 
 ## A First Signal Form
 > 📖 pp.157-162
 
-Lo store (`FlightDetailStore`, sullo stile del [[05-state-management-services-signals|cap.5]]) è responsabile della consistenza dei dati, quindi pubblica solo dati **read-only**. La form deve invece modificarli con un two-way binding, quindi serve una **copia di lavoro locale**, rappresentata da un [[linked-signal|linkedSignal]].
+Lo [[glossario#store|store]] (`FlightDetailStore`, sullo stile del [[05-state-management-services-signals|cap.5]]) è responsabile della consistenza dei dati, quindi pubblica solo dati **read-only**. La form deve invece modificarli con un two-way binding (legame a doppio senso: ciò che l'utente digita aggiorna il dato e viceversa), quindi serve una **copia di lavoro locale**, rappresentata da un [[linked-signal|linkedSignal]].
 
 ```ts
 // src/app/domains/ticketing/feature-booking/flight-edit/flight-edit.ts
@@ -44,7 +44,7 @@ export class FlightEdit {
 - Il parametro `path` (tipo `SchemaPathTree`) referenzia le singole proprietà da validare (`path.from`, `path.to`, ...).
 - `form()` ritorna un **FieldTree**, da legare ai controlli del template.
 
-`normalizeFlight` converte la data nel formato richiesto da `<input type="datetime-local">`: una stringa ISO **senza** designatore di timezone (es. `2030-12-24T17:30:00.000`).
+`normalizeFlight` converte la data nel formato richiesto da `<input type="datetime-local">`: una stringa ISO **senza** designatore di timezone (cioè senza il suffisso che indica il fuso orario, come la `Z` finale o `+02:00`) — es. `2030-12-24T17:30:00.000`.
 
 ```ts
 function normalizeFlight(flight: Flight): Flight {
@@ -111,7 +111,7 @@ Si importa la direttiva **`FormField`** (e `JsonPipe` per mostrare gli errori ne
 ## Working with Schemas
 > 📖 pp.163-170
 
-Lo schema non definisce solo le regole di validazione, ma anche altri aspetti del comportamento della form: debouncing, campi disabilitati/read-only/hidden in certe condizioni, validazione contro schemi esterni.
+Lo schema non definisce solo le regole di validazione, ma anche altri aspetti del comportamento della form: [[glossario#debounce-debouncing|debouncing]], campi disabilitati/read-only/hidden in certe condizioni, validazione contro schemi esterni.
 
 ### Using Separate Schemas
 > 📖 pp.163-164
@@ -150,7 +150,7 @@ export const flightFormSchema = schema<Flight>((path) => {
 ### Controlling Behavior
 > 📖 pp.164-166
 
-Lo schema può anche dichiarare quando un campo è `disabled`, `readonly` o `hidden`. La condizione si passa nell'oggetto opzioni tramite la proprietà **`when`**, che riceve il `ctx` di validazione.
+Lo schema può anche dichiarare quando un campo è `disabled`, `readonly` o `hidden`. La condizione si passa nell'oggetto opzioni tramite la proprietà **`when`**, che riceve il `ctx` di validazione (il *context*: un oggetto che dà accesso al valore e allo stato corrente degli altri campi, es. `ctx.valueOf(path.delayed)`).
 
 ```ts
 // disabilita delay quando il volo NON è in ritardo
@@ -221,7 +221,7 @@ debounce(path, (ctx, _abortSignal) => {
 ### Validating Against Zod / Standard Schema
 > 📖 pp.167-169
 
-`validateStandardSchema` valida la form contro uno schema **Zod** (o Valibot, o qualsiasi libreria conforme allo **Standard Schema**). Spesso queste regole esistono già lato server o sono generate da un JSON Schema/OpenAPI.
+`validateStandardSchema` valida la form contro uno schema **Zod** (o Valibot, o qualsiasi libreria conforme allo **Standard Schema** — uno standard comune che diverse librerie di validazione adottano, così Angular può lavorare con tutte allo stesso modo). Spesso queste regole esistono già lato server o sono generate da un JSON Schema/OpenAPI.
 
 ```ts
 // data/flight-schema.ts
@@ -305,7 +305,7 @@ protected async save(form: FieldTree<Flight>) {
 - `action`: funzione eseguita al submit; di default **non parte** se un validatore fallisce o è *pending* (validatore async che non ha ancora un risultato).
 - `ignoreValidators`: `none` (default, blocca su failing/pending), `pending` (ignora solo i pending), `all` (ignora tutto).
 - `onInvalid`: eseguito quando un validatore fallito blocca il submit.
-- `action` può **ritornare un `ValidationError`**: viene piazzato nel grafo della form e appare in `errorSummary()`.
+- `action` può **ritornare un `ValidationError`**: viene piazzato nel grafo della form (la struttura ad albero che rappresenta la form e tutti i suoi campi) e appare in `errorSummary()` (l'elenco di tutti gli errori del campo e dei suoi sotto-campi).
 
 ```ts
 private reportValidationError(form: FieldTree<Flight>): void {
@@ -339,7 +339,7 @@ Gli errori restituiti dal backend appaiono nel grafo della form; per mostrarli s
 </form>
 ```
 
-`formRoot` fa tre cose: disabilita il submit nativo (niente postback al server), disabilita la validazione HTML del browser (ci pensa Angular), collega l'`action` all'evento submit. Funziona anche premendo Invio.
+`formRoot` fa tre cose: disabilita il submit nativo (niente postback al server, cioè niente ricaricamento della pagina con invio dei dati al server come nelle pagine HTML tradizionali), disabilita la validazione HTML del browser (ci pensa Angular), collega l'`action` all'evento submit. Funziona anche premendo Invio.
 
 **Further Submit Actions** — per azioni aggiuntive (es. richiesta di approvazione) si usa un `<button type="button">` con la funzione `submit()`, che esegue la logica solo se la form è valida:
 
@@ -359,7 +359,7 @@ protected async requestApproval(): Promise<void> {
 ## Custom Validators
 > 📖 pp.174-185
 
-Logica di validazione oltre i built-in. Si usa `validate(path, lambda)`: la lambda riceve un `ctx` e ritorna `null` (nessun errore), un `ValidationError`, oppure un array di `ValidationError`. Ogni errore è identificato dalla stringa `kind` e può avere proprietà libere.
+Logica di validazione oltre i built-in. Si usa `validate(path, lambda)`: la lambda riceve un `ctx` e ritorna `null` (nessun errore), un `ValidationError`, oppure un array di `ValidationError`. Ogni errore è identificato dalla stringa `kind` (il "tipo" dell'errore) e può avere proprietà libere (campi extra che decidi tu, per portarti dietro dati utili, es. il valore rifiutato).
 
 ```ts
 // validatore inline nello schema
@@ -454,7 +454,7 @@ export function validateRoundTrip(path: SchemaPathTree<Flight>) {
 > [!warning]
 > Gli errori restano associati al **livello validato** del FieldTree: qui è il flight intero, non `from`/`to`. Per mostrarli servono `flightForm().errors()` (livello corrente) oppure `flightForm().errorSummary()` (include i livelli inferiori — qui conviene `[showFieldNames]="true"`). Gli errori dei livelli più bassi **non** compaiono in `errors`.
 
-**Accessing Sibling Fields** — in alternativa, validi solo `from` accedendo al sibling `to` con `ctx.valueOf(path.to)`; così l'errore appare nel campo `from`.
+**Accessing Sibling Fields** — in alternativa, validi solo `from` accedendo al sibling `to` (il campo "fratello", cioè un altro campo allo stesso livello) con `ctx.valueOf(path.to)`; così l'errore appare nel campo `from`.
 
 ```ts
 export function validateRoundTrip2(path: SchemaPathTree<Flight>) {
@@ -480,7 +480,7 @@ export function validateRoundTripTree(path: SchemaPathTree<Flight>) {
 }
 ```
 
-**Asynchronous Validators** — `validateAsync` definisce quattro mapping: `params` (stato → parametri), `factory` (crea una resource), `onSuccess` (risultato → `ValidationError | null`), `onError` (errore → `ValidationError | null`):
+**Asynchronous Validators** — validatori che fanno una chiamata asincrona (tipicamente al server) prima di dare il verdetto. `validateAsync` si configura con quattro funzioni: `params` (dallo stato del campo ricava i parametri della chiamata), `factory` (crea la resource, cioè l'oggetto che esegue la chiamata e ne segue il risultato), `onSuccess` (dal risultato → `ValidationError | null`), `onError` (dall'errore → `ValidationError | null`):
 
 ```ts
 import { rxResource } from '@angular/core/rxjs-interop';
@@ -713,7 +713,7 @@ Per convertire subito dopo la digitazione si può usare un *delegated signal* (v
 ## Custom Fields
 > 📖 pp.201-203
 
-Per usare `[formField]` con widget propri, il componente implementa l'interfaccia **`FormValueControl<T>`**, che richiede solo un [[model-signal|ModelSignal]] chiamato `value` (più proprietà opzionali come `disabled`, `errors`). Sostituisce il vecchio, scomodo *Control Value Accessor*.
+Per usare `[formField]` con widget propri (i tuoi componenti-controllo, es. uno stepper al posto del classico `<input>`), il componente implementa l'interfaccia **`FormValueControl<T>`**, che richiede solo un [[model-signal|ModelSignal]] chiamato `value` (più proprietà opzionali come `disabled`, `errors`). Sostituisce il vecchio, scomodo *Control Value Accessor* (l'interfaccia che nelle form classiche faceva da ponte fra il valore della form e il controllo personalizzato).
 
 ```ts
 // delay-stepper.ts — widget che incrementa il delay di 15 min
