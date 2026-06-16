@@ -7,7 +7,7 @@ tags: [tipo/capitolo, architecture]
 # 19 · Analyzing Your Architecture with Forensic Techniques
 > 📖 cap.19 · pp.456-465 — *Modern Angular* v2.0.0
 
-Dei buoni **domain boundary** rendono un sistema manutenibile nel lungo periodo (vedi [[08-sustainable-architectures]]). Ma come capire se la struttura definita all'inizio è ancora valida, e dove conviene migliorarla? L'approccio ovvio è analizzare le **dipendenze** fra le parti dell'app. La **forensic analysis** va oltre: tenendo conto anche dei **dati storici** del version control, scopre pattern nascosti che le sole dipendenze non rivelano.
+Dei buoni **domain boundary** (i confini fra i domini, cioè dove finisce un'area funzionale e ne inizia un'altra) rendono un sistema manutenibile nel lungo periodo (vedi [[08-sustainable-architectures]]). Ma come capire se la struttura definita all'inizio è ancora valida, e dove conviene migliorarla? L'approccio ovvio è analizzare le **dipendenze** fra le parti dell'app. La **forensic analysis** (analisi "forense", cioè in stile scena del crimine: si parte dalle tracce lasciate nella storia del codice per ricostruire com'è fatto davvero) va oltre: tenendo conto anche dei **dati storici** del version control (la storia dei commit registrata da Git), scopre pattern nascosti che le sole dipendenze non rivelano.
 
 Il capitolo mostra cosa può rivelare, dal punto di vista architetturale, la forensic analysis di un'app Angular. Lo strumento usato è **Detective** (open-source, di Angular Architects), ispirato al libro *Your Code as a Crime Scene* di Adam Tornhill, di cui implementa parzialmente le idee.
 
@@ -26,10 +26,10 @@ L'app demo è divisa in **due domini**, più un'area `shared` che fornisce compo
 
 Il collegamento `ticketing → shared` è disegnato **più spesso** di `booking → shared`: indica più dipendenze (il tooltip mostra il numero concreto). A prima vista tutto torna: due domini separati che condividono qualche implementazione tecnica.
 
-Aprendo i tre blocchi (drill-down) si vede che **dentro** ogni dominio ci sono molte dipendenze. Anche questo è un buon segno: significa che ogni dominio si occupa di un'area di responsabilità coerente. È la **high cohesion**: idealmente la maggior parte dei cambiamenti resta isolata dentro un dominio e non tocca gli altri.
+Aprendo i tre blocchi (drill-down, cioè scendendo nel dettaglio di ciascuno) si vede che **dentro** ogni dominio ci sono molte dipendenze. Anche questo è un buon segno: significa che ogni dominio si occupa di un'area di responsabilità coerente. È la **high cohesion** (alta coesione: le cose che cambiano insieme stanno insieme): idealmente la maggior parte dei cambiamenti resta isolata dentro un dominio e non tocca gli altri.
 
 > [!tip]
-> **High cohesion** dentro i domini e **low coupling** fra i domini sono due facce della stessa medaglia: entrambi servono a far evolvere i domini in modo il più possibile indipendente. Lo sviluppatore non deve tenere a mente tutto il sistema → meno carico cognitivo, più focus, meno errori, lead time più brevi. Idealmente il taglio dei domini correla anche con la struttura dei team, dando team self-sufficient che si concentrano ciascuno sul proprio dominio (vedi [[#Team Alignment and Conway's Law]]).
+> **High cohesion** dentro i domini e **low coupling** fra i domini (basso accoppiamento: pochi legami che li tengono attaccati l'uno all'altro) sono due facce della stessa medaglia: entrambi servono a far evolvere i domini in modo il più possibile indipendente. Lo sviluppatore non deve tenere a mente tutto il sistema → meno carico cognitivo, più focus, meno errori, lead time più brevi (passa meno tempo dall'inizio del lavoro alla consegna). Idealmente il taglio dei domini correla anche con la struttura dei team, dando team self-sufficient (autosufficienti: ciascuno lavora sul proprio dominio senza dipendere dagli altri) che si concentrano ciascuno sul proprio dominio (vedi [[#Team Alignment and Conway's Law]]).
 
 ## Analyzing Layering
 > 📖 pp.457-458
@@ -43,7 +43,7 @@ domain    → tipi che rappresentano gli oggetti ricevuti + servizi che parlano 
 util      → funzioni ausiliarie (authentication, logging, ...)
 ```
 
-Questi layer si allineano alle idee del team **Nx** e si sono dimostrati validi nei progetti degli autori, soprattutto perché bilanciano bene beneficio e overhead. Sono anche adattabili al singolo progetto: alcuni clienti splittano il layer `data` in due (un layer fa data access, l'altro fornisce i tipi associati), così i dumb component vedono solo i tipi, dato che non devono parlare autonomamente col backend.
+Questi layer si allineano alle idee del team **Nx** e si sono dimostrati validi nei progetti degli autori, soprattutto perché bilanciano bene beneficio e overhead (il costo aggiuntivo in complessità e lavoro che la struttura ti impone). Sono anche adattabili al singolo progetto: alcuni clienti splittano il layer `data` in due (un layer fa data access — cioè legge/scrive i dati dal backend —, l'altro fornisce i tipi associati), così i dumb component vedono solo i tipi, dato che non devono parlare autonomamente col backend.
 
 La funzionalità che `feature-my-tickets` vuole condividere con `feature-next-flights` può essere gestita in vari modi:
 - spostare dumb component e servizi nei layer `ui` e `data`;
@@ -95,7 +95,7 @@ graph LR
   A <-. cambiati spesso insieme<br/>(change coupling) .-> B
 ```
 
-Nella demo emerge che il coupling fra i domini `check-in` e `ticketing` **non è basso** come sembrava dopo l'analisi strutturale. Sapendo che i domain boundary perfetti non esistono, questo insight diventa base di discussione: si può ritagliare diversamente l'intersezione fra i domini per favorire cohesion più alta e coupling più basso, puntando a una migliore separation of concerns. Qui aiuta l'idea di **bounded context** del Domain-driven Design.
+Nella demo emerge che il coupling fra i domini `check-in` e `ticketing` **non è basso** come sembrava dopo l'analisi strutturale. Sapendo che i domain boundary perfetti non esistono, questo insight (questa scoperta) diventa base di discussione: si può ritagliare diversamente l'intersezione fra i domini per favorire cohesion più alta e coupling più basso, puntando a una migliore separation of concerns (separazione delle responsabilità: ogni parte fa una cosa sola e ben definita). Qui aiuta l'idea di **bounded context** del Domain-driven Design (il "contesto delimitato": una porzione del sistema con un proprio modello e vocabolario coerenti, con confini netti verso il resto).
 
 > [!tip]
 > Se la discussione conclude che le alternative hanno svantaggi maggiori, la decisione è **mantenere** l'implementazione attuale. Anche in quel caso l'analisi è servita: ha reso consapevoli dei trade-off necessari.
@@ -103,7 +103,7 @@ Nella demo emerge che il coupling fra i domini `check-in` e `ticketing` **non è
 ## Hotspots as an Indicator of Architectural Problems
 > 📖 pp.461-462
 
-Se lo **stesso file** viene modificato molto spesso può esserci un problema di architettura e di modularizzazione: magari un componente centrale da cui troppi domini dipendono, oppure un file editato di continuo per motivi diversi, segno che ha troppe responsabilità. Inoltre è ormai noto che un alto **code churn** (molte modifiche agli stessi file) correla con un tasso di errore più elevato.
+Se lo **stesso file** viene modificato molto spesso può esserci un problema di architettura e di modularizzazione: magari un componente centrale da cui troppi domini dipendono, oppure un file editato di continuo per motivi diversi, segno che ha troppe responsabilità. Inoltre è ormai noto che un alto **code churn** (il "ricambio" del codice: quante volte le stesse righe/file vengono toccate nel tempo) correla con un tasso di errore più elevato.
 
 Ovviamente conta se il file è semplice o complesso: un file con la lista delle voci di menu, che cresce di poche righe a ogni nuova feature, ha churn alto ma **non è critico**, perché la sua struttura non è complessa. Per questo Tornhill raccomanda di pesare il **churn** contro la **complessità**.
 
@@ -135,15 +135,15 @@ Ma l'allineamento *ufficiale* fra team e domini non garantisce che sia *praticat
 
 Nella demo non c'è un allineamento chiaro fra team e domini: sembra piuttosto che i team Alpha e Beta supportino il team Gamma. La situazione va indagata: forse serve un'altra struttura di team che correli meglio con i domain boundary, oppure sono i domain boundary a dover essere aggiustati. Altre cause possibili: aderenza a vecchie strutture organizzative, distribuzione dei task fra team per ragioni tecniche, fattori storici — es. Gamma ha iniziato a sviluppare prima degli altri team, poi Alpha ha preso in carico `ticketing`. Ipotesi del genere si testano in fretta **limitando il periodo di analisi**.
 
-Poiché `shared` non è un'unità omogenea ma una collezione eterogenea di moduli riusabili, l'analisi va **ripetuta a livello di modulo**, per vedere se ci sono dei lead author. Per i moduli tecnici riusabili, però, contano più le **responsabilità chiare** dell'allineamento stretto team/codice: tra l'altro evitano che contributi di team diversi causino breaking change.
+Poiché `shared` non è un'unità omogenea ma una collezione eterogenea di moduli riusabili, l'analisi va **ripetuta a livello di modulo**, per vedere se ci sono dei lead author (gli autori principali: chi ha scritto la maggior parte di quel modulo). Per i moduli tecnici riusabili, però, contano più le **responsabilità chiare** dell'allineamento stretto team/codice: tra l'altro evitano che contributi di team diversi causino breaking change (modifiche che rompono il codice di chi usa quel modulo).
 
-Assegnando gli **ex membri** a un team artificiale a parte si può anche scoprire una **perdita di conoscenza** dovuta alla loro uscita. L'approccio si estende a ragionamenti **what-if**, per capire se la conoscenza vada distribuita meglio all'interno dei team.
+Assegnando gli **ex membri** a un team artificiale a parte si può anche scoprire una **perdita di conoscenza** dovuta alla loro uscita. L'approccio si estende a ragionamenti **what-if** (scenari ipotetici "e se...": si simula un cambiamento per vederne l'effetto), per capire se la conoscenza vada distribuita meglio all'interno dei team.
 
 ## From Detective to Code Scene
 > 📖 p.464
 
 La forensic analysis descritta può essere migliorata ulteriormente:
-- **raggruppare i commit** dello stesso feature branch o che referenziano lo stesso ticket ID, per non perdere il change coupling quando un dominio viene cambiato in commit separati;
+- **raggruppare i commit** dello stesso feature branch (il ramo Git dedicato a una singola funzionalità) o che referenziano lo stesso ticket ID (il codice della task/issue), per non perdere il change coupling quando un dominio viene cambiato in commit separati;
 - negli hotspot, considerare anche **come è distribuita la conoscenza**: se una sola persona conosce il codice dell'hotspot, la sua criticità aumenta;
 - vedere come il sistema **è evoluto nel tempo** (coupling, team alignment e hotspot sono migliorati o peggiorati nelle ultime iterazioni?).
 
