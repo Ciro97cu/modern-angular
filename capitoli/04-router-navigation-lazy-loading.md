@@ -7,7 +7,7 @@ tags: [tipo/capitolo, routing, di, performance, angular-22]
 # 04 · Navigation & Lazy Loading with the Router
 > 📖 cap.4 · pp.99-131 — *Modern Angular* v2.0.0
 
-In una SPA le "pagine" si simulano mostrando e nascondendo componenti, ma non basta: perché back button, bookmark e history del browser funzionino, ogni cambio di stato deve riflettersi nell'**URL**. Il **Router** di Angular automatizza tutto questo: mappa **path** → **componenti** e li attiva in un **placeholder** (`<router-outlet>`), tenendo l'URL sincronizzato con la vista corrente. Il capitolo copre: configurazione del routing, navigazione (link e programmatica), route parametrizzate, child routes, lazy loading e preloading, query string e hash fragment, e le due strategie di location (path vs hash).
+In una SPA le "pagine" si simulano mostrando e nascondendo componenti, ma non basta: perché back button, bookmark e history del browser funzionino, ogni cambio di stato deve riflettersi nell'**URL**. Il **Router** di Angular automatizza tutto questo: mappa **path** → **componenti** e li attiva in un **placeholder** (`<router-outlet>`), tenendo l'URL sincronizzato con la vista corrente. Il capitolo copre: configurazione del routing, navigazione (link e programmatica), route parametrizzate, child routes, [[glossario#lazy-loading|lazy loading]] e preloading, query string e hash fragment, e le due strategie di location (path vs hash).
 
 > [!tip]
 > In un'app Angular convivono più configurazioni di routing: `app.routes.ts` contiene le route necessarie fin dall'avvio; altre config vengono caricate **on demand** per singola feature o dominio (vedi lazy loading).
@@ -163,7 +163,7 @@ export class MyComponent {
 }
 ```
 
-`navigate` prende il path come **array**: ogni elemento è un segmento dell'URL, viene URL-encodato e i segmenti vengono concatenati per identificare la route di destinazione.
+`navigate` prende il path come **array**: ogni elemento è un segmento dell'URL, viene URL-encodato (i caratteri speciali come spazi o `/` vengono convertiti in una forma sicura per l'URL, es. lo spazio diventa `%20`) e i segmenti vengono concatenati per identificare la route di destinazione.
 
 ```ts
 this.router.navigate(['/a', 'b', id]); // con id=17 → attiva /a/b/17
@@ -260,7 +260,7 @@ export class FlightEdit {
 ```
 
 > [!tip]
-> `withComponentInputBinding` elimina il subscribe manuale: gli [[signal-input|input()]] diventano la fonte reattiva dei parametri. Usa i transformer `numberAttribute` / `booleanAttribute` per la conversione di tipo, dato che i routing parameter sono sempre stringhe.
+> `withComponentInputBinding` elimina il subscribe manuale: gli [[signal-input|input()]] diventano la fonte reattiva dei parametri. Usa i transformer (piccole funzioni che convertono il valore in ingresso prima che arrivi all'input) `numberAttribute` / `booleanAttribute` per la conversione di tipo, dato che i routing parameter sono sempre stringhe.
 
 ### Configuring & Linking parameterized routes
 
@@ -384,7 +384,7 @@ export const ticketingRoutes: Routes = [
 },
 ```
 
-`loadChildren` punta a una lambda che carica le route on demand e le ritorna via Promise. Il dynamic `import()` carica un modulo TypeScript; il `.then` mappa quel modulo alla config di routing che esporta. Se il file ha un **default export**, si salta il `.then`:
+`loadChildren` punta a una lambda (una funzione anonima, la `() => ...`) che carica le route on demand e le ritorna via Promise (un valore "promesso" che arriva quando il caricamento è finito). Il dynamic `import()` carica un modulo TypeScript; il `.then` mappa quel modulo alla config di routing che esporta. Se il file ha un **default export**, si salta il `.then`:
 
 ```ts
 // src/app/domains/ticketing/ticketing.routes.ts
@@ -418,7 +418,7 @@ Verifica nel browser: nell'output di `ng serve` compare un **bundle separato**; 
 ## Preloading
 > 📖 p.125
 
-Il preloading si costruisce sul lazy loading: usa le risorse idle **dopo l'avvio** per caricare in background i bundle lazy prima che servano, così quando il Router ne ha bisogno sono già disponibili. Si attiva con la feature `withPreloading` più una strategia.
+Il preloading si costruisce sul lazy loading: usa le risorse idle (i tempi morti in cui browser e rete non hanno nulla da fare) **dopo l'avvio** per caricare in background i bundle lazy prima che servano, così quando il Router ne ha bisogno sono già disponibili. Si attiva con la feature `withPreloading` più una strategia.
 
 ```ts
 // src/app/app.config.ts
@@ -434,7 +434,7 @@ provideRouter(
 `PreloadAllModules` (built-in) precarica **tutte** le route lazy subito dopo lo startup: l'app parte veloce (senza i lazy) e poi li scarica in background, così è molto probabile che siano pronti al bisogno. Se l'utente attiva una route lazy prima che il preloading la carichi, si torna al lazy loading classico.
 
 > [!tip]
-> Strategie out-of-the-box: `NoPreloading` (default) e `PreloadAllModules`. Per logiche custom implementa un service che soddisfa l'interfaccia `PreloadingStrategy` — ma prima verifica se le due built-in (o soluzioni di terze parti come `ngx-quicklink`, che precarica le route i cui link entrano nel viewport, o `guess.js`, che usa il ML per predire la prossima route) bastano già.
+> Strategie out-of-the-box (già pronte, incluse in Angular senza installare nulla): `NoPreloading` (default) e `PreloadAllModules`. Per logiche custom implementa un service che soddisfa l'interfaccia `PreloadingStrategy` — ma prima verifica se le due built-in (o soluzioni di terze parti come `ngx-quicklink`, che precarica le route i cui link entrano nel viewport, o `guess.js`, che usa il machine learning per predire la prossima route che l'utente visiterà) bastano già.
 
 ## Query Strings & Hash Fragments
 > 📖 pp.126-127
@@ -515,7 +515,7 @@ provideRouter(
 Vantaggio: niente redirect server-side né `<base>` da configurare — la separazione tra parte server-side e route client-side è data direttamente dall'hash nell'URL.
 
 > [!warning]
-> Con `HashLocationStrategy` l'URL appare meno "naturale" all'utente e **non funziona il server-side rendering** delle singole route ([[17-defer-ssr-hydration|cap.17]]): l'hash fragment non viene inviato al server.
+> Con `HashLocationStrategy` l'URL appare meno "naturale" all'utente e **non funziona il [[glossario#ssr-server-side-rendering|server-side rendering]]** delle singole route ([[17-defer-ssr-hydration|cap.17]]): l'hash fragment non viene inviato al server.
 
 Collegamenti: [[providers]] · [[17-defer-ssr-hydration]].
 
