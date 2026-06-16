@@ -95,7 +95,7 @@ Si attiva il browser nel nodo `projects/<project-name>/architect/test` di `angul
 }
 ```
 
-- Browser supportati dal provider Playwright: `Chromium`, `Firefox`, `Webkit` (Safari), più le varianti headless (`ChromiumHeadless`, `FirefoxHeadless`, `WebkitHeadless`).
+- Browser supportati dal provider Playwright: `Chromium`, `Firefox`, `Webkit` (Safari), più le varianti **headless** (browser che gira senza finestra grafica, tipico in CI dove non c'è uno schermo): `ChromiumHeadless`, `FirefoxHeadless`, `WebkitHeadless`.
 - Di default la CLI parte in **watch mode** (ri-esegue i test a ogni modifica): feedback rapido in sviluppo. In CI conviene eseguirli una sola volta → `watch: false` nella configurazione `ci`.
 
 ## Running Tests
@@ -155,7 +155,7 @@ Collegamenti: [[inject]] · [[providers]] · [[04-router-navigation-lazy-loading
 ## A First Component Test & Locators
 > 📖 pp.210-212
 
-Il primo test tratta il componente — più o meno — come una **black box**: interagisce via DOM, come farebbe l'utente. In browser mode Vitest fornisce l'oggetto **`page`**; usando **`expect.element`** (invece del semplice `expect`) si ottengono assert "browser-aware" (es. `toBeDisabled`).
+Il primo test tratta il componente — più o meno — come una **black box** (scatola nera: non si guarda dentro al codice, si interagisce solo da fuori): interagisce via DOM, come farebbe l'utente. In browser mode Vitest fornisce l'oggetto **`page`**; usando **`expect.element`** (invece del semplice `expect`) si ottengono assert "browser-aware" (es. `toBeDisabled`).
 
 ```ts
 import { page } from 'vitest/browser';
@@ -207,7 +207,7 @@ Per accedere subito al nodo DOM dietro un locator: `.element()` (o `.elements()`
 ## Locating Elements via DebugElement
 > 📖 p.213
 
-Anche il `debugElement` della fixture permette query sul DOM, ma tramite **selettori CSS** (non ARIA). È più di **basso livello** e quindi più verboso: niente retry integrato, e devi **dispatchare a mano** l'evento `input` per notificare ad Angular il cambio di valore.
+Anche il `debugElement` della fixture permette query sul DOM, ma tramite **selettori CSS** (non ARIA). È più di **basso livello** (lavori più vicino al DOM, scrivendo a mano cose che `page` farebbe per te) e quindi più verboso: niente retry integrato, e devi **dispatchare a mano** l'evento `input` (cioè scatenarlo tu via codice) per notificare ad Angular il cambio di valore.
 
 ```ts
 import { By } from '@angular/platform-browser';
@@ -261,7 +261,7 @@ Poi registra il file per il builder `unit-test` in `angular.json`:
 ## Mocking Services
 > 📖 pp.214-216
 
-I test isolano l'oggetto sotto test dalle sue dipendenze: così gli errori sono attribuibili con chiarezza e i test restano veloci e affidabili, senza dipendere da sistemi esterni. Si sostituiscono con **mock** (implementazioni semplificate); le **spy**, invece, monitorano le chiamate (con quali parametri e quante volte). Grazie alla DI di Angular basta dire al `TestBed` di fornire un mock al posto del servizio reale — qui il `ConfigService`, che espone dati di configurazione come la base URL del backend.
+I test isolano l'oggetto sotto test dalle sue dipendenze: così gli errori sono attribuibili con chiarezza e i test restano veloci e affidabili, senza dipendere da sistemi esterni. Si sostituiscono con **mock** (implementazioni semplificate); le **spy**, invece, monitorano le chiamate (con quali parametri e quante volte). Grazie alla [[glossario#dependency-injection-di|DI]] di Angular (il meccanismo con cui Angular fornisce le dipendenze a un componente) basta dire al `TestBed` di fornire un mock al posto del servizio reale — qui il `ConfigService`, che espone dati di configurazione come la base URL del backend.
 
 ```ts
 import { ConfigService } from '../domains/shared/util-common/config-service';
@@ -387,7 +387,7 @@ describe('flight-search', () => {
 Una volta inclusi i mock provider, si può iniettare l'**`HttpTestingController`**: informa di ogni richiesta HTTP scatenata e ne accetta la risposta fake. **Ogni chiamata resta in pausa** finché il test non risponde con `flush(...)`. L'app carica già alcuni voli allo startup via `httpResource`: bisogna gestire quella richiesta, altrimenti la resource resterebbe appesa all'infinito e il componente non uscirebbe mai dallo stato di loading.
 
 > [!warning]
-> L'`httpResource` **non** esegue la chiamata HTTP subito: internamente usa un [[effect]] che osserva il request signal, e per definizione gli effect girano in un **microtask successivo** (per evitare stati intermedi inutili). Quindi prima di `expectOne` bisogna **attendere** che l'effect parta con `vi.waitFor(...)` (riprova la funzione finché ha successo o scatta il timeout). Senza, la richiesta non esiste ancora e il componente resta in loading.
+> L'`httpResource` **non** esegue la chiamata HTTP subito: internamente usa un [[effect]] che osserva il request signal, e per definizione gli effect girano in un **microtask successivo** (un microtask è un compito che il browser esegue subito dopo il codice in corso, prima del prossimo "giro" dell'event loop: qui serve a evitare stati intermedi inutili). Quindi prima di `expectOne` bisogna **attendere** che l'effect parta con `vi.waitFor(...)` (riprova la funzione finché ha successo o scatta il timeout). Senza, la richiesta non esiste ancora e il componente resta in loading.
 
 ```ts
 const request = await vi.waitFor(
@@ -439,7 +439,7 @@ Collegamenti: [[resource|httpResource]] · [[02-signal-based-components]] (la fe
 ## Gray-Box Testing with Spies
 > 📖 pp.221-222
 
-Idealmente il test si concentra sul **comportamento** dell'oggetto sotto test, senza assunzioni sul suo funzionamento interno. A volte però conviene verificare che certi metodi **interni** vengano chiamati correttamente → test **gray-box**, dove si conoscono alcuni dettagli interni. Le **spy** di Vitest (`vi.spyOn`) sono proxy che decorano una funzione/metodo e ricordano con quali parametri è stata chiamata e quante volte.
+Idealmente il test si concentra sul **comportamento** dell'oggetto sotto test, senza assunzioni sul suo funzionamento interno. A volte però conviene verificare che certi metodi **interni** vengano chiamati correttamente → test **gray-box** (scatola grigia: una via di mezzo, dove si conoscono alcuni dettagli interni e non solo l'esterno come nella black box). Le **spy** di Vitest (`vi.spyOn`) avvolgono una funzione/metodo (gli stanno "intorno" senza cambiarne il comportamento) e ricordano con quali parametri è stata chiamata e quante volte.
 
 ```ts
 // .../feature-booking/flight-search/flight-search.spec.ts
@@ -523,7 +523,7 @@ Collegamenti: [[04-router-navigation-lazy-loading]].
 ## Testing Timers & Debouncing — Mocking Delays
 > 📖 pp.223-224
 
-Componenti e servizi usano timer per ritardare certe azioni: il caso tipico è il **debounce** dell'input, per evitare elaborazioni eccessive. Quando possibile, gli autori raccomandano di **mockare** i ritardi per tenere i test veloci e affidabili. Perché ciò sia possibile, i tempi di debounce non vanno hardcodati: si espongono via un settings object così da poterli sovrascrivere.
+Componenti e servizi usano timer per ritardare certe azioni: il caso tipico è il [[glossario#debounce-debouncing|debounce]] dell'input (aspetta che l'utente smetta di digitare prima di reagire, invece di reagire a ogni tasto), per evitare elaborazioni eccessive. Quando possibile, gli autori raccomandano di **mockare** i ritardi per tenere i test veloci e affidabili. Perché ciò sia possibile, i tempi di debounce non vanno scritti fissi nel codice (*hardcodati*): si espongono via un oggetto di configurazione (*settings object*) così da poterli sovrascrivere.
 
 ```ts
 // src/app/domains/shared/util-common/app-settings.ts
