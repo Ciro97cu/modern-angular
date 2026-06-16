@@ -10,14 +10,14 @@ tags: [tipo/capitolo, ssr, performance, angular-22]
 Le SPA hanno ottime performance a runtime, ma il **primo caricamento** è spesso più lento di qualche secondo rispetto a un sito classico server-rendered: il browser non riceve solo l'HTML, ma deve anche scaricare ed eseguire una quantità significativa di JavaScript prima di poter renderizzare l'applicazione. Il *First Meaningful Paint* (FMP) arriva quindi tardi. Per app aziendali interne il ritardo può essere accettabile; per soluzioni pubbliche come web shop e landing page diventa un problema (più secondi di attesa = più bounce).
 
 Il capitolo presenta tre meccanismi complementari:
-- **Deferrable views** (`@defer`): rimandano le regioni non critiche.
-- **SSR** (server-side rendering): invia HTML già pronto da dipingere.
-- **Hydration**: rende interattivo quell'HTML sul client, eventualmente a step incrementali.
+- **[[glossario#deferrable-view-defer|Deferrable views]]** (`@defer`): rimandano le regioni non critiche (le caricano dopo, non subito).
+- **[[glossario#ssr-server-side-rendering|SSR]]** (server-side rendering): invia HTML già pronto da dipingere (la pagina è renderizzata sul server e arriva già "disegnabile").
+- **[[glossario#hydration|Hydration]]**: rende interattivo quell'HTML sul client (gli "aggancia" il JavaScript così bottoni, form ecc. rispondono), eventualmente a step incrementali.
 
 ## Deferrable Views — `@defer`
 > 📖 pp.422-423
 
-Non tutte le aree di una pagina contano allo stesso modo. Sulla pagina di ricerca voli, form e lista risultati sono primari; i pannelli opzionali (noleggio auto, hotel, tenda) sono secondari. Caricarne il codice subito appesantisce inutilmente il bundle iniziale. Con `@defer` si avvolge la regione: Angular ne **splitta il codice in un bundle separato** e lo carica solo allo scattare di un trigger. Nel frattempo `@placeholder` fornisce contenuto alternativo, così il layout non "salta".
+Non tutte le aree di una pagina contano allo stesso modo. Sulla pagina di ricerca voli, form e lista risultati sono primari; i pannelli opzionali (noleggio auto, hotel, tenda) sono secondari. Caricarne il codice subito appesantisce inutilmente il bundle iniziale (il pacchetto JavaScript scaricato all'avvio). Con `@defer` si avvolge la regione: Angular ne **splitta il codice in un bundle separato** (lo isola in un pacchetto a parte) e lo carica solo allo scattare di un trigger (un evento che fa partire il caricamento). Nel frattempo `@placeholder` fornisce contenuto alternativo, così il layout non "salta" (non si riassesta bruscamente quando arriva il contenuto vero).
 
 ```html
 <!-- .../ticketing/feature-booking/flight-search/flight-search.html -->
@@ -28,9 +28,9 @@ Non tutte le aree di una pagina contano allo stesso modo. Sulla pagina di ricerc
 }
 ```
 
-Nella demo i pannelli opzionali mostrano prima dei ghost element; appena il bundle è caricato, `@defer` scambia il placeholder col contenuto reale.
+Nella demo i pannelli opzionali mostrano prima dei ghost element (sagome grigie segnaposto che imitano la forma del contenuto in arrivo); appena il bundle è caricato, `@defer` scambia il placeholder col contenuto reale.
 
-Oltre a `@placeholder`, `@defer` supporta `@loading` (mostrato mentre si scarica il bundle) e `@error` (se il caricamento fallisce). Per evitare flicker:
+Oltre a `@placeholder`, `@defer` supporta `@loading` (mostrato mentre si scarica il bundle) e `@error` (se il caricamento fallisce). Per evitare flicker (lo sfarfallio di elementi che appaiono e spariscono troppo in fretta):
 - `minimum` su `@placeholder`/`@loading` → durata minima di visualizzazione.
 - `after` su `@loading` → ritarda lo spinner finché il caricamento non supera la soglia indicata.
 
@@ -47,7 +47,7 @@ Oltre a `@placeholder`, `@defer` supporta `@loading` (mostrato mentre si scarica
 ```
 
 > [!tip]
-> Usa `@defer` per UI che chiaramente **non** serve alla prima interazione utile. Differire la navigazione core o le azioni primarie costringe l'utente a uno stato di loading proprio quando ha bisogno di quella funzionalità: danneggia la *perceived performance*.
+> Usa `@defer` per UI che chiaramente **non** serve alla prima interazione utile. Differire (rimandare) la navigazione core o le azioni primarie costringe l'utente a uno stato di loading proprio quando ha bisogno di quella funzionalità: danneggia la *perceived performance* (la velocità che l'utente percepisce, a prescindere dai tempi reali).
 
 ### Triggers
 > 📖 pp.423-424
@@ -64,9 +64,9 @@ Insieme fisso di trigger su `@defer`:
 | `on timer(duration)` | dopo una durata, es. `on timer(5s)` |
 | `when (condition)` | quando la condizione è vera, es. `when (userName() !== null)` |
 
-Di default `on viewport`, `on interaction` e `on hover` **richiedono un `@placeholder`**. In alternativa possono riferirsi a un altro elemento via template variable: `@defer (on viewport(recommendations)) { … }` con un corrispondente `#recommendations` su qualche elemento.
+Di default `on viewport`, `on interaction` e `on hover` **richiedono un `@placeholder`**. In alternativa possono riferirsi a un altro elemento via [[glossario#template-variable|template variable]] (un riferimento `#nome` dato a un elemento nel template): `@defer (on viewport(recommendations)) { … }` con un corrispondente `#recommendations` su qualche elemento.
 
-**Prefetch**: si può anticipare il download del bundle senza inserire subito il contenuto. `@defer (on viewport; prefetch on immediate)` inizia a caricare appena possibile, ma scambia il contenuto solo quando il placeholder entra nel viewport.
+**Prefetch** (pre-caricamento): si può anticipare il download del bundle senza inserire subito il contenuto. `@defer (on viewport; prefetch on immediate)` inizia a caricare appena possibile, ma scambia il contenuto solo quando il placeholder entra nel viewport (l'area visibile dello schermo).
 
 ```html
 @defer (on viewport; prefetch on immediate) {
@@ -76,7 +76,7 @@ Di default `on viewport`, `on interaction` e `on hover` **richiedono un `@placeh
 }
 ```
 
-Collegamenti: il code-splitting/lazy loading è lo stesso tema del [[04-router-navigation-lazy-loading|cap.4]] applicato a livello di template.
+Collegamenti: il code-splitting/[[glossario#lazy-loading|lazy loading]] (caricare il codice solo quando serve, non tutto all'avvio) è lo stesso tema del [[04-router-navigation-lazy-loading|cap.4]] applicato a livello di template.
 
 ## SSR & Hydration
 > 📖 pp.424-425
@@ -129,7 +129,7 @@ Collegamenti: [[providers]] · le provider function (`provide*`/`with*`).
 ### Incremental Hydration
 > 📖 pp.425-426
 
-L'hydration **non deve avvenire tutta in una volta**. I bundle si richiedono solo quando servono — il più tardi possibile, idealmente mai per le regioni che l'utente non tocca. Le parti più importanti diventano interattive prima; le meno importanti dopo. Si abbina naturalmente a `@defer`: le regioni da idratare on-demand si marcano con `@defer` e la clausola **`hydrate`** dice *quando* idratare.
+L'[[glossario#incremental-hydration|hydration incrementale]] vuol dire che l'hydration **non deve avvenire tutta in una volta**. I bundle si richiedono solo quando servono — il più tardi possibile, idealmente mai per le regioni che l'utente non tocca. Le parti più importanti diventano interattive prima; le meno importanti dopo. Si abbina naturalmente a `@defer`: le regioni da idratare on-demand (su richiesta, solo al bisogno) si marcano con `@defer` e la clausola **`hydrate`** dice *quando* idratare.
 
 > [!info] Angular 22+ · Hydration incrementale di default
 > Da **Angular 22** `provideClientHydration()` attiva l'hydration incrementale da sola: la feature esplicita `withIncrementalHydration()` non serve più ed è tenuta solo per gli scenari di opt-out. Per disattivarla usa la nuova feature **`withNoIncrementalHydration()`**.
@@ -160,12 +160,12 @@ Trigger di hydration disponibili:
 | `hydrate never` | nessuna hydration; anche i `@defer` annidati restano statici |
 
 > [!warning]
-> Per l'hydration *non distruttiva* il markup server-rendered deve **combaciare** con quello che Angular renderizzerebbe sul client. Componenti o librerie di terze parti che manipolano il DOM direttamente possono violare questo vincolo. Per escluderli usa l'attributo `ngSkipHydration` sull'host element: Angular **non** ammette data binding su questo attributo (deve essere assente o impostato a `'true'`). Per escludere un componente per default, mettilo nei `host` metadata: `host: { 'ngSkipHydration': 'true' }`. Se più app Angular convivono sulla stessa pagina, vanno distinte via token `APP_ID` perché l'hydration colpisca l'app giusta.
+> Per l'hydration *non distruttiva* (che riusa il markup del server senza buttarlo via e ricostruirlo) il markup server-rendered deve **combaciare** con quello che Angular renderizzerebbe sul client. Componenti o librerie di terze parti che manipolano il DOM direttamente possono violare questo vincolo. Per escluderli usa l'attributo `ngSkipHydration` sull'[[glossario#host-elemento-host|host element]] (l'elemento DOM su cui vive il componente): Angular **non** ammette data binding su questo attributo (deve essere assente o impostato a `'true'`). Per escludere un componente per default, mettilo nei `host` metadata: `host: { 'ngSkipHydration': 'true' }`. Se più app Angular convivono sulla stessa pagina, vanno distinte via token `APP_ID` perché l'hydration colpisca l'app giusta.
 
 ### Event Replay
 > 📖 p.428
 
-Il periodo tra FMP e *Time to Interactive* — la **Uncanny Valley** — è quando l'utente già vede la pagina ma il JavaScript che gestisce le interazioni non è ancora caricato: i click e gli altri eventi andrebbero persi. L'**Event Replay** lo evita: un piccolo script incluso nell'HTML server-rendered si carica con la risposta iniziale e **registra** le interazioni (click, input nei form, ecc.) avvenute prima del termine dell'hydration. Quando l'app è interattiva, Angular **rigioca** gli eventi registrati, così nulla va perso.
+Il periodo tra FMP e *Time to Interactive* (il momento in cui la pagina risponde davvero alle interazioni) — la **Uncanny Valley** — è quando l'utente già vede la pagina ma il JavaScript che gestisce le interazioni non è ancora caricato: i click e gli altri eventi andrebbero persi. L'**[[glossario#event-replay|Event Replay]]** lo evita: un piccolo script incluso nell'HTML server-rendered si carica con la risposta iniziale e **registra** le interazioni (click, input nei form, ecc.) avvenute prima del termine dell'hydration. Quando l'app è interattiva, Angular **rigioca** gli eventi registrati, così nulla va perso.
 
 Si abilita passando `withEventReplay()` a `provideClientHydration`, come nel listato di `app.config.ts` sopra.
 
@@ -175,9 +175,9 @@ Si abilita passando `withEventReplay()` a `provideClientHydration`, come nel lis
 ### Different Implementations for Server and Client
 > 📖 pp.428-430
 
-SSR e hydration fanno girare lo **stesso codice Angular in due ambienti molto diversi**: sul server al render iniziale e nel browser dopo il boot. Alcune API (`window`, `document`, `navigator`) esistono solo nel browser; il codice server spesso ha bisogno di dati specifici della richiesta.
+SSR e hydration fanno girare lo **stesso codice Angular in due ambienti molto diversi**: sul server al render iniziale e nel browser dopo il boot (l'avvio dell'app lato client). Alcune API (`window`, `document`, `navigator`) esistono solo nel browser; il codice server spesso ha bisogno di dati specifici della richiesta.
 
-**Via DI** — quando un servizio ha responsabilità diverse su server e client, si forniscono **implementazioni diverse**. Es. un `LanguageDetector` che rileva la lingua dell'utente: sul server legge l'header `Accept-Language` dalla richiesta HTTP, sul client legge `navigator.language`.
+**Via [[glossario#dependency-injection-di|DI]]** (dependency injection: Angular fornisce le dipendenze al posto tuo) — quando un servizio ha responsabilità diverse su server e client, si forniscono **implementazioni diverse**. Es. un `LanguageDetector` che rileva la lingua dell'utente: sul server legge l'header `Accept-Language` dalla richiesta HTTP, sul client legge `navigator.language`.
 
 ```ts
 // src/app/domains/shared/util-common/language.ts
@@ -203,7 +203,7 @@ export class ClientLanguageDetector implements LanguageDetector {
 }
 ```
 
-Entrambe le implementazioni sono decorate con `@Service({ autoProvided: false })`: sono **iniettabili ma non registrate** globalmente. È la configurazione applicativa platform-specific a decidere quale usare. L'implementazione server si registra in `app.config.server.ts` (eseguito solo lato server); quella client in `app.config.ts`.
+Entrambe le implementazioni sono decorate con `@Service({ autoProvided: false })`: sono **iniettabili ma non registrate** globalmente (Angular sa costruirle, ma non le rende disponibili ovunque da solo: le fornisci tu dove servono). È la configurazione applicativa platform-specific (diversa a seconda dell'ambiente, server o browser) a decidere quale usare. L'implementazione server si registra in `app.config.server.ts` (eseguito solo lato server); quella client in `app.config.ts`.
 
 > [!info] Angular 22+
 > `@Service({ autoProvided: false })` dichiara un service iniettabile ma **non** auto-registrato nello scope root: lo fornisci tu dove serve. Equivale al vecchio `@Injectable()` *senza* `providedIn: 'root'`. Vedi [[service]].
@@ -238,7 +238,7 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
-**Controllo della piattaforma a runtime** — se solo una piccola parte è platform-specific, conviene ramificare a runtime con gli helper `isPlatformBrowser` / `isPlatformServer` sul token `PLATFORM_ID`.
+**Controllo della piattaforma a runtime** — se solo una piccola parte è platform-specific, conviene ramificare a runtime (decidere con un `if`, mentre l'app gira, se sei su server o browser) con gli helper `isPlatformBrowser` / `isPlatformServer` sul token `PLATFORM_ID`.
 
 ```ts
 // src/app/app.ts
@@ -267,7 +267,7 @@ Collegamenti: [[inject]] · [[providers]] · l'[[injection-context]] e i provide
 ## Hybrid Routing
 > 📖 pp.430-432
 
-Non tutte le route traggono lo stesso beneficio dall'SSR: una landing o lista prodotti pubblica sì, una route di back-office dietro login forse non giustifica il costo, una pagina "About" quasi statica è ottima per il **prerendering** a build time. L'**hybrid routing** lo permette: una config di route **lato server** sceglie il *render mode* per ogni route. Oltre alla normale routing config, l'app definisce le `serverRoutes` e le passa alla config server.
+Non tutte le route traggono lo stesso beneficio dall'SSR: una landing o lista prodotti pubblica sì, una route di back-office (le pagine gestionali interne) dietro login forse non giustifica il costo, una pagina "About" quasi statica è ottima per il **prerendering** a build time (l'HTML viene generato una volta sola in fase di compilazione, non a ogni richiesta). L'**hybrid routing** lo permette: una config di route **lato server** sceglie il *render mode* (la modalità con cui ogni route viene resa: sul client, prerenderizzata o sul server) per ogni route. Oltre alla normale routing config, l'app definisce le `serverRoutes` e le passa alla config server.
 
 ```ts
 // src/app/app.config.server.ts
@@ -289,7 +289,7 @@ const serverConfig: ApplicationConfig = {
 export const config = mergeApplicationConfig(appConfig, serverConfig);
 ```
 
-Le decisioni per-route vivono in `app.routes.server.ts`: ogni entry assegna un `renderMode` a un path; la catch-all `path: '**'` copre tutto ciò che non è elencato esplicitamente.
+Le decisioni per-route vivono in `app.routes.server.ts`: ogni entry assegna un `renderMode` a un path; la catch-all `path: '**'` (la regola "acchiappa-tutto", che fa da default) copre tutto ciò che non è elencato esplicitamente.
 
 ```ts
 // src/app/app.routes.server.ts
@@ -379,7 +379,7 @@ Per la **response** si possono impostare header e status **dichiarativamente** n
 > [!tip]
 > L'hybrid routing dà il meglio combinato con `@defer` + incremental hydration: anche su route server-rendered le regioni non critiche restano fuori dal bundle iniziale e diventano interattive solo quando l'utente le richiede.
 
-Collegamenti: [[inject]] · [[12-initialization-route-changes|cap.12]] (resolver/interceptor lato HTTP).
+Collegamenti: [[inject]] · [[12-initialization-route-changes|cap.12]] ([[glossario#resolver|resolver]]/[[glossario#interceptor-httpinterceptor|interceptor]] lato HTTP).
 
 ## 🔁 Ripasso lampo
 
