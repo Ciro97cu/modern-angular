@@ -48,4 +48,5 @@
   - [lightweight store](/concetti/lightweight-store.md)
 
 - **🛠️ Meta**
+  - [📖 Glossario](/_meta/glossario.md)
   - [Convenzioni del vault](/_meta/conventions.md)

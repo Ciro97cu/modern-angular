@@ -25,11 +25,16 @@
         // converte i wikilink
         return content.replace(/\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]/g, function (_, target, label) {
           target = target.trim();
-          var text = (label || target).trim();
+          var anchor = '';
+          var hashIdx = target.indexOf('#');
+          if (hashIdx >= 0) { anchor = target.slice(hashIdx + 1).trim(); target = target.slice(0, hashIdx).trim(); }
+          var text = (label || (anchor || target)).trim();
+          var q = anchor ? '?id=' + anchor : '';
           var path;
-          if (/^\d{2}-/.test(target)) path = '/capitoli/' + target + '.md';
+          if (target === 'glossario') path = '/_meta/glossario.md' + q;
+          else if (/^\d{2}-/.test(target)) path = '/capitoli/' + target + '.md' + q;
           else if (target === '00-index') path = '/00-index.md';
-          else path = '/concetti/' + target + '.md';
+          else path = '/concetti/' + target + '.md' + q;
           return '[' + text + '](' + path + ')';
         });
       });
